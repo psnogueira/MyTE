@@ -21,8 +21,10 @@ namespace MyTE_grupo05.Models
         [Required(ErrorMessage = "Nível de acesso é obrigatório.")]
         [ForeignKey(nameof(AccessLevel))]
         public int LevelId { get; set; }
-        public AccessLevel accessLevel { get; set; }
+        public AccessLevel AccessLevel { get; set; }
 
+        // Relacionamento com Tabela de Departamentos
+        // Um Funcionário pode estar em apenas um departamento.
         [Required(ErrorMessage = "Departamento é obrigatório.")]
         [ForeignKey(nameof(Department))]
         public int DepartmentId { get; set; }
