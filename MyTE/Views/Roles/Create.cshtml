@@ -1,0 +1,22 @@
+﻿@using Microsoft.AspNetCore.Identity
+@model IdentityRole
+
+<div class="row">
+    <div class="col-md-6">
+        <form method="post">
+            <h5>Criar novo Nível de Acesso</h5>
+            <hr />
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-floating">
+                <input asp-for="Name" class="form-control" aria-required="true" />
+                <label asp-for="Name"></label>
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="row">
+                <button type="submit" class="btn btn-primary">Salvar</button>
+            </div>
+        </form>
+    </div>
+
+
+</div>
