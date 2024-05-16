@@ -3,9 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.9.34728.123
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyTE_grupo05", "MyTE_grupo05\MyTE_grupo05.csproj", "{A8CBF55D-AC1D-4CA9-94A0-81921EE9A85E}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyTE", "MyTE\MyTE.csproj", "{1F8395C3-43BC-4B97-A7F2-E8C7905C6045}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyTE", "MyTE\MyTE.csproj", "{1F8395C3-43BC-4B97-A7F2-E8C7905C6045}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -13,10 +11,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{A8CBF55D-AC1D-4CA9-94A0-81921EE9A85E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A8CBF55D-AC1D-4CA9-94A0-81921EE9A85E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A8CBF55D-AC1D-4CA9-94A0-81921EE9A85E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A8CBF55D-AC1D-4CA9-94A0-81921EE9A85E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{1F8395C3-43BC-4B97-A7F2-E8C7905C6045}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{1F8395C3-43BC-4B97-A7F2-E8C7905C6045}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1F8395C3-43BC-4B97-A7F2-E8C7905C6045}.Release|Any CPU.ActiveCfg = Release|Any CPU

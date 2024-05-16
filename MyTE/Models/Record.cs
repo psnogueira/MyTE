@@ -1,4 +1,4 @@
-﻿namespace MyTE_grupo05.Models
+﻿namespace MyTE.Models
 {
     public class Record
     {
