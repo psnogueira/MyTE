@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 
-namespace MyTE_grupo05.Models
+namespace MyTE.Models
 {
     public class Employee
     {
@@ -10,7 +10,7 @@ namespace MyTE_grupo05.Models
 
         [Required(ErrorMessage = "Nome do funcionário é obrigatório.")]
         [StringLength(100, ErrorMessage = "Nome do funcionário deve ter no máximo 100 caracteres.")]
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         [Required(ErrorMessage = "Data de contratação é obrigatória.")]
         [DataType(DataType.Date, ErrorMessage = "Data de contratação deve ser uma data válida.")]
@@ -30,6 +30,6 @@ namespace MyTE_grupo05.Models
         [Required(ErrorMessage = "Departamento é obrigatório.")]
         [ForeignKey(nameof(Department))]
         public int DepartmentId { get; set; }
-        public Department Department { get; set; }
+        public Department? Department { get; set; }
     }
 }

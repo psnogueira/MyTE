@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using MyTE_grupo05.Models.Enum;
+using MyTE.Models.Enum;
 
-namespace MyTE_grupo05.Models
+namespace MyTE.Models
 {
     public class WBS
     {
@@ -16,7 +16,7 @@ namespace MyTE_grupo05.Models
         [StringLength(255, ErrorMessage = "Descrição da WBS deve ter no máximo 255 caracteres.")]
         public string Desc { get; set; }
 
-        [Required(ErrorMessage = "O tipo da WBS é obrigatório.")]
+
         public WBSType Type { get; set; }
     }
 }
