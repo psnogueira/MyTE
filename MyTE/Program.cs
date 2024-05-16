@@ -35,6 +35,9 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+// Adicionar autenticação e autorização para as páginas.
+app.UseAuthentication();
+
 app.UseAuthorization();
 
 app.MapControllerRoute(

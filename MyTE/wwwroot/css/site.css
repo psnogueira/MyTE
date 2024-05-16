@@ -20,3 +20,8 @@ html {
 body {
   margin-bottom: 60px;
 }
+
+btn-orange {
+    background-color: #ff6600;
+    color: white;
+}
