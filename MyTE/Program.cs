@@ -16,6 +16,10 @@ builder.Services.AddIdentity<IdentityUser, IdentityRole>(options => options.Sign
     .AddDefaultTokenProviders();
 builder.Services.AddControllersWithViews();
 
+builder.Services.AddControllersWithViews().AddRazorPagesOptions(options => {
+    options.Conventions.AddAreaPageRoute("Identity", "/Account/Login", "");
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
