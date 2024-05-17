@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace MyTE_grupo05.Models
+namespace MyTE.Models
 {
     public class Department
     {
@@ -9,10 +9,10 @@ namespace MyTE_grupo05.Models
 
         [Required(ErrorMessage = "Nome do departamento é obrigatório.")]
         [StringLength(100, ErrorMessage = "Nome do departamento deve ter no máximo 100 caracteres.")]
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         // Relacionamento com Tabela de Funcionarios
         // Um departamento pode ter vários Funcionários.
-        public ICollection<Employee> Employees { get; set; }
+        public virtual ICollection<Employee>? Employees { get; set; }
     }
 }
