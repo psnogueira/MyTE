@@ -1,38 +1,58 @@
 ﻿@using Microsoft.AspNetCore.Identity
 @model IEnumerable<IdentityRole>
+
 @{
-    ViewData["Title"] = "Roles";
+    ViewData["Title"] = "Role";
+    Layout = "~/Views/Shared/_LayoutRegister.cshtml";
 }
 
+<div class="container mt-3">
+    <h1 class="fw-bold display-2 text-white mb-3">@ViewData["Title"]</h1>
+    <div class="d-flex align-items-center justify-content-between my-3">
+        <form asp-action="Index" method="get">
+            <div class="form-actions input-group">
+                <input type="text" class="form-control col-3" name="SearchString" value="@ViewData["CurrentFilter"]" placeholder="Código ou descrição" />
+                <input class="btn btn-outline-primary" type="submit" value="Procurar" />
+                <a class="btn btn-outline-primary align-content-center" asp-action="Index">Lista completa</a>
+            </div>
+        </form>
+        <a asp-action="Create" class="btn btn-secondary text-white"><i class="bi bi-plus-lg"></i> Nova Role</a>
+    </div>
+</div>
 
-<h1>Níveis de Acesso (Roles)</h1>
+<img class="position-absolute object-fit-cover w-100 h-50 top-0 z-n1" src="~/img/art.jpg" alt="Arte ilustrativa" />
 
-<p>
-    <a asp-action="Create">Criar novo Nível de Acesso</a>
-</p>
-
-<table class="table table-bordered">
-    <thead>
-        <tr>
-            <th>@Html.DisplayNameFor(model => model.Id)</th>
-            <th>@Html.DisplayNameFor(model => model.Name)</th>
-            <th>@Html.DisplayNameFor(model => model.NormalizedName)</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach(var item in Model)
-        {
+<div class="bg-white  container rounded table-responsive">
+    <table class="table text-center align-middle">
+        <thead>
             <tr>
-                <td>@Html.DisplayFor(modelitem => item.Id)</td>
-                <td>@Html.DisplayFor(modelitem => item.Name)</td>
-                <td>@Html.DisplayFor(modelitem => item.NormalizedName)</td>
-                <td>
-                    <a class="btn btn-sm btn-warning"><i class="bi bi-pencil-fill"></i>  Editar</a>
-                    <a class="btn btn-sm btn-primary"><i class="bi bi-pencil-fill"></i>  Detalhes</a>
-                    <a class="btn btn-sm btn-danger"><i class="bi bi-pencil-fill"></i>  Deletar</a>
-                </td>
+                <th class="col-2">
+                    @Html.DisplayNameFor(model => model.Id)
+                </th>
+                <th class="col-4">
+                    @Html.DisplayNameFor(model => model.Name)
+                </th>
+
+                <th class="col-2">Ações</th>
             </tr>
-        }
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Id)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Name)
+                    </td>
+                    <td>
+                        <a class="text-primary fs-5" asp-action="Edit" asp-route-id="@item.Id"><i class="bi bi-pen"></i></a>
+                        <a class="text-primary fs-5 mx-2" asp-action="Details" asp-route-id="@item.Id"><i class="bi bi-info-circle"></i></a>
+                        <a class="text-primary fs-5" asp-action="Delete" asp-route-id="@item.Id"><i class="bi bi-trash3"></i></a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
