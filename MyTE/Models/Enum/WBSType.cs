@@ -1,8 +1,8 @@
-﻿namespace MyTE_grupo05.Models.Enum
+﻿namespace MyTE.Models.Enum
 {
     public enum WBSType
     {
-        Chargeability,
-        NonChargeability
+        Chargeability = 1,
+        NonChargeability = 2
     }
 }

@@ -11,9 +11,17 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddIdentity<IdentityUser, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = true)
+    .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultUI()
     .AddDefaultTokenProviders();
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("RequerPerfilAdmin",
+        policy => policy.RequireRole("admin"));
+});
+
 builder.Services.AddControllersWithViews();
 
 builder.Services.AddControllersWithViews().AddRazorPagesOptions(options => {
@@ -49,5 +57,19 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.MapRazorPages();
+
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try
+    {
+        DbInitializer.Initialize(services).Wait();
+    }
+    catch (Exception ex)
+    {
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "An error occurred while seeding the database.");
+    }
+}
 
 app.Run();
