@@ -11,14 +11,6 @@
     --primary-100: var(--violet-100);
     --primary-50: var(--violet-50);
 }*/
-.form-control {
-  border-radius: 0.8rem !important;
-}
-
-.btn {
-  border-radius: 0.8rem !important;
-}
-
 /*!
  * Bootstrap  v5.3.3 (https://getbootstrap.com/)
  * Copyright 2011-2024 The Bootstrap Authors
