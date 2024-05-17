@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using MyTE.Models;
 
 namespace MyTE.Data
 {
@@ -15,7 +16,7 @@ namespace MyTE.Data
                 .GetRequiredService<RoleManager<IdentityRole>>();
 
             var userManager = serviceProvider
-                .GetRequiredService<UserManager<IdentityUser>>();
+                .GetRequiredService<UserManager<ApplicationUser>>();
 
             var config = serviceProvider
                 .GetRequiredService<IConfiguration>();
@@ -34,7 +35,7 @@ namespace MyTE.Data
 
             if (admin == null)
             {
-                admin = new IdentityUser { UserName = adminEmail, Email = adminEmail, EmailConfirmed = true };
+                admin = new ApplicationUser { UserName = adminEmail, Email = adminEmail, EmailConfirmed = true };
                 var result = await userManager.CreateAsync(admin, adminPassword);
 
                 if (result.Succeeded)
