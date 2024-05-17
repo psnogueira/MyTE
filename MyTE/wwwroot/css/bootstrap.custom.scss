@@ -16,8 +16,12 @@ $secondary: #7096D1;
 
 @import "../lib/bootstrap/scss/bootstrap";
 
-form-label {
-    color: $secondary;
+.h-30{
+    height: 30%;
+}
+
+.rotate-90 {
+    transform: rotate(90deg);
 }
 
 .img-end {

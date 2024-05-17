@@ -11906,8 +11906,12 @@ textarea.form-control-lg {
     display: none !important;
   }
 }
-form-label {
-  color: #7096D1;
+.h-30 {
+  height: 30%;
+}
+
+.rotate-90 {
+  transform: rotate(90deg);
 }
 
 .img-end {

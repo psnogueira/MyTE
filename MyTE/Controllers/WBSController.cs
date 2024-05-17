@@ -20,9 +20,18 @@ namespace MyTE.Controllers
         }
 
         // GET: WBS
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string searchString)
         {
-            return View(await _context.WBS.ToListAsync());
+            ViewData["CurrentFilter"] = searchString;
+            var wbs = from s in _context.WBS
+                           select s;
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                wbs = wbs.Where(s => s.Code.Contains(searchString)
+                                       || s.Desc.Contains(searchString));
+            }
+
+            return View(await wbs.ToListAsync());
         }
 
         // GET: WBS/Details/5
