@@ -22,13 +22,14 @@ namespace MyTE.Models
         public DateTime HiringDate { get; set; }
 
         [Required(ErrorMessage = "O código PID do funcionário é obrigatório.")]
-        [DataType(DataType.Date)]
-        [Display(Name = "Data de Contratação")]
+        [StringLength(11, MinimumLength = 11, ErrorMessage = "O PID do funcionário tem apenas 11 caracteres")]
         public string? PID { get; set; }
 
         [Required(ErrorMessage = "O departamento é obrigatório.")]
         [ForeignKey("Department")]
+        [Display(Name = "Departamento")]
         public int DepartmentId { get; set; }
+
         public virtual Department? Department { get; set; }
 
     }
