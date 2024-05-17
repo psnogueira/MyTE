@@ -12,6 +12,5 @@ namespace MyTE.Data
         }
         public DbSet<MyTE.Models.Department> Department { get; set; } = default!;
         public DbSet<MyTE.Models.WBS> WBS { get; set; } = default!;
-        public DbSet<MyTE.Models.Employee> Employee { get; set; } = default!;
     }
 }
