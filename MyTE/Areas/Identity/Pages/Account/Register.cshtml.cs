@@ -1,33 +1,20 @@
-﻿// Licensed to the .NET Foundation under one or more agreements.
-// The .NET Foundation licenses this file to you under the MIT license.
-#nullable disable
+﻿#nullable disable
 
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
 using System.Text;
 using System.Text.Encodings.Web;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.WebUtilities;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using MyTE.Data;
-using MyTE.Data.Migrations;
 using MyTE.Models;
 
 namespace MyTE.Areas.Identity.Pages.Account
 {
-    //[Authorize(Roles = "admin")]
     public class RegisterModel : PageModel
     {
         private readonly SignInManager<ApplicationUser> _signInManager;
@@ -37,8 +24,6 @@ namespace MyTE.Areas.Identity.Pages.Account
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
         private readonly RoleManager<IdentityRole> _roleManager;
-
-        // Traz o contexto do banco de dados para cá para que seja possível acessá-lo e obter os departamentos existentes na hora de cadastrar o usuário
         private readonly ApplicationDbContext _context;
 
         public RegisterModel(
@@ -48,7 +33,6 @@ namespace MyTE.Areas.Identity.Pages.Account
             ILogger<RegisterModel> logger,
             IEmailSender emailSender,
             RoleManager<IdentityRole> roleManager,
-            // Traz contexto do banco de dados
             ApplicationDbContext context)
         {
             _userManager = userManager;
@@ -58,58 +42,28 @@ namespace MyTE.Areas.Identity.Pages.Account
             _logger = logger;
             _emailSender = emailSender;
             _roleManager = roleManager;
-            // Traz contexto do banco de dados
             _context = context;
         }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         [BindProperty]
         public InputModel Input { get; set; }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         public string ReturnUrl { get; set; }
-
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         public IList<AuthenticationScheme> ExternalLogins { get; set; }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         public class InputModel
         {
-            /// <summary>
-            ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-            ///     directly from your code. This API may change or be removed in future releases.
-            /// </summary>
             [Required]
             [EmailAddress]
             [Display(Name = "Email")]
             public string Email { get; set; }
 
-            /// <summary>
-            ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-            ///     directly from your code. This API may change or be removed in future releases.
-            /// </summary>
             [Required]
             [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
             [DataType(DataType.Password)]
             [Display(Name = "Password")]
             public string Password { get; set; }
 
-            /// <summary>
-            ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-            ///     directly from your code. This API may change or be removed in future releases.
-            /// </summary>
             [DataType(DataType.Password)]
             [Display(Name = "Confirm password")]
             [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
@@ -139,7 +93,7 @@ namespace MyTE.Areas.Identity.Pages.Account
             [Display(Name = "Departamento")]
             public int DepartmentId { get; set; }
 
-            public List<SelectListItem> Departments { get; set; }
+            public IEnumerable<SelectListItem> Departments { get; set; }
 
             [Display(Name = "Nível de Acesso")]
             public string Role { get; set; }
@@ -147,27 +101,30 @@ namespace MyTE.Areas.Identity.Pages.Account
             public IEnumerable<SelectListItem> RolesList { get; set; }
         }
 
-
         public async Task OnGetAsync(string returnUrl = null)
         {
             ReturnUrl = returnUrl;
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
 
             // Acrescenta a seleção de departamentos entre os existentes na tabela
-            var departments = await GetAllDepartmentsAsync();
-            Input = new InputModel
+            var departments = _context.Department.Select(d => new SelectListItem
             {
-                Departments = departments.Select(d => new SelectListItem { Value = d.DepartmentId.ToString(), Text = d.Name }).ToList()
-            };
+                Value = d.DepartmentId.ToString(),
+                Text = d.Name
+            }).ToList();
 
             // Acrescenta a seleção de Níveis de acesso
+            var roles = _roleManager.Roles.Select(x => x.Name).Select(i => new SelectListItem
+            {
+                Text = i,
+                Value = i
+            }).ToList();
+
+            // Ajuste no InputModel para incluir a lista de departamentos e roles
             Input = new InputModel
             {
-                RolesList = _roleManager.Roles.Select(x => x.Name).Select(i => new SelectListItem
-                {
-                    Text = i,
-                    Value = i
-                })
+                Departments = departments,
+                RolesList = roles
             };
         }
 
@@ -175,19 +132,38 @@ namespace MyTE.Areas.Identity.Pages.Account
         {
             returnUrl ??= Url.Content("~/");
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser { UserName = Input.Email, Email = Input.Email, FirstName = Input.FirstName, LastName = Input.LastName, HiringDate = Input.HiringDate, PID = Input.PID, DepartmentId = Input.DepartmentId };
+                var user = new ApplicationUser
+                {
+                    UserName = Input.Email,
+                    Email = Input.Email,
+                    FirstName = Input.FirstName,
+                    LastName = Input.LastName,
+                    HiringDate = Input.HiringDate,
+                    PID = Input.PID,
+                    DepartmentId = Input.DepartmentId
+                };
 
-                await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
-                await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
                 var result = await _userManager.CreateAsync(user, Input.Password);
 
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User created a new account with password.");
 
-                    await _userManager.AddToRoleAsync(user, Input.Role);
+                    // Verifica se um role foi selecionado e adiciona o usuário a este role
+                    if (!string.IsNullOrEmpty(Input.Role))
+                    {
+                        var roleResult = await _userManager.AddToRoleAsync(user, Input.Role);
+                        if (!roleResult.Succeeded)
+                        {
+                            foreach (var error in roleResult.Errors)
+                            {
+                                ModelState.AddModelError(string.Empty, error.Description);
+                            }
+                        }
+                    }
 
                     var userId = await _userManager.GetUserIdAsync(user);
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
@@ -217,7 +193,23 @@ namespace MyTE.Areas.Identity.Pages.Account
                 }
             }
 
-            // If we got this far, something failed, redisplay form
+            // Se algo falhar, redisplay do formulário
+            var departments = _context.Department.Select(d => new SelectListItem
+            {
+                Value = d.DepartmentId.ToString(),
+                Text = d.Name
+            }).ToList();
+
+            var roles = _roleManager.Roles.Select(x => x.Name).Select(i => new SelectListItem
+            {
+                Text = i,
+                Value = i
+            }).ToList();
+
+            // Certifica-se de que as listas de departamentos e roles são recarregadas
+            Input.Departments = departments;
+            Input.RolesList = roles;
+
             return Page();
         }
 
@@ -242,14 +234,6 @@ namespace MyTE.Areas.Identity.Pages.Account
                 throw new NotSupportedException("The default UI requires a user store with email support.");
             }
             return (IUserEmailStore<ApplicationUser>)_userStore;
-        }
-
-        private async Task<List<Department>> GetAllDepartmentsAsync()
-        {
-            // Acessa o contexto do banco de dados para recuperar todos os departamentos
-            var departments = await _context.Department.ToListAsync();
-
-            return departments;
         }
     }
 }

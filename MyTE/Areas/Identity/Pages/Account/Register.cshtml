@@ -14,17 +14,17 @@
             <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
             <div class="form-floating mb-3">
                 <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
-                <label asp-for="Input.Email">Email</label>
+                <label asp-for="Input.Email">E-mail</label>
                 <span asp-validation-for="Input.Email" class="text-danger"></span>
             </div>
             <div class="form-floating mb-3">
                 <input asp-for="Input.Password" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password" />
-                <label asp-for="Input.Password">Password</label>
+                <label asp-for="Input.Password">Senha</label>
                 <span asp-validation-for="Input.Password" class="text-danger"></span>
             </div>
             <div class="form-floating mb-3">
                 <input asp-for="Input.ConfirmPassword" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password" />
-                <label asp-for="Input.ConfirmPassword">Confirm Password</label>
+                <label asp-for="Input.ConfirmPassword">Confirmar a senha</label>
                 <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
             </div>
 
@@ -47,13 +47,6 @@
                 <span asp-validation-for="Input.HiringDate" class="text-danger"></span>
             </div>
 
-            @* <div class="form-group">
-                <label asp-for="Input.DepartmentId"></label>
-                <select asp-for="Input.DepartmentId" class="form-control" asp-items="@Model.Input.Departments">
-                    <option value="">Selecione o departamento do funcionário</option>
-                </select>
-            </div> *@
-
             <div class="form-floating mb-3">
                 <select asp-for="Input.DepartmentId" class="form-select" asp-items="@Model.Input.Departments" aria-required="true">
                     <option disabled selected>Selecione o departamento do funcionário</option>
@@ -61,13 +54,13 @@
                 <span asp-validation-for="Input.DepartmentId" class="text-danger"></span>
             </div>
 
-            @* Nível de acesso *@ 
             <div class="form-floating mb-3">
                 <select asp-for="Input.Role" class="form-select" asp-items="@Model.Input.RolesList" aria-required="true" >
                     <option disabled selected>Selecione o Nível de Acesso</option>
                 </select>
                 <span asp-validation-for="Input.Role" class="text-danger"></span>
             </div>
+
             <button id="registerSubmit" type="submit" class="w-100 btn btn-lg btn-primary">Cadastrar</button>
         </form>
     </div>
