@@ -48,6 +48,12 @@
             </div>
 
             <div class="form-floating mb-3">
+                <input asp-for="Input.PID" class="form-control" aria-required="true" placeholder="PID" />
+                <label asp-for="Input.PID">PID</label>
+                <span asp-validation-for="Input.PID" class="text-danger"></span>
+            </div>
+
+            <div class="form-floating mb-3">
                 <select asp-for="Input.DepartmentId" class="form-select" asp-items="@Model.Input.Departments" aria-required="true">
                     <option disabled selected>Selecione o departamento do funcionário</option>
                 </select>
