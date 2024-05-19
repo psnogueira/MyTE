@@ -1,5 +1,43 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@using Microsoft.AspNetCore.Identity
+@model IdentityRole
+
 @{
+    ViewData["Title"] = "Informações";
+    Layout = "~/Views/Shared/_LayoutRegister.cshtml";
 }
+
+<div class="container mt-3">
+    <h1 class="fw-bold display-2 text-white mb-3">@ViewData["Title"]</h1>
+    <h4 class="fw-bold display-4 text-white mb-3">Role: @Model.Name</h4>
+</div>
+
+<img class="position-absolute object-fit-cover w-100 h-50 top-0 z-n1" src="~/img/art.jpg" alt="Arte ilustrativa" />
+
+<div class="bg-white container rounded table-responsive p-4">
+    <table class="table col-2 text-center align-middle">
+        <thead>
+            <tr>
+                <th class="col-6 text-end">
+                    @Html.DisplayNameFor(model => model.Id)
+                </th>
+                <th class="col-6 text-start">
+                    @Html.DisplayNameFor(model => model.Name)
+                </th>                
+            </tr>
+        </thead>
+        <tbody>
+                <tr>
+                <td class="text-end">
+                        @Model.Id
+                    </td>
+                <td class ="col-6 text-start">
+                        @Model.Name
+                    </td>
+                </tr>
+        </tbody>
+    </table>
+    <div class="form-group d-flex justify-content-between">
+        <a class="btn btn-secondary text-white w-25" asp-action="Index">Voltar</a>
+        <a asp-action="Edit" class="btn btn-primary w-25" asp-route-id="@Model.Id">Editar</a>
+    </div>
+</div>
