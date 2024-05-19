@@ -6,16 +6,29 @@
     Layout = "~/Views/Shared/_LayoutRegister.cshtml";
 }
 
+
+
 <div class="container mt-3">
     <h1 class="fw-bold display-2 text-white mb-3">@ViewData["Title"]</h1>
     <div class="d-flex align-items-center justify-content-between my-3">
+
+
         <form asp-action="Index" method="get">
             <div class="form-actions input-group">
-                <input type="text" class="form-control col-3" name="SearchString" value="@ViewData["CurrentFilter"]" placeholder="Código ou descrição" />
+                <input type="text" class="form-control col-3" id="roleName" name="SearchString" value="@ViewData["CurrentFilter"]" placeholder="Id ou nome" />
                 <input class="btn btn-outline-primary" type="submit" value="Procurar" />
+                <div class="input-group-append">
+
                 <a class="btn btn-outline-primary align-content-center" asp-action="Index">Lista completa</a>
+                </div>
             </div>
         </form>
+
+
+
+
+
+
         <a asp-action="Create" class="btn btn-secondary text-white"><i class="bi bi-plus-lg"></i> Nova Role</a>
     </div>
 </div>
@@ -56,3 +69,15 @@
         </tbody>
     </table>
 </div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $("#roleName").autocomplete({
+                source: '@Url.Action("AutoComplete", "Roles")',
+                minlenght: 2
+            })
+        })
+    </script>
+
+}
