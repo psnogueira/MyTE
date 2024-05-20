@@ -6,7 +6,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using MyTE.Data;
+using MyTE.Data.Migrations;
 using MyTE.Models;
+using MyTE.Models.ViewModel;
+using MyTE.Pagination;
 
 namespace MyTE.Controllers
 {
@@ -20,9 +23,26 @@ namespace MyTE.Controllers
         }
 
         // GET: Departments
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string searchString, int? pageNumber)
         {
-            return View(await _context.Department.ToListAsync());
+            int pageSize = 7;
+            ViewData["CurrentFilter"] = searchString;
+            var department = from s in _context.Department
+                      select s;
+
+            if (!String.IsNullOrEmpty(searchString))
+            {
+
+                department = department.Where(s => s.Name.Contains(searchString));
+            }
+
+            var viewModel = new DepartmentViewModel
+            {
+                DepartmentList = await PaginatedList<Department>.CreateAsync(department.AsNoTracking(), pageNumber ?? 1, pageSize),
+                Department = new Department(),
+                CurrentFilter = searchString
+            };
+            return View(viewModel);
         }
 
         // GET: Departments/Details/5

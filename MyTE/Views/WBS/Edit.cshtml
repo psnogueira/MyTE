@@ -4,41 +4,45 @@
     ViewData["Title"] = "Edit";
 }
 
-<h1>Edit</h1>
-
-<h4>WBS</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
+<div class="d-flex justify-content-between align-items-center position-relative">
+    <div class="col-md-5 d-flex flex-column justify-content-evenly ">
+        <a class="position-absolute top-0 mt-2 start-0 d-flex align-items-center gap-1 text-primary fs-5 text-decoration-none" asp-action="Index">
+            <i class="bi bi-arrow-left-short fs-3"></i>Voltar
+        </a>
+        <h1 class="mb-3 text-primary fw-bold">Editar WBS</h1>
         <form asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="WBSId" />
-            <div class="form-group">
-                <label asp-for="Code" class="control-label"></label>
-                <input asp-for="Code" class="form-control" />
+            <div class="form-floating mb-3">
+                <input asp-for="Code" class="form-control" placeholder="code" />
+                <label asp-for="Code" class="form-label text-secondary"></label>
                 <span asp-validation-for="Code" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="Desc" class="control-label"></label>
-                <input asp-for="Desc" class="form-control" />
+            <div class="form-floating mb-3">
+                <input asp-for="Desc" class="form-control" placeholder="desc" />
+                <label asp-for="Desc" class="form-label text-secondary"></label>
                 <span asp-validation-for="Desc" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="Type" class="control-label"></label>
-                <select asp-for="Type" class="form-control"></select>
+            <div class="form-floating mb-3">
+                <select asp-for="Type" class="form-control">
+                    <option value="1">Chargable</option>
+                    <option value="2">Non-Chargable</option>
+                </select>
+                <label asp-for="Type" class="form-label text-secondary"></label>
                 <span asp-validation-for="Type" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
+                <input type="submit" value="Salvar" class="btn btn-primary btn-lg w-100 fw-bold" />
             </div>
         </form>
     </div>
-</div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
+    <div class="col-md-6">
+        <img class=" w-100" src="~/img/artSq.jpg" alt="Arte decorativa" />
+    </div>
 </div>
-
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

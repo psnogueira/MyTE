@@ -16,8 +16,12 @@ $secondary: #7096D1;
 
 @import "../lib/bootstrap/scss/bootstrap";
 
-.h-30{
-    height: 30%;
+.bg-violet {
+    background: #EDF1F6;
+}
+
+.w-50px{
+    width: 30rem;
 }
 
 .rotate-90 {
@@ -44,8 +48,26 @@ $secondary: #7096D1;
     text-decoration: none;
 }
 
+.logo-sm {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: $primary;
+    font-weight: 700;
+    font-size: 20px;
+    text-decoration: none;
+}
+
+.logo-sm:hover{
+    color: $primary;
+}
+
 .logo img {
     height: 35px;
+}
+
+.logo-sm img {
+    height: 30px;
 }
 
 .dvh-100 {

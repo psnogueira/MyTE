@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using MyTE.Data;
 using MyTE.Models;
+using MyTE.Models.ViewModel;
+using MyTE.Pagination;
 
 namespace MyTE.Controllers
 {
@@ -20,18 +22,26 @@ namespace MyTE.Controllers
         }
 
         // GET: WBS
-        public async Task<IActionResult> Index(string searchString)
+        public async Task<IActionResult> Index(string searchString, int? pageNumber)
         {
+            int pageSize = 7;
             ViewData["CurrentFilter"] = searchString;
             var wbs = from s in _context.WBS
                            select s;
-            if (!String.IsNullOrEmpty(searchString))
+
+            if (!string.IsNullOrEmpty(searchString))
             {
                 wbs = wbs.Where(s => s.Code.Contains(searchString)
                                        || s.Desc.Contains(searchString));
             }
 
-            return View(await wbs.ToListAsync());
+            var viewModel = new WBSViewModel
+            {
+                WBSList = await PaginatedList<WBS>.CreateAsync(wbs.AsNoTracking(), pageNumber ?? 1, pageSize),
+                WBS = new WBS(), // Inicialize um novo objeto WBS para o formulário
+                CurrentFilter = searchString
+            };
+            return View(viewModel);
         }
 
         // GET: WBS/Details/5

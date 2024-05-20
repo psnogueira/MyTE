@@ -6,7 +6,6 @@
     Layout = "~/Views/Shared/_LayoutLogin.cshtml";
 }
 
-
 <div class="d-flex justify-content-between align-items-center dvh-100">
     <div class="col-md-5 h-100 d-flex flex-column justify-content-between mx-auto">
         <h1 class="logo mt-5"><img src="~/img/logo.png" alt="Logo" /> MyTE</h1>
@@ -27,7 +26,8 @@
                 <div class="checkbox mb-3">
                     <label asp-for="Input.RememberMe" class="form-label">
                         <input class="form-check-input" asp-for="Input.RememberMe" />
-                        @Html.DisplayNameFor(m => m.Input.RememberMe)
+                        Lembre de mim
+                        @* @Html.DisplayNameFor(m => m.Input.RememberMe) *@
                     </label>
                 </div>
                 <div>
@@ -43,7 +43,7 @@
         </div>
     </div>
     <div class="col-md-6 h-100 overflow-hidden">
-        <img class="img-fluid img-login" src="~/img/art.jpg" alt="Arte ilustrativa" />
+        <img class="img-fluid img-login" src="~/img/Art.jpg" alt="Arte decorativa" />
     </div>
 </div>
 

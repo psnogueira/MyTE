@@ -7,6 +7,7 @@ namespace MyTE.Models
         [Key]
         public int DepartmentId { get; set; }
 
+        [Display(Name = "Nome")]
         [Required(ErrorMessage = "Nome do departamento é obrigatório.")]
         [StringLength(100, ErrorMessage = "Nome do departamento deve ter no máximo 100 caracteres.")]
         public string? Name { get; set; }

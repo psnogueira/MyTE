@@ -11906,8 +11906,12 @@ textarea.form-control-lg {
     display: none !important;
   }
 }
-.h-30 {
-  height: 30%;
+.bg-violet {
+  background: #EDF1F6;
+}
+
+.w-50px {
+  width: 30rem;
 }
 
 .rotate-90 {
@@ -11934,8 +11938,26 @@ textarea.form-control-lg {
   text-decoration: none;
 }
 
+.logo-sm {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #334EAC;
+  font-weight: 700;
+  font-size: 20px;
+  text-decoration: none;
+}
+
+.logo-sm:hover {
+  color: #334EAC;
+}
+
 .logo img {
   height: 35px;
+}
+
+.logo-sm img {
+  height: 30px;
 }
 
 .dvh-100 {
