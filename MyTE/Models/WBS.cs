@@ -1,5 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
-using MyTE.Models.Enum;
+﻿using MyTE.Models.Enum;
+using System.ComponentModel.DataAnnotations;
+
 
 namespace MyTE.Models
 {

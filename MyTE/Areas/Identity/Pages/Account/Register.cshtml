@@ -26,6 +26,7 @@
             <div class="row">
                 <div class="col form-floating mb-3">
                     @* Input data de contratação *@
+                 
                 </div>
                 <div class="col form-floating mb-3">
                     @* Input PID *@
@@ -34,6 +35,39 @@
             <div class="form-floating mb-3">
                 @* Input departamento *@
             </div>
+
+            @* Colunas inseridas na tabela de usuário*@
+            <div class="form-floating mb-3">
+                <input asp-for="Input.FirstName" class="form-control" aria-required="true" placeholder="Nome" />
+                <label asp-for="Input.FirstName">Nome</label>
+                <span asp-validation-for="Input.FirstName" class="text-danger"></span>
+            </div>
+
+            <div class="form-floating mb-3">
+                <input asp-for="Input.LastName" class="form-control" aria-required="true" placeholder="Sobrenome" />
+                <label asp-for="Input.LastName">Sobrenome</label>
+                <span asp-validation-for="Input.LastName" class="text-danger"></span>
+            </div>
+
+            <div class="form-floating mb-3">
+                <input asp-for="Input.HiringDate" type="date" class="form-control" aria-required="true" placeholder="dd/mm/aaaa" />
+                <label asp-for="Input.HiringDate">Data de contratação</label>
+                <span asp-validation-for="Input.HiringDate" class="text-danger"></span>
+            </div>
+
+            <div class="form-floating mb-3">
+                <input asp-for="Input.PID" class="form-control" aria-required="true" placeholder="PID" />
+                <label asp-for="Input.PID">PID</label>
+                <span asp-validation-for="Input.PID" class="text-danger"></span>
+            </div>
+
+            <div class="form-floating mb-3">
+                <select asp-for="Input.DepartmentId" class="form-select" asp-items="@Model.Input.Departments" aria-required="true">
+                    <option disabled selected>Selecione o departamento do funcionário</option>
+                </select>
+                <span asp-validation-for="Input.DepartmentId" class="text-danger"></span>
+            </div>
+
             <div class="form-floating mb-3">
                 <select asp-for="Input.Role" class="form-select" asp-items="@Model.Input.RolesList" aria-required="true">
                     <option disabled selected>------</option>
