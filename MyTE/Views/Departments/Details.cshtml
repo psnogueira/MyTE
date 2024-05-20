@@ -4,21 +4,23 @@
     ViewData["Title"] = "Details";
 }
 
-<h1>Details</h1>
-
-<div>
-    <h4>Department</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Name)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Name)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.DepartmentId">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+<div class="d-flex justify-content-between align-items-center position-relative">
+    <div class="col-md-5">
+        <a class="position-absolute top-0 mt-2 start-0 d-flex align-items-center gap-1 text-primary fs-5 text-decoration-none" asp-action="Index">
+            <i class="bi bi-arrow-left-short fs-3"></i>Voltar
+        </a>
+        <h1 class="mb-3 text-primary fw-bold">Detalhes do departamento</h1>
+        <dl class="row">
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Name)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Name)
+            </dd>
+        </dl>
+        <a class="btn btn-primary " asp-action="Edit" asp-route-id="@Model?.DepartmentId">Editar</a>
+    </div>
+    <div class="col-md-6">
+        <img class=" w-100" src="~/img/artSq.jpg" alt="Arte decorativa" />
+    </div>
 </div>

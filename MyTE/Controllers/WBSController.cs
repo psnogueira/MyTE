@@ -7,6 +7,9 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using MyTE.Data;
 using MyTE.Models;
+using MyTE.Models.Enum;
+using MyTE.Models.ViewModel;
+using MyTE.Pagination;
 
 namespace MyTE.Controllers
 {
@@ -20,9 +23,36 @@ namespace MyTE.Controllers
         }
 
         // GET: WBS
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string searchString, int? pageNumber, WBSType? wbsType)
         {
-            return View(await _context.WBS.ToListAsync());
+            int pageSize = 7;
+            ViewData["CurrentFilter"] = searchString;
+            var wbs = from s in _context.WBS
+                           select s;
+
+            IQueryable<WBSType> wbsQuery = from m in _context.WBS
+                                           orderby m.Type
+                                           select m.Type;
+
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                wbs = wbs.Where(s => s.Code.Contains(searchString)
+                                       || s.Desc.Contains(searchString));
+            }
+
+            if (wbsType.HasValue)
+            {
+                wbs = wbs.Where(x => x.Type == wbsType.Value);
+            }
+
+            var viewModel = new WBSViewModel
+            {
+                WBSList = await PaginatedList<WBS>.CreateAsync(wbs.AsNoTracking(), pageNumber ?? 1, pageSize),
+                Type = new SelectList(await wbsQuery.Distinct().ToListAsync()),
+                WBS = new WBS(),
+                CurrentFilter = searchString
+            };
+            return View(viewModel);
         }
 
         // GET: WBS/Details/5
@@ -152,6 +182,28 @@ namespace MyTE.Controllers
         private bool WBSExists(int id)
         {
             return _context.WBS.Any(e => e.WBSId == id);
+        }
+
+
+        [Produces("application/json")]
+        [HttpGet("search")]
+        public IActionResult AutoComplete()
+        {
+            try
+            {
+                string term = HttpContext.Request.Query["term"].ToString();
+                var wbsName = _context.WBS
+                    .Where(w => w.Code.Contains(term) || w.Desc.Contains(term))
+                    .Select(w => w.Code)
+                    .ToList();
+
+                return Ok(wbsName);
+
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
         }
     }
 }

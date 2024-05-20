@@ -27,6 +27,11 @@ builder.Services.AddAuthorization(options =>
 
 builder.Services.AddControllersWithViews();
 
+//builder.Services.AddControllersWithViews().AddRazorPagesOptions(options =>
+//{
+//    options.Conventions.AddAreaPageRoute("Identity", "/Account/Login", "");
+//});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
