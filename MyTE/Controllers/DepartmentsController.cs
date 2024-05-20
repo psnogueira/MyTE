@@ -154,13 +154,5 @@ namespace MyTE.Controllers
         {
             return _context.Department.Any(e => e.DepartmentId == id);
         }
-
-        private async Task<List<Department>> GetAllDepartmentsAsync()
-        {
-            // Acessa o contexto do banco de dados para recuperar todos os departamentos
-            var departments = await _context.Department.ToListAsync();
-
-            return departments;
-        }
     }
 }

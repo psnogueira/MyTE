@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿//Essa classe foi criada para subtituir a classe IdentityUser adicionando novas colunas para a tabela de usuários no banco de dados. Ela estende a classe IdentityUser. É a base para o cadastro de usuários, login e autenticação com Identity. 
+
+using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
