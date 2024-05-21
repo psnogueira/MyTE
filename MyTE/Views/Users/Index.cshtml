@@ -1,0 +1,200 @@
+﻿@using Microsoft.AspNetCore.Identity
+@model List<MyTE.Models.ViewModel.UserViewModel>
+
+@{
+    ViewData["Title"] = "Usuários";
+    Layout = "~/Views/Shared/_LayoutRegister.cshtml";
+}
+
+<div class="container mt-3">
+    <h1 class="fw-bold display-2 text-white mb-3">@ViewData["Title"]</h1>
+    <div class="d-flex align-items-center justify-content-between my-3">
+        <form asp-action="Index" method="get">
+            <div class="form-actions input-group">
+                <input type="text" class="form-control col-3" id="roleName" name="SearchString" value="@ViewData["CurrentFilter"]" placeholder="Nome ou usuário" />
+                <input class="btn btn-outline-primary" type="submit" value="Procurar" />
+                <div class="input-group-append">
+
+                    <a class="btn btn-outline-primary align-content-center" asp-action="Index">Lista completa</a>
+                </div>
+            </div>
+        </form>
+        <a asp-area="Identity" asp-page="/Account/Register" class="btn btn-secondary text-white"><i class="bi bi-plus-lg"></i> Novo Usuário</a>
+    </div>
+</div>
+
+<img class="position-absolute object-fit-cover w-100 h-50 top-0 z-n1" src="~/img/art.jpg" alt="Arte ilustrativa" />
+
+<div class="bg-white  container rounded table-responsive">
+    <table class="table mx-a text-center align-middle">
+        <thead>
+            <tr>
+                <th class="col-2">
+                    Nome Completo
+                </th>
+                <th class="col-2">
+                    Usuário/Email
+                </th>
+                <th class="col-2">
+                    Departamento
+                </th>
+                <th class="col-1">
+                    PID
+                </th>
+                <th class="col-2">
+                    Data de Contratação
+                </th>
+                <th class="col-1">
+                    Registros
+                </th>
+
+                <th class="col-2">Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var user in Model)
+            {
+                <tr>
+                    <td class="col-2">
+                        @user.FullName
+                    </td>
+                    <td class="col-2">
+                        @user.UserName
+                    </td>
+                    <td class="col-2">
+                        @user.Department
+                    </td>
+                    <td class="col-1">
+                        @user.PID
+                    </td>
+                    <td class="col-2">
+                        @user.HireDate
+                    </td>
+                    <td class="col-1">
+                        Ver Registros
+                    </td>
+                    <td class="col-2">
+                        <a class="text-primary fs-5" asp-action="Edit" asp-route-id="@user.Id"><i class="bi bi-pen"></i></a>
+                        @* <a class="text-primary fs-5" asp-action="Details" asp-route-id="@user.Id"><i class="bi bi-info-circle"></i></a> *@
+                        <a type="button" class="text-primary fs-5 mx-2" data-bs-toggle="modal" data-bs-target="#detail-@user.Id" data-task-id="@user.Id">
+                            <i class="bi bi-info-circle"></i>
+                        </a>
+
+                        <a type="button" class="text-primary fs-5" data-bs-toggle="modal" data-bs-target="#delete-@user.Id" data-task-id="@user.Id">
+                            <i class="bi bi-trash3"></i>
+                        </a>
+                    </td>
+
+                </tr>
+
+               @*  @* Detail Modal *@
+                 <div class="modal fade" id="detail-@user.Id" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header d-flex flex-column border-none  align-items-start">
+                                <span class="d-flex w-100 flex-row">
+                                    <h1 class="text-primary fw-bold ">Detalhes do Usuário</h1>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </span>
+                            </div>
+                            <div class="modal-body">
+                                <dl class="row ">
+                                    <dt class="col-sm-4">
+                                        Nome Completo
+                                    </dt>
+                                    <dd class="col-sm-8">
+                                        @user.FullName
+                                    </dd>
+
+                                    <dt class="col-sm-4">
+                                        Usuário/Email
+                                    </dt>
+                                    <dd class="col-sm-8">
+                                        @user.UserName
+                                    </dd>
+
+                                    <dt class="col-sm-4">
+                                        Departamento
+                                    </dt>
+                                    <dd class="col-sm-8">
+                                        @user.Department
+                                    </dd>
+                                    <dt class="col-sm-4">
+                                        Data de Contratação:
+                                    </dt>
+                                    <dd class="col-sm-8">
+                                        @user.HireDate
+                                    </dd>
+                                    
+                                </dl>
+                            </div>
+                            <div class="modal-footer">
+                                <a type="button" class="btn btn-lg btn-primary w-100 fw-bold" asp-action="Edit" asp-route-id="@user.Id"> Editar</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                @* Delete Modal *@
+                 <div class="modal fade" id="delete-@user.Id" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header d-flex flex-column border-none  align-items-start">
+                                <span class="d-flex w-100 flex-row">
+                                    <h1 class="text-primary fw-bold ">Deletar Usuário</h1>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </span>
+                                <h3>Tem certeza de que deseja deletar?</h3>
+                                <p class="text-danger mb-0 fw-bold">Esta operação não poderá ser desfeita</p>
+                            </div>
+                            <div class="modal-body">
+                                <dl class="row">
+                                    <dt class="col-sm-4">
+                                        Nome Completo
+                                    </dt>
+                                    <dd class="col-sm-8">
+                                        @user.FullName
+                                    </dd>
+
+                                    <dt class="col-sm-4">
+                                        Usuário/Email
+                                    </dt>
+                                    <dd class="col-sm-8">
+                                        @user.UserName
+                                    </dd>
+
+                                    <dt class="col-sm-4">
+                                        Departamento
+                                    </dt>
+                                    <dd class="col-sm-8">
+                                        @user.Department
+                                    </dd>
+                                    <dt class="col-sm-4">
+                                        Data de Contratação:
+                                    </dt>
+                                    <dd class="col-sm-8">
+                                        @user.HireDate
+                                    </dd>
+                                </dl>
+                            </div>
+                            <div class="modal-footer">
+                                <a type="button" class="btn btn-lg btn-danger w-100 fw-bold" asp-action="Delete" asp-route-id="@user.Id"><i class="bi bi-trash3"></i> Deletar</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>   
+            }
+        </tbody>
+    </table>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $("#roleName").autocomplete({
+                source: 'api/autocomplete/identitySearch',
+            })
+        })
+    </script>
+
+}
