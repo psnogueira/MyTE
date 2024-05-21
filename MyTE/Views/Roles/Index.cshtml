@@ -6,13 +6,9 @@
     Layout = "~/Views/Shared/_LayoutRegister.cshtml";
 }
 
-
-
 <div class="container mt-3">
     <h1 class="fw-bold display-2 text-white mb-3">@ViewData["Title"]</h1>
     <div class="d-flex align-items-center justify-content-between my-3">
-
-
         <form asp-action="Index" method="get">
             <div class="form-actions input-group">
                 <input type="text" class="form-control col-3" id="roleName" name="SearchString" value="@ViewData["CurrentFilter"]" placeholder="Id ou nome" />
@@ -23,12 +19,6 @@
                 </div>
             </div>
         </form>
-
-
-
-
-
-
         <a asp-action="Create" class="btn btn-secondary text-white"><i class="bi bi-plus-lg"></i> Nova Role</a>
     </div>
 </div>
@@ -73,9 +63,6 @@
                 
                 </tr>
 
-
-
-
                 @* Detail Modal *@
                 <div class="modal fade" id="detail-@item.Id" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                     <div class="modal-dialog modal-dialog-centered">
@@ -108,9 +95,6 @@
                         </div>
                     </div>
                 </div>
-
-
-
 
                 @* Delete Modal *@
                 <div class="modal fade" id="delete-@item.Id" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -147,8 +131,6 @@
                     </div>
                 </div>
             }
-
-
         </tbody>
     </table>
 </div>
