@@ -2,9 +2,12 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
 using MyTE.Data;
+using MyTE.Data.Migrations;
 using MyTE.Models;
 using MyTE.Models.ViewModel;
+using System.Security.Cryptography;
 
 namespace MyTE.Controllers
 {
@@ -85,7 +88,7 @@ namespace MyTE.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, ApplicationUser user)
+        public async Task<IActionResult> Edit(string id, EditUserViewModel user)
         {
             if (id != user.Id)
             {
@@ -96,13 +99,26 @@ namespace MyTE.Controllers
             {
                 try
                 {
-                    var existingRole = await _manager.FindByIdAsync(id);
-                    existingRole.UserName = user.Id;
-                    await _manager.UpdateAsync(existingRole);
+                    var existingUser = await _manager.FindByIdAsync(id);
+                    if (existingUser == null)
+                    {
+                        return NotFound();
+                    }
+
+                    existingUser.UserName = user.UserName;
+                    existingUser.FirstName = user.FirstName;
+                    existingUser.LastName = user.LastName;
+                    existingUser.HiringDate = user.HiringDate;
+                    existingUser.PasswordHash = user.Password;
+                    existingUser.Email = user.Email;
+                    existingUser.PID = user.PID;
+                    existingUser.Department = user.Department;
+                    
+                    await _manager.UpdateAsync(existingUser);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (_manager.FindByIdAsync(id).GetAwaiter().GetResult() == null)
+                    if (_manager.Users.FirstOrDefault(u => u.Id == id) == null)
                     {
                         return NotFound();
                     }
@@ -111,7 +127,7 @@ namespace MyTE.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("Index");
             }
             return View(user);
         }
