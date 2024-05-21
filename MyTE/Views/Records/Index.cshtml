@@ -1,0 +1,39 @@
+﻿@model IEnumerable<MyTE.Models.Record>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<form asp-action="Create">
+
+    <p>
+        <input type="submit" value="Salvar" class="btn btn-primary" />
+    </p>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    WBS
+                </th>
+                @foreach (var item in Model) {
+                    <th>
+                        @Html.DisplayFor(modelItem => item.Data.Day)
+                    </th>
+                }
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td></td>
+                @foreach (var item in Model)
+                {
+                    <td>
+                        <input asp-for="@item.Hours" class="form-control" />
+                    </td>
+                }
+            </tr>
+        </tbody>
+    </table>
+</form>
