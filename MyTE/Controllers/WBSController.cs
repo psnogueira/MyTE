@@ -25,11 +25,11 @@ namespace MyTE.Controllers
         // GET: WBS
         public async Task<IActionResult> Index(string searchString, int? pageNumber, WBSType? wbsType)
         {
-            int pageSize = 7;
+            int pageSize = 5;
             ViewData["CurrentFilter"] = searchString;
             var wbs = from s in _context.WBS
                            select s;
-
+            
             IQueryable<WBSType> wbsQuery = from m in _context.WBS
                                            orderby m.Type
                                            select m.Type;

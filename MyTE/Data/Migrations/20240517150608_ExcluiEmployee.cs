@@ -11,8 +11,8 @@ namespace MyTE.Data.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "Departmente");
+            //migrationBuilder.DropTable(
+            //    name: "Departmente");
 
             migrationBuilder.DropTable(
                 name: "Employee");

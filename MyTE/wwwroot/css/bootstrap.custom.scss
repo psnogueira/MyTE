@@ -14,14 +14,37 @@
 $primary: #334EAC;
 $secondary: #7096D1;
 
+
+
 @import "../lib/bootstrap/scss/bootstrap";
+
+.text-invert {
+    filter: invert(1);
+    mix-blend-mode: difference;
+}
 
 .bg-violet {
     background: #EDF1F6;
 }
 
+.btn-outline-secondary:hover{
+    color: white;
+}
+
 .w-40rem{
     width: 40rem;
+}
+
+.w-20rem {
+    width: 25.3rem;
+}
+
+.h-20rem{
+    height: 20rem;
+}
+
+.h-40rem {
+    height: 48rem;
 }
 
 .rotate-90 {

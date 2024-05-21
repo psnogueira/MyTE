@@ -25,7 +25,7 @@ namespace MyTE.Controllers
         // GET: Departments
         public async Task<IActionResult> Index(string searchString, int? pageNumber)
         {
-            int pageSize = 7;
+            int pageSize = 5;
             ViewData["CurrentFilter"] = searchString;
             var department = from s in _context.Department
                       select s;
