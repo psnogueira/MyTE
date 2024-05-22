@@ -7,6 +7,7 @@ namespace MyTE.Models
     public class WBS
     {
         [Key]
+        [Display(Name = "Id")]
         public int WBSId { get; set; }
 
         [Display(Name = "Código")]

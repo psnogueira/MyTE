@@ -193,20 +193,20 @@ namespace MyTE.Controllers
                 return NotFound();
             }
 
-            var wBS = await _context.WBS
-                .FirstOrDefaultAsync(m => m.WBSId == id);
-            if (wBS == null)
-            {
-                return NotFound();
-            }
+        //    var wBS = await _context.WBS
+        //        .FirstOrDefaultAsync(m => m.WBSId == id);
+        //    if (wBS == null)
+        //    {
+        //        return NotFound();
+        //    }
 
-            return View(wBS);
-        }
+        //    return View(wBS);
+        //}
 
         // POST: WBS/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        //[HttpPost, ActionName("Delete")]
+        //[ValidateAntiForgeryToken]
+        public async Task<IActionResult> Delete(int id)
         {
             var wBS = await _context.WBS.FindAsync(id);
             if (wBS != null)
@@ -221,28 +221,6 @@ namespace MyTE.Controllers
         private bool WBSExists(int id)
         {
             return _context.WBS.Any(e => e.WBSId == id);
-        }
-
-
-        [Produces("application/json")]
-        [HttpGet("search")]
-        public IActionResult AutoComplete()
-        {
-            try
-            {
-                string term = HttpContext.Request.Query["term"].ToString();
-                var wbsName = _context.WBS
-                    .Where(w => w.Code.Contains(term) || w.Desc.Contains(term))
-                    .Select(w => w.Code)
-                    .ToList();
-
-                return Ok(wbsName);
-
-            }
-            catch (Exception)
-            {
-                return BadRequest();
-            }
         }
     }
 }

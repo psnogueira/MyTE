@@ -139,27 +139,27 @@ namespace MyTE.Controllers
         }
 
         // GET: Departments/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
+        //public async Task<IActionResult> Delete(int? id)
+        //{
+        //    if (id == null)
+        //    {
+        //        return NotFound();
+        //    }
 
-            var department = await _context.Department
-                .FirstOrDefaultAsync(m => m.DepartmentId == id);
-            if (department == null)
-            {
-                return NotFound();
-            }
+        //    var department = await _context.Department
+        //        .FirstOrDefaultAsync(m => m.DepartmentId == id);
+        //    if (department == null)
+        //    {
+        //        return NotFound();
+        //    }
 
-            return View(department);
-        }
+        //    return View(department);
+        //}
 
         // POST: Departments/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        //[HttpPost, ActionName("Delete")]
+        //[ValidateAntiForgeryToken]
+        public async Task<IActionResult> Delete(int id)
         {
             var department = await _context.Department.FindAsync(id);
             if (department != null)

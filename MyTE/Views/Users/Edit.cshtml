@@ -1,0 +1,66 @@
+﻿@model MyTE.Models.ViewModel.EditUserViewModel
+
+@{
+    ViewData["Title"] = "Cadastrar";
+    Layout = "~/Views/Shared/_LayoutRegister.cshtml";
+}
+
+<div class="d-flex justify-content-between  ">
+    <div class="col-md-5 h-100 d-flex flex-column justify-content-evenly mx-auto">
+        <h1 class="text-primary fw-bold mt-3 mb-4">@ViewData["Title"]</h1>
+        <form asp-action="Edit" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+            <div class="row">
+                <div class="form-floating mb-3">
+                    <input asp-for="FirstName" class="form-control" aria-required="true" placeholder="Nome" />
+                    <label asp-for="FirstName">Nome</label>
+                    <span asp-validation-for="FirstName" class="text-danger"></span>
+                </div>
+
+                <div class="form-floating mb-3">
+                    <input asp-for="LastName" class="form-control" aria-required="true" placeholder="Sobrenome" />
+                    <label asp-for="LastName">Sobrenome</label>
+                    <span asp-validation-for="LastName" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="form-floating mb-3">
+                <input asp-for="UserName" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
+                <label asp-for="UserName" class="text-secondary">Email corporativo</label>
+                <span asp-validation-for="UserName" class="text-danger"></span>
+            </div>
+            <div class="row">
+                <div class="form-floating mb-3">
+                    <input asp-for="HiringDate" type="date" class="form-control" aria-required="true" placeholder="dd/mm/aaaa" />
+                    <label asp-for="HiringDate">Data de contratação</label>
+                    <span asp-validation-for="HiringDate" class="text-danger"></span>
+                </div>
+
+                <div class="form-floating mb-3">
+                    <input asp-for="PID" class="form-control" aria-required="true" placeholder="PID" />
+                    <label asp-for="PID">PID</label>
+                    <span asp-validation-for="PID" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="form-floating mb-3">
+                <select asp-for="Department.DepartmentId" class="form-select" asp-items="@Model.Departments" aria-required="true">
+                    <option disabled selected>Selecione o departamento do funcionário</option>
+                </select>
+                <span asp-validation-for="Department.DepartmentId" class="text-danger"></span>
+            </div>           
+
+            <div class="form-floating mb-3">
+                <select asp-for="Role" class="form-select" asp-items="@Model.RolesList" aria-required="true">
+                    <option disabled selected>------</option>
+                </select>
+                <label asp-for="Role" class="text-secondary">Selecione o Nível de Acesso</label>
+                <span asp-validation-for="Role" class="text-danger"></span>
+            </div>
+                <input type="submit" value="Salvar" class="btn btn-primary btn-lg w-100 fw-bold" />
+        </form>
+    </div>
+
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

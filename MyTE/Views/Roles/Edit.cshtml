@@ -2,20 +2,21 @@
 @model IdentityRole
 
 @{
-    ViewData["Title"] = "Criar";
+    ViewData["Title"] = "Editar";
     Layout = "~/Views/Shared/_LayoutRegister.cshtml";
 }
 
 <div class="container mt-3">
     <h1 class="fw-bold display-2 text-white mb-3">@ViewData["Title"]</h1>
-    <h4 class="fw-bold display-4 text-white mb-3">Role</h4>
+    <h4 class="fw-bold display-4 text-white mb-3">Role: @Model.Name</h4>
 </div>
 
 <img class="position-absolute object-fit-cover w-100 h-50 top-0 z-n1" src="~/img/art.jpg" alt="Arte ilustrativa" />
 
 <div class="bg-white container rounded table-responsive p-4">
-    <form asp-action="Create">
+    <form asp-action="Edit">
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <input type="hidden" asp-for="Id" />
         <div class="form-floating mb-3">
             <input asp-for="Name" class="form-control" autocomplete="current-password" aria-required="true" placeholder="Nome da Role" />
             <label asp-for="Name" class="form-label text-secondary">Nome</label>
@@ -23,8 +24,8 @@
         </div>
 
         <div class="form-group d-flex justify-content-between">
-            <input type="submit" value="Cadastrar" class="btn btn-primary w-25" />
             <a class="btn btn-secondary text-white w-25" asp-action="Index">Voltar</a>
+            <input type="submit" value="Editar" class="btn btn-primary w-25" />
         </div>
     </form>
 
