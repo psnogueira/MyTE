@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MyTE.Data;
+using MyTE.DTO;
 using MyTE.Models;
 
 namespace MyTE.Controllers
@@ -14,9 +15,14 @@ namespace MyTE.Controllers
             _context = context;
         }
 
+        
+
         // GET: Records
         public async Task<IActionResult> Index()
         {
+
+            var consultaWbs = from obj in _context.WBS select obj;
+            var consultaRecord = from obj in _context.Record select obj;
 
             int year = DateTime.Now.Year;
             int month = DateTime.Now.Month;
@@ -31,16 +37,44 @@ namespace MyTE.Controllers
                 dayInit = 16;
                 dayMax = DateTime.DaysInMonth(year, month);
             }
-            List<Record> records = new List<Record>();
-            for (int i = dayInit; i <= dayMax; i++) {
-                Record record = new Record();
-                record.Data = new DateTime(year, month, i);
-                //pegar usuario da sessao, entender como fazer isso
-                record.EmployeeId = 1;
-                records.Add(record);
-            }
+            
+            List<RecordDTO> list = new List<RecordDTO>();
+            double[] totalHoursDay = new double[16];
 
-            return View(await Task.FromResult(records));
+            foreach (var wbs in consultaWbs.ToList())
+            {
+                int posicaoInicial = 0;
+                double totalHoursWBS = 0d;
+                List<Record> records = new List<Record>();
+                for (int i = dayInit; i <= dayMax; i++) {
+
+                    //pegar usuario da sessao, entender como fazer isso
+                    var consultaRecordFinal = consultaRecord.Where(s => s.EmployeeId == 1 && s.Data == new DateTime(year, month, i) && s.WBSId == wbs.WBSId);
+
+                    Record? result = consultaRecordFinal.FirstOrDefault();
+
+                    if (result != null && result.RecordId > 0) {
+                        totalHoursWBS += result.Hours;
+                        records.Add(result);
+                        totalHoursDay[posicaoInicial] = totalHoursDay[posicaoInicial] + result.Hours;
+                    } else {
+                        Record record = new Record();
+                        record.Data = new DateTime(year, month, i);
+                        //pegar usuario da sessao, entender como fazer isso
+                        record.EmployeeId = 1;
+                        record.WBSId = wbs.WBSId;
+                        records.Add(record);
+                    }
+                    posicaoInicial++;
+                }
+                RecordDTO dto = new RecordDTO();
+                dto.WBS = wbs;
+                dto.records = records;
+                dto.TotalHours = totalHoursWBS;
+                dto.TotalHoursDay = totalHoursDay;
+                list.Add(dto);
+            }
+            return View(await Task.FromResult(list));
         }
 
         // GET: Records/Details/5

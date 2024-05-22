@@ -1,7 +1,8 @@
-﻿@model IEnumerable<MyTE.Models.Record>
+﻿@model IEnumerable<MyTE.DTO.RecordDTO>
 
 @{
     ViewData["Title"] = "Index";
+    
 }
 
 <h1>Index</h1>
@@ -11,29 +12,66 @@
     <p>
         <input type="submit" value="Salvar" class="btn btn-primary" />
     </p>
+    
+    <div class="row">
+        <div class="col-4">
+            <div class="form-group">
+                <label>Data Inicial</label>
+                <input type="date" name="startDate" class="form-control" />
+            </div>
+        </div>
+        <div class="col-3">
+            <div class="form-group">
+                <label>Data Final</label>
+                <input type="date" name="endDate" class="form-control" />
+            </div>
+        </div>
+        <div class=" col-3">
+            <button type="submit" class="btn  btn-primary">Filtrar</button>
+        </div>
+    </div>
+   
     <table class="table">
         <thead>
             <tr>
                 <th>
                     WBS
                 </th>
-                @foreach (var item in Model) {
+                @foreach (var record in Model.First().records) {
                     <th>
-                        @Html.DisplayFor(modelItem => item.Data.Day)
-                    </th>
+                        @Html.DisplayFor(modelItem => record.Data.Day)
+                     </th>
                 }
+                <th>
+                   Total
+                </th>
             </tr>
         </thead>
         <tbody>
+            @foreach (var item in Model)
+                {
+                <tr>
+                    <td>@Html.DisplayFor(modelItem => item.WBS.Code)</td>
+                    @foreach (var record in item.records)
+                    {
+                        <td>
+                            <input asp-for="@record.Hours" class="form-control" />
+                        </td>
+                    }
+                    <td>@Html.DisplayFor(modelItem => item.TotalHours)</td>
+                
+                </tr>
+            }
             <tr>
                 <td></td>
-                @foreach (var item in Model)
-                {
+                @for (int i = 0; i <= 15; i++) {
                     <td>
-                        <input asp-for="@item.Hours" class="form-control" />
+                        {Model.First().TotalHoursDay[i]}
                     </td>
                 }
+                <td></td>
             </tr>
         </tbody>
     </table>
+  
 </form>
