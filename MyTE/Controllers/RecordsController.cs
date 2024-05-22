@@ -15,8 +15,6 @@ namespace MyTE.Controllers
             _context = context;
         }
 
-        
-
         // GET: Records
         public async Task<IActionResult> Index()
         {
@@ -101,21 +99,36 @@ namespace MyTE.Controllers
             return View();
         }
 
-        // POST: Records/Create
+        // POST: Records/Persist
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("RecordId,EmployeeId,WBSId,Data,Hours")] Record record)
+        public async Task<IActionResult> Persist(List<RecordDTO> listRecordDTO)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(record);
-                await _context.SaveChangesAsync();
+                List<Record> records = new List<Record>();
+                foreach (var item in listRecordDTO)
+                {
+                    records.AddRange(item.records);
+                }
+                if (ValidateRecords(ConvertForMap(records)))
+                {
+
+                    var recordsExclude = await _context.Record.Where(
+                            r => r.EmployeeId == records[0].EmployeeId
+                            && r.Data >= records[0].Data && r.Data <= records[records.Count()-1].Data
+                        ).ToListAsync();
+                    _context.Record.RemoveRange(recordsExclude);
+                    _context.AddRange(records);
+                    await _context.SaveChangesAsync();
+                }
+
                 return RedirectToAction(nameof(Index));
                 
             }
-            return View(record);
+            return RedirectToAction(nameof(Index));
         }
 
 
@@ -214,15 +227,21 @@ namespace MyTE.Controllers
         {
             foreach (var item in myMap)
             {
-                if (item.Value < 8)
+                if (item.Value > 0 && item.Value < 8)
                 {
                     Console.WriteLine("A Data: " + item.Key + " possui uma quantidade inferior ao minimo permitido (8 horas). Quantidade de horas registradas: " + item.Value);
                     //throw new Exception("A Data: " + item.Key + " possui uma quantidade inferior ao minimo permitido (8 horas). Quantidade de horas registradas: " + item.Value);
                     return false;
                 }
-                if (item.Key.DayOfWeek.Equals(DayOfWeek.Sunday) || item.Key.DayOfWeek.Equals(DayOfWeek.Saturday))
+                if (item.Value > 0 && (item.Key.DayOfWeek.Equals(DayOfWeek.Sunday) || item.Key.DayOfWeek.Equals(DayOfWeek.Saturday)))
                 {
                     Console.WriteLine("A Data: " + item.Key + " não é considerada um dia útil.");
+                    return false;
+                }
+                if (item.Value > 24)
+                {
+                    Console.WriteLine("A Data: " + item.Key + " possui uma quantidade superior ao máximo de horas de um dia (24 horas). Quantidade de horas registradas: " + item.Value);
+                    //throw new Exception("A Data: " + item.Key + " possui uma quantidade superior ao máximo de horas de um dia (24 horas). Quantidade de horas registradas: " + item.Value);
                     return false;
                 }
             }
@@ -252,16 +271,6 @@ namespace MyTE.Controllers
             return myMap;
         }
 
-
-        private static void Preenchelist(List<Record> listRecord)
-        {
-            listRecord.AddRange(new[] {
-                new Record(1,1,new DateTime(2024,05,17), 6),
-                new Record(1,2, new DateTime(2024,05,15), 8),
-                new Record(1,1, new DateTime(2024,05,16), 8),
-                new Record(1,2, new DateTime(2024,05,17), 4)
-            });
-        }
     }
 
 }

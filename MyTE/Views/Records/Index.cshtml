@@ -5,13 +5,11 @@
     
 }
 
-<h1>Index</h1>
+<h1>Registro de Horas</h1>
 
-<form asp-action="Create">
 
-    <p>
-        <input type="submit" value="Salvar" class="btn btn-primary" />
-    </p>
+
+    
     
     <div class="row">
         <div class="col-4">
@@ -20,17 +18,12 @@
                 <input type="date" name="startDate" class="form-control" />
             </div>
         </div>
-        <div class="col-3">
-            <div class="form-group">
-                <label>Data Final</label>
-                <input type="date" name="endDate" class="form-control" />
-            </div>
-        </div>
         <div class=" col-3">
             <button type="submit" class="btn  btn-primary">Filtrar</button>
         </div>
     </div>
-   
+<form asp-action="Persist" method="post">
+
     <table class="table">
         <thead>
             <tr>
@@ -48,14 +41,19 @@
             </tr>
         </thead>
         <tbody>
-            @foreach (var item in Model)
+            @for (int i = 0; i < Model.Count(); i++)
                 {
+                var item = Model.ElementAt(i);
                 <tr>
                     <td>@Html.DisplayFor(modelItem => item.WBS.Code)</td>
-                    @foreach (var record in item.records)
+                    @for (int j = 0; j < item.records.Count(); j++)
                     {
+                        var record = Model.ElementAt(i).records.ElementAt(j);
                         <td>
-                            <input asp-for="@record.Hours" class="form-control" />
+                            <input type="text" name="listRecordDTO[@i].records[@j].Hours" value="@record.Hours" class="form-control" />
+                            <input type="hidden" name="listRecordDTO[@i].records[@j].EmployeeId" value="@record.EmployeeId" class="form-control" />
+                            <input type="hidden" name="listRecordDTO[@i].records[@j].WBSId" value="@record.WBSId" class="form-control" />
+                            <input type="hidden" name="listRecordDTO[@i].records[@j].Data" value="@record.Data" class="form-control" />
                         </td>
                     }
                     <td>@Html.DisplayFor(modelItem => item.TotalHours)</td>
@@ -63,15 +61,17 @@
                 </tr>
             }
             <tr>
-                <td></td>
+                <td>Total Dia</td>
                 @for (int i = 0; i <= 15; i++) {
                     <td>
-                        {Model.First().TotalHoursDay[i]}
+                        <input class="form-control" value="@(Model.First().TotalHoursDay[@i])" readonly/>
                     </td>
                 }
                 <td></td>
             </tr>
         </tbody>
     </table>
-  
+    <p>
+        <input type="submit" value="Salvar" class="btn btn-primary" />
+    </p>
 </form>
