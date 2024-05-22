@@ -34,5 +34,14 @@ namespace MyTE.Models
 
         public virtual Department Department { get; set; }
 
+        [NotMapped]
+        public virtual IdentityRole Role { get; set; }
+
+        //[NotMapped]
+        public string FullName
+        {
+            get { return $"{FirstName} {LastName}"; }
+        }
+
     }
 }

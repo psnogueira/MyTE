@@ -6,7 +6,9 @@ using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pag
 using MyTE.Data;
 using MyTE.Data.Migrations;
 using MyTE.Models;
+using MyTE.Models.Enum;
 using MyTE.Models.ViewModel;
+using MyTE.Pagination;
 using System.Security.Cryptography;
 
 namespace MyTE.Controllers
@@ -15,39 +17,50 @@ namespace MyTE.Controllers
     {
         private readonly UserManager<ApplicationUser> _manager;
         private readonly RoleManager<IdentityRole> _roleManager;
-        private readonly SignInManager<ApplicationUser> _signInManager;
+
         private readonly ApplicationDbContext _context;
 
         public UsersController(UserManager<ApplicationUser> userManeger, SignInManager<ApplicationUser> signInManager, ApplicationDbContext context)
         {
             _manager = userManeger;
-            _signInManager = signInManager;
             _context = context;
         }
-        public async Task<IActionResult> Index(string searchString)
+
+        public async Task<IActionResult> Index(string searchString, int? pageNumber, int? departmentType)
         {
+            int pageSize = 7;
             ViewData["CurrentFilter"] = searchString;
 
-            var users = _manager.Users.Include(u => u.Department).ToList();
+            var usersQuery = _context.Users.Include(u => u.Department).AsQueryable();
 
-            var userViewModels = new List<UserViewModel>();
-            foreach (var user in users)
+
+            if (departmentType.HasValue && departmentType != 0)
             {
-                var fullName = $"{user.FirstName} {user.LastName}";
-                var userViewModel = new UserViewModel
-                {
-                    Id = user.Id,
-                    FullName = fullName,
-                    UserName = user.UserName,
-                    Email = user.Email,
-                    PID = user.PID,
-                    HireDate = user.HiringDate,
-                    Department = user.Department != null ? user.Department.Name : "Unknown",
-                };
-                userViewModels.Add(userViewModel);
+                usersQuery = usersQuery.Where(u => u.DepartmentId == departmentType);
             }
 
-            return View(userViewModels);
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                usersQuery = usersQuery.Where(u => EF.Functions.Like(u.FirstName, $"%{searchString}%"));
+            }
+
+            var users = await PaginatedList<ApplicationUser>.CreateAsync(usersQuery.AsNoTracking(), pageNumber ?? 1, pageSize);
+            var userRoles = new Dictionary<string, IList<string>>();
+
+            foreach (var user in users)
+            {
+                var roles = await _manager.GetRolesAsync(user);
+                userRoles[user.Id] = roles;
+            }
+
+            var viewModel = new EditUserViewModel
+            {
+                UserList = users,
+                User = new ApplicationUser(),
+                CurrentFilter = searchString,
+                UserRoles = userRoles
+            };
+            return View(viewModel);
         }
 
         [HttpGet]
@@ -59,30 +72,40 @@ namespace MyTE.Controllers
             }
 
             var user = _manager.Users.FirstOrDefault(u => u.Id == id);
+            
             if (user == null)
             {
                 return NotFound();
             }
 
-            var model = new EditUserViewModel
+            var viewModel = new EditUserViewModel
             {
                 UserName = user.UserName,
                 FirstName = user.FirstName,
                 LastName = user.LastName,
                 HiringDate = user.HiringDate,
-                Password = user.PasswordHash,
                 Email = user.Email,
                 PID = user.PID,
                 Department = user.Department,
                 Departments = await _context.Department
-                    .Select(d => new SelectListItem
-                    {
-                        Value = d.DepartmentId.ToString(),
-                        Text = d.Name
-                    }).ToListAsync(),
+                        .Select(d => new SelectListItem
+                        {
+                            Value = d.DepartmentId.ToString(),
+                            Text = d.Name
+                        }).ToListAsync(),
+
+                RolesList = await _context.Roles
+                        .Select(d => new SelectListItem
+                        {
+                            Value = d.Id.ToString(),
+                            Text = d.Name
+                        }).ToListAsync(),
+
             };
 
-            return View(model);
+
+
+            return View(viewModel);
 
         }
 
@@ -109,11 +132,10 @@ namespace MyTE.Controllers
                     existingUser.FirstName = user.FirstName;
                     existingUser.LastName = user.LastName;
                     existingUser.HiringDate = user.HiringDate;
-                    existingUser.PasswordHash = user.Password;
                     existingUser.Email = user.Email;
                     existingUser.PID = user.PID;
                     existingUser.Department = user.Department;
-                    
+
                     await _manager.UpdateAsync(existingUser);
                 }
                 catch (DbUpdateConcurrencyException)
@@ -143,5 +165,17 @@ namespace MyTE.Controllers
             return RedirectToAction("Index");
 
         }
+
+
+        //public async Task<IActionResult> Edit(string id)
+        //{
+        //    var user = await _manager.FindByIdAsync(id);
+        //    if (user == null)
+        //    {
+        //        return NotFound();
+        //    }
+
+        //    return View(user);
+        //}
     }
 }
