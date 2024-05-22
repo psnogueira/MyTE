@@ -5,6 +5,22 @@
     Layout = "~/Views/Shared/_LayoutCRUD.cshtml";
 }
 
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show position-absolute top-0 mt-5 start-50 translate-middle-x" role="alert">
+        <strong>@TempData["SuccessMessage"]</strong> Você pode encontrá-lo na lista abaixo.
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+@if (TempData["SuccessMessage2"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show position-absolute top-0 mt-5 start-50 translate-middle-x" role="alert">
+        <strong>@TempData["SuccessMessage2"]</strong> Você pode encontrá-lo na lista abaixo.
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
 <div class="container mt-3">
     <h1 class="fw-bold display-2 text-white mb-3">@ViewData["Title"]</h1>
     <div class="d-flex align-items-center justify-content-between my-3">
@@ -15,9 +31,10 @@
                 <a class="btn btn-outline-secondary align-content-center" asp-action="Index">Lista completa</a>
             </div>
         </form>
-        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#create">
+        <a asp-action="Create" class="btn btn-primary"><i class="bi bi-plus-lg"></i> Novo departamento</a>
+        @* <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#create">
             <i class="bi bi-plus-lg"></i> Novo departamento
-        </button>
+        </button> *@
     </div>
 </div>
 
@@ -30,7 +47,7 @@
                 <th>
                     @Html.DisplayNameFor(model => model.Department.Name)
                 </th>
-                <th>Ações</th>
+                <th class="col-4">Ações</th>
             </tr>
         </thead>
         <tbody>
@@ -68,7 +85,7 @@
     </ul>
 </nav>
 
-<div class="modal fade" id="create" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+@* <div class="modal fade" id="create" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
@@ -90,4 +107,4 @@
             </div>
         </div>
     </div>
-</div>
+</div> *@

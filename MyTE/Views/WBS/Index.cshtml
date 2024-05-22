@@ -6,121 +6,173 @@
     Layout = "~/Views/Shared/_LayoutCRUD.cshtml";
 }
 
-<div class="container mt-3">
-    <h1 class="fw-bold display-2 text-white mb-3">WBS</h1>
-    <div class="d-flex align-items-center justify-content-between my-3">
-        <form asp-action="Index" method="get">
-            <div class="form-actions input-group w-40rem">
-                <select class="form-control" asp-for="WBSType" asp-items="Model.Type">
-                    <option value="">Todos</option>
-                </select>
-                <input type="text" class="form-control w-25" id="wbsName" name="SearchString" value="@ViewData["CurrentFilter"]" placeholder="Buscar por código ou descrição" />
-                <input class="btn btn-outline-primary" type="submit" value="Procurar" />
-                <a class="btn btn-outline-primary align-content-center" asp-action="Index">Lista completa</a>
-            </div>
-        </form>
-        @* <a asp-action="Create" class="btn btn-primary"><i class="bi bi-plus-lg"></i> Nova WBS</a> *@
-        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#create">
-            <i class="bi bi-plus-lg"></i> Nova WBS
-        </button>
-    </div>
-</div>
+@{
+    if (this.User.IsInRole("user")){
+        Layout = "~/Views/Shared/_LayoutCRUD2.cshtml";
 
-<img class="position-absolute object-fit-cover w-100 h-20rem top-0 z-n1" src="~/img/ArtH3.jpg" alt="Arte ilustrativa" />
-
-<div class="bg-white container rounded table-responsive">
-    <table class="table text-center align-middle">
-        <thead>
-            <tr>
-                <th class="col-2">
-                    @Html.DisplayNameFor(model => model.WBS.Code)
-                </th>
-                <th class="col-4">
-                    @Html.DisplayNameFor(model => model.WBS.Desc)
-                </th>
-                <th class="col-2">
-                    @Html.DisplayNameFor(model => model.WBS.Type)
-                </th>
-                <th class="col-2">Ações</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model.WBSList)
-            {
-                <tr>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Code)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Desc)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Type)
-                    </td>
-                    <td>
-                        <a class="text-primary fs-5" asp-action="Edit" asp-route-id="@item.WBSId"><i class="bi bi-pen"></i></a>
-                        <a class="text-primary fs-5 mx-2" asp-action="Details" asp-route-id="@item.WBSId"><i class="bi bi-info-circle"></i></a>
-                        <a class="text-primary fs-5" asp-action="Delete" asp-route-id="@item.WBSId"><i class="bi bi-trash3"></i></a>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
-</div>
-
-<nav aria-label="Page navigation example" class="container mt-4">
-    <ul class="pagination">
-        <li class="page-item @(Model.WBSList.HasPreviousPage ? "" : "disabled")">
-            <a class="page-link" asp-action="Index" asp-route-pageNumber="@(Model.WBSList.PageIndex - 1)" asp-route-searchString="@Model.CurrentFilter">Anterior</a>
-        </li>
-        @for (int i = 1; i <= Model.WBSList.TotalPages; i++)
-        {
-            <li class="page-item @(i == Model.WBSList.PageIndex ? "active" : "")">
-                <a class="page-link" asp-action="Index" asp-route-pageNumber="@i" asp-route-searchString="@Model.CurrentFilter">@i</a>
-            </li>
-        }
-        <li class="page-item @(Model.WBSList.HasNextPage ? "" : "disabled")">
-            <a class="page-link" asp-action="Index" asp-route-pageNumber="@(Model.WBSList.PageIndex + 1)" asp-route-searchString="@Model.CurrentFilter">Próxima</a>
-        </li>
-    </ul>
-</nav>
-
-<div class="modal fade" id="create" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h1 class="modal-title text-primary fs-3" id="exampleModalLabel">Criar nova WBS</h1>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form asp-action="Create">
-                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                    <div class="form-floating mb-3">
-                        <input asp-for="WBS.Code" class="form-control" placeholder="code" />
-                        <label asp-for="WBS.Code" class="form-label text-secondary"></label>
-                        <span asp-validation-for="WBS.Code" class="text-danger"></span>
-                    </div>
-                    <div class="form-floating mb-3">
-                        <input asp-for="WBS.Desc" class="form-control" placeholder="desc" />
-                        <label asp-for="WBS.Desc" class="form-label text-secondary"></label>
-                        <span asp-validation-for="WBS.Desc" class="text-danger"></span>
-                    </div>
-                    <div class="form-floating mb-3">
-                        <select asp-for="WBS.Type" class="form-control">
-                            <option value="1">Chargable</option>
-                            <option value="2">Non-Chargable</option>
+        <div class="container mt-3">
+            <h1 class="fw-bold display-2 text-white mb-3">WBS</h1>
+            <div class="d-flex align-items-center justify-content-between my-3">
+                <form asp-action="Index" method="get">
+                    <div class="form-actions input-group w-40rem">
+                        <select class="form-control" asp-for="WBSType" asp-items="Model.Type">
+                            <option value="">Todos</option>
                         </select>
-                        <label asp-for="WBS.Type" class="form-label text-secondary"></label>
-                        <span asp-validation-for="WBS.Type" class="text-danger"></span>
-                    </div>
-                    <div class="form-group">
-                        <input type="submit" value="Criar" class="btn btn-lg btn-primary w-100 fw-bold" />
+                        <input type="text" class="form-control w-25" id="wbsName" name="SearchString" value="@ViewData["CurrentFilter"]" placeholder="Buscar por código ou descrição" />
+                        <input class="btn btn-outline-primary" type="submit" value="Procurar" />
+                        <a class="btn btn-outline-primary align-content-center" asp-action="Index">Lista completa</a>
                     </div>
                 </form>
             </div>
         </div>
-    </div>
-</div>
+
+        <img class="position-absolute object-fit-cover w-100 h-20rem top-0 z-n1" src="~/img/ArtH3.jpg" alt="Arte ilustrativa" />
+
+        <div class="bg-white container rounded table-responsive">
+            <table class="table text-center align-middle">
+                <thead>
+                    <tr>
+                        <th class="col-2">
+                            @Html.DisplayNameFor(model => model.WBS.Code)
+                        </th>
+                        <th class="col-4">
+                            @Html.DisplayNameFor(model => model.WBS.Desc)
+                        </th>
+                        <th class="col-2">
+                            @Html.DisplayNameFor(model => model.WBS.Type)
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.WBSList)
+                    {
+                        <tr>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Code)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Desc)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Type)
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <nav aria-label="Page navigation example" class="container mt-4">
+            <ul class="pagination">
+                <li class="page-item @(Model.WBSList.HasPreviousPage ? "" : "disabled")">
+                    <a class="page-link" asp-action="Index" asp-route-pageNumber="@(Model.WBSList.PageIndex - 1)" asp-route-searchString="@Model.CurrentFilter">Anterior</a>
+                </li>
+                @for (int i = 1; i <= Model.WBSList.TotalPages; i++)
+                {
+                    <li class="page-item @(i == Model.WBSList.PageIndex ? "active" : "")">
+                        <a class="page-link" asp-action="Index" asp-route-pageNumber="@i" asp-route-searchString="@Model.CurrentFilter">@i</a>
+                    </li>
+                }
+                <li class="page-item @(Model.WBSList.HasNextPage ? "" : "disabled")">
+                    <a class="page-link" asp-action="Index" asp-route-pageNumber="@(Model.WBSList.PageIndex + 1)" asp-route-searchString="@Model.CurrentFilter">Próxima</a>
+                </li>
+            </ul>
+        </nav>
+    }
+    else
+    {
+        if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show position-absolute top-0 mt-5 start-50 translate-middle-x" role="alert">
+                <strong>@TempData["SuccessMessage"]</strong> Você pode encontrá-la na lista abaixo.
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+
+        if (TempData["SuccessMessage2"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show position-absolute top-0 mt-5 start-50 translate-middle-x" role="alert">
+                <strong>@TempData["SuccessMessage2"]</strong> Você pode encontrá-la na lista abaixo.
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+
+        <div class="container mt-3">
+            <h1 class="fw-bold display-2 text-white mb-3">WBS</h1>
+            <div class="d-flex align-items-center justify-content-between my-3">
+                <form asp-action="Index" method="get">
+                    <div class="form-actions input-group w-40rem">
+                        <select class="form-control" asp-for="WBSType" asp-items="Model.Type">
+                            <option value="">Todos</option>
+                        </select>
+                        <input type="text" class="form-control w-25" id="wbsName" name="SearchString" value="@ViewData["CurrentFilter"]" placeholder="Buscar por código ou descrição" />
+                        <input class="btn btn-outline-primary" type="submit" value="Procurar" />
+                        <a class="btn btn-outline-primary align-content-center" asp-action="Index">Lista completa</a>
+                    </div>
+                </form>
+                <a asp-action="Create" class="btn btn-primary"><i class="bi bi-plus-lg"></i> Nova WBS</a>
+            </div>
+        </div>
+
+        <img class="position-absolute object-fit-cover w-100 h-20rem top-0 z-n1" src="~/img/ArtH3.jpg" alt="Arte ilustrativa" />
+
+        <div class="bg-white container rounded table-responsive">
+            <table class="table text-center align-middle">
+                <thead>
+                    <tr>
+                        <th class="col-2">
+                            @Html.DisplayNameFor(model => model.WBS.Code)
+                        </th>
+                        <th class="col-4">
+                            @Html.DisplayNameFor(model => model.WBS.Desc)
+                        </th>
+                        <th class="col-2">
+                            @Html.DisplayNameFor(model => model.WBS.Type)
+                        </th>
+                        <th class="col-2">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.WBSList)
+                    {
+                        <tr>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Code)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Desc)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Type)
+                            </td>
+                            <td>
+                                <a class="text-primary fs-5" asp-action="Edit" asp-route-id="@item.WBSId"><i class="bi bi-pen"></i></a>
+                                <a class="text-primary fs-5 mx-2" asp-action="Details" asp-route-id="@item.WBSId"><i class="bi bi-info-circle"></i></a>
+                                <a class="text-primary fs-5" asp-action="Delete" asp-route-id="@item.WBSId"><i class="bi bi-trash3"></i></a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <nav aria-label="Page navigation example" class="container mt-4">
+            <ul class="pagination">
+                <li class="page-item @(Model.WBSList.HasPreviousPage ? "" : "disabled")">
+                    <a class="page-link" asp-action="Index" asp-route-pageNumber="@(Model.WBSList.PageIndex - 1)" asp-route-searchString="@Model.CurrentFilter">Anterior</a>
+                </li>
+                @for (int i = 1; i <= Model.WBSList.TotalPages; i++)
+                {
+                    <li class="page-item @(i == Model.WBSList.PageIndex ? "active" : "")">
+                        <a class="page-link" asp-action="Index" asp-route-pageNumber="@i" asp-route-searchString="@Model.CurrentFilter">@i</a>
+                    </li>
+                }
+                <li class="page-item @(Model.WBSList.HasNextPage ? "" : "disabled")">
+                    <a class="page-link" asp-action="Index" asp-route-pageNumber="@(Model.WBSList.PageIndex + 1)" asp-route-searchString="@Model.CurrentFilter">Próxima</a>
+                </li>
+            </ul>
+        </nav>
+    }
+}
 
 @section Scripts {
     <script>
