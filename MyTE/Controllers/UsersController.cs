@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using MyTE.Data;
 using MyTE.Models;
+using MyTE.Models.ViewModel;
+using MyTE.Pagination;
 
 //[Authorize(Roles = "admin")]
 public class UsersController : Controller
@@ -20,13 +22,29 @@ public class UsersController : Controller
         _roleManager = roleManager;
     }
 
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index(string searchString, int? pageNumber, int? departmentType)
     {
+        int pagesize = 5;
+        ViewData["CurrentFilter"] = searchString;
 
-        var users = _userManager.Users
-            .Include(u => u.Department)
-            .ToList();
+        var usersQuery = _context.Users
+            .Include(d => d.Department)
+            .AsQueryable();
 
+        if (!string.IsNullOrEmpty(searchString))
+        {
+            usersQuery = usersQuery.Where(s => s.FirstName.Contains(searchString));
+        }
+
+        if(departmentType.HasValue && departmentType != 0)
+        {
+            usersQuery = usersQuery.Where(d => d.DepartmentId == departmentType);
+        }
+
+        //var users = _userManager.Users
+        //    .Include(u => u.Department)
+        //    .ToList();
+        var users = await PaginatedList<ApplicationUser>.CreateAsync(usersQuery.AsNoTracking(), pageNumber ?? 1, pagesize);
         var userRoles = new Dictionary<string, IList<string>>();
 
         foreach (var user in users)
@@ -35,7 +53,15 @@ public class UsersController : Controller
             userRoles[user.Id] = roles;
         }
 
-        return View(users);
+        var viewModel = new EditUserViewModel
+        {
+            UsersList = users,
+            User = new ApplicationUser(),
+            CurrentFilter = searchString,
+            UserRoles = userRoles,
+        };
+
+        return View(viewModel);
     }
 
     public IActionResult Create()
@@ -47,7 +73,7 @@ public class UsersController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create([Bind("Email", "FirstName", "LastName", "HiringDate", "PID", "DepartmentId", "RoleId", "Password")] CreateUserViewModel model)
+    public async Task<IActionResult> Create([Bind("Email", "FirstName", "LastName", "HiringDate", "PID", "DepartmentId", "RoleId", "Password","ConfirmPassword")] CreateUserViewModel model)
     {
         if (ModelState.IsValid)
         {
@@ -157,7 +183,7 @@ public class UsersController : Controller
         var user = await _userManager.FindByIdAsync(id);
         if (user != null)
         {
-            _userManager.DeleteAsync(user);
+            await _userManager.DeleteAsync(user);
         }
 
         return RedirectToAction("Index");

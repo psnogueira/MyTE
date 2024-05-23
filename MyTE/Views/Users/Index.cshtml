@@ -1,58 +1,72 @@
-﻿@model IEnumerable<ApplicationUser>
+﻿@model MyTE.Models.ViewModel.EditUserViewModel
+
+
 @{
-    ViewData["Title"] = "Usuários";
+    ViewData["Title"] = "Usuário";
     Layout = "~/Views/Shared/_LayoutCRUD.cshtml";
 }
 
 <div class="container mt-3">
     <h1 class="fw-bold display-2 text-white mb-3">@ViewData["Title"]</h1>
-    <div class="row justify-content-between my-3">
-        <form class="col-7" asp-action="Index" method="get">
-            <div class="form-actions input-group w-100">
-                <select class="form-control" @* asp-for="WBSType" asp-items="Model.Type" *@>
-                    <option value="">Todos</option>
-                </select>
+    <div class="d-flex align-items-center justify-content-between my-3">
+        <form asp-action="Index" method="get">
+            <div class="form-actions input-group w-40rem">
+                @* <select class="form-control" asp-for="WBSType" asp-items="Model.Type">
+                <option value="">Todos</option>
+                </select> *@
                 <input type="text" class="form-control w-25" id="wbsName" name="SearchString" value="@ViewData["CurrentFilter"]" placeholder="Buscar por código ou descrição" />
                 <input class="btn btn-outline-primary" type="submit" value="Procurar" />
                 <a class="btn btn-outline-primary align-content-center" asp-action="Index">Lista completa</a>
             </div>
         </form>
-        <div class="col d-flex justify-content-end">
-            <a asp-action="Create" class="btn btn-primary"><i class="bi bi-plus-lg"></i> Novo usuário</a>
-        </div>
+        <a asp-action="Create" class="btn btn-primary"><i class="bi bi-plus-lg"></i> Novo Usuário</a>
+        @*         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#create">
+        <i class="bi bi-plus-lg"></i> Novo usuário
+        </button> *@
     </div>
 </div>
 
-<img class="position-absolute object-fit-cover w-100 h-20rem top-0 z-n1" src="~/img/ArtH3.jpg" alt="Arte ilustrativa" />
+<img class="position-absolute object-fit-cover w-100 h-50 top-0 z-n1" src="~/img/ArtH.jpg" alt="Arte ilustrativa" />
 
 <div class="bg-white container rounded table-responsive">
     <table class="table text-center align-middle">
-        <tr>
-            <th>@Html.DisplayNameFor(model => model.Email)</th>
-            <th>@Html.DisplayNameFor(model => model.FirstName)</th>
-            <th>@Html.DisplayNameFor(model => model.LastName)</th>
-            <th>@Html.DisplayNameFor(model => model.HiringDate)</th>
-            <th>@Html.DisplayNameFor(model => model.PID)</th>
-            <th>@Html.DisplayNameFor(model => model.Department)</th>
-            <th>Ações</th>
-        </tr>
+        <thead>
+            <tr>
+                <th>@Html.DisplayNameFor(model => model.User.Email)</th>
+                <th>@Html.DisplayNameFor(model => model.User.FullName)</th>
+                <th>@Html.DisplayNameFor(model => model.User.HiringDate)</th>
+                <th>@Html.DisplayNameFor(model => model.User.PID)</th>
+                <th>@Html.DisplayNameFor(model => model.User.DepartmentId)</th>
+                <th>@Html.DisplayNameFor(model => model.User.RoleId)</th>
+                <th>Ações</th>
+            </tr>
         </thead>
         <tbody>
-            @foreach (var user in Model)
+            @foreach (var user in Model.UsersList)
             {
                 <tr>
                     <td>@user.Email</td>
-                    <td>@user.FirstName</td>
-                    <td>@user.LastName</td>
+                    <td>@user.FullName</td>
                     <td>@user.HiringDate.ToShortDateString()</td>
                     <td>@user.PID</td>
                     <td>@user.Department?.Name</td>
+                    <td>
+                        @if (Model.UserRoles.ContainsKey(user.Id))
+                        {
+                            @foreach (var role in Model.UserRoles[user.Id])
+                            {
+                                <span>@role</span>
+                            }
+                        }
+                    </td>
 
                     <td>
                         <a class="text-primary fs-5" asp-action="Edit" asp-route-id="@user.Id"><i class="bi bi-pen"></i></a>
+
                         <a type="button" class="text-primary fs-5 mx-2" data-bs-toggle="modal" data-bs-target="#detail-@user.Id" data-task-id="@user.Id">
                             <i class="bi bi-info-circle"></i>
                         </a>
+
                         <a type="button" class="text-primary fs-5" data-bs-toggle="modal" data-bs-target="#delete-@user.Id" data-task-id="@user.Id">
                             <i class="bi bi-trash3"></i>
                         </a>
@@ -63,54 +77,54 @@
                 <div class="modal fade" id="detail-@user.Id" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                     <div class="modal-dialog modal-dialog-centered">
                         <div class="modal-content">
-                            <div class="modal-header d-flex flex-column border-none align-items-start">
-                                <span class="d-flex w-100 align-items-center">
-                                    <h3 class="text-primary fw-bold ">Detalhes do usuário</h3>
+                            <div class="modal-header d-flex flex-column border-none  align-items-start">
+                                <span class="d-flex w-100 flex-row">
+                                    <h1 class="text-primary fw-bold ">Detalhes do Usuário</h1>
                                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                 </span>
                             </div>
                             <div class="modal-body">
                                 <dl class="row">
-                                    <dt class="col-sm-3">
-                                        @Html.DisplayNameFor(model => model.Id)
+                                    <dt class="col-sm-4">
+                                        @Html.DisplayNameFor(model => model.User.Id)
                                     </dt>
-                                    <dd class="col-sm-9">
+                                    <dd class="col-sm-8">
                                         @Html.DisplayFor(modelItem => user.Id)
                                     </dd>
-                                    <dt class="col-sm-3">
-                                        @Html.DisplayNameFor(model => model.FirstName)
+                                    <dt class="col-sm-4">
+                                        @Html.DisplayNameFor(model => model.User.FirstName)
                                     </dt>
-                                    <dd class="col-sm-9">
+                                    <dd class="col-sm-8">
                                         @Html.DisplayFor(modelItem => user.FirstName)
                                     </dd>
-                                    <dt class="col-sm-3">
-                                        @Html.DisplayNameFor(model => model.LastName)
+                                    <dt class="col-sm-4">
+                                        @Html.DisplayNameFor(model => model.User.LastName)
                                     </dt>
-                                    <dd class="col-sm-9">
+                                    <dd class="col-sm-8">
                                         @Html.DisplayFor(modelItem => user.LastName)
                                     </dd>
-                                    <dt class="col-sm-3">
-                                        @Html.DisplayNameFor(model => model.HiringDate)
+                                    <dt class="col-sm-4">
+                                        @Html.DisplayNameFor(model => model.User.HiringDate)
                                     </dt>
-                                    <dd class="col-sm-9">
+                                    <dd class="col-sm-8">
                                         @Html.DisplayFor(modelItem => user.HiringDate)
                                     </dd>
-                                    <dt class="col-sm-3">
-                                        @Html.DisplayNameFor(model => model.PID)
+                                    <dt class="col-sm-4">
+                                        @Html.DisplayNameFor(model => model.User.PID)
                                     </dt>
-                                    <dd class="col-sm-9">
+                                    <dd class="col-sm-8">
                                         @Html.DisplayFor(modelItem => user.PID)
                                     </dd>
-                                    <dt class="col-sm-3">
-                                        @Html.DisplayNameFor(model => model.Department)
+                                    <dt class="col-sm-4">
+                                        @Html.DisplayNameFor(model => model.User.DepartmentId)
                                     </dt>
-                                    <dd class="col-sm-9">
-                                        @user.Department?.Name
+                                    <dd class="col-sm-8">
+                                        @Html.DisplayFor(modelItem => user.Department.Name)
                                     </dd>
                                 </dl>
                             </div>
                             <div class="modal-footer">
-                                <a type="button" class="btn btn-lg btn-primary w-100 fw-bold" asp-action="Edit" asp-route-id="@user.Id">Editar</a>
+                                <a type="button" class="btn btn-lg btn-primary w-100 fw-bold" asp-action="Edit" asp-route-id="@user.Id"> Editar</a>
                             </div>
                         </div>
                     </div>
@@ -120,49 +134,51 @@
                 <div class="modal fade" id="delete-@user.Id" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                     <div class="modal-dialog modal-dialog-centered">
                         <div class="modal-content">
-                            <div class="modal-header align-items-center">
-                                <h3 class="text-primary fw-bold ">Deletar usuário</h3>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            <div class="modal-header d-flex flex-column border-none  align-items-start">
+                                <span class="d-flex w-100 flex-row">
+                                    <h1 class="text-primary fw-bold ">Deletar Usuário</h1>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </span>
+                                <h3>Tem certeza de que deseja deletar?</h3>
+                                <p class="text-danger mb-0 fw-bold">Esta operação não poderá ser desfeita</p>
                             </div>
                             <div class="modal-body">
-                                <h4>Tem certeza de que deseja deletar?</h4>
-                                <p class="lh-1 mb-4 text-danger">*Esta operação não poderá ser desfeita*</p>
                                 <dl class="row">
-                                    <dt class="col-sm-3">
-                                        @Html.DisplayNameFor(model => model.Id)
+                                    <dt class="col-sm-4">
+                                        @Html.DisplayNameFor(model => model.User.Id)
                                     </dt>
-                                    <dd class="col-sm-9">
+                                    <dd class="col-sm-8">
                                         @Html.DisplayFor(modelItem => user.Id)
                                     </dd>
-                                    <dt class="col-sm-3">
-                                        @Html.DisplayNameFor(model => model.FirstName)
+                                    <dt class="col-sm-4">
+                                        @Html.DisplayNameFor(model => model.User.FirstName)
                                     </dt>
-                                    <dd class="col-sm-9">
+                                    <dd class="col-sm-8">
                                         @Html.DisplayFor(modelItem => user.FirstName)
                                     </dd>
-                                    <dt class="col-sm-3">
-                                        @Html.DisplayNameFor(model => model.LastName)
+                                    <dt class="col-sm-4">
+                                        @Html.DisplayNameFor(model => model.User.LastName)
                                     </dt>
-                                    <dd class="col-sm-9">
+                                    <dd class="col-sm-8">
                                         @Html.DisplayFor(modelItem => user.LastName)
                                     </dd>
-                                    <dt class="col-sm-3">
-                                        @Html.DisplayNameFor(model => model.HiringDate)
+                                    <dt class="col-sm-4">
+                                        @Html.DisplayNameFor(model => model.User.HiringDate)
                                     </dt>
-                                    <dd class="col-sm-9">
+                                    <dd class="col-sm-8">
                                         @Html.DisplayFor(modelItem => user.HiringDate)
                                     </dd>
-                                    <dt class="col-sm-3">
-                                        @Html.DisplayNameFor(model => model.PID)
+                                    <dt class="col-sm-4">
+                                        @Html.DisplayNameFor(model => model.User.PID)
                                     </dt>
-                                    <dd class="col-sm-9">
+                                    <dd class="col-sm-8">
                                         @Html.DisplayFor(modelItem => user.PID)
                                     </dd>
-                                    <dt class="col-sm-3">
-                                        @Html.DisplayNameFor(model => model.Department)
+                                    <dt class="col-sm-4">
+                                        @Html.DisplayNameFor(model => model.User.DepartmentId)
                                     </dt>
-                                    <dd class="col-sm-9">
-                                        @user.Department?.Name
+                                    <dd class="col-sm-8">
+                                        @Html.DisplayFor(modelItem => user.Department.Name)
                                     </dd>
                                 </dl>
                             </div>
@@ -176,3 +192,87 @@
         </tbody>
     </table>
 </div>
+
+<nav aria-label="Page navigation example" class="container mt-4">
+    <ul class="pagination">
+        <li class="page-item @(Model.UsersList.HasPreviousPage ? "" : "disabled")">
+            <a class="page-link" asp-action="Index" asp-route-pageNumber="@(Model.UsersList.PageIndex - 1)" asp-route-searchString="@Model.CurrentFilter">Anterior</a>
+        </li>
+        @for (int i = 1; i <= Model.UsersList.TotalPages; i++)
+        {
+            <li class="page-item @(i == Model.UsersList.PageIndex ? "active" : "")">
+                <a class="page-link" asp-action="Index" asp-route-pageNumber="@i" asp-route-searchString="@Model.CurrentFilter">@i</a>
+            </li>
+        }
+        <li class="page-item @(Model.UsersList.HasNextPage ? "" : "disabled")">
+            <a class="page-link" asp-action="Index" asp-route-pageNumber="@(Model.UsersList.PageIndex + 1)" asp-route-searchString="@Model.CurrentFilter">Próxima</a>
+        </li>
+    </ul>
+</nav>
+
+@* Create Modal *@
+@* <div class="modal fade" id="create" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title text-primary fs-3" id="exampleModalLabel">Criar nova WBS</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form asp-action="Create">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <div class="form-floating mb-3">
+                        <input asp-for="WBS.Code" class="form-control" placeholder="code" />
+                        <label asp-for="WBS.Code" class="form-label text-secondary"></label>
+                        <span asp-validation-for="WBS.Code" class="text-danger"></span>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <input asp-for="WBS.Desc" class="form-control" placeholder="desc" />
+                        <label asp-for="WBS.Desc" class="form-label text-secondary"></label>
+                        <span asp-validation-for="WBS.Desc" class="text-danger"></span>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <select asp-for="WBS.Type" class="form-control">
+                            <option value="1">Chargable</option>
+                            <option value="2">Non-Chargable</option>
+                        </select>
+                        <label asp-for="WBS.Type" class="form-label text-secondary"></label>
+                        <span asp-validation-for="WBS.Type" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <input type="submit" value="Criar" class="btn btn-lg btn-primary w-100 fw-bold" />
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div> *@
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // O ID deve ser igual ao colocado no input do search
+            $("#wbsName").autocomplete({
+                source: function (request, response) {
+                    var tableName = "WBS"; // O ID deve ser igual ao colocado no input do search
+                    var columnName1 = "Code"; // Nome da primeira coluna usada no Auto-complete
+                    var columnName2 = "Desc"; // Nome da segunda coluna usada no Auto-complete
+                    var url = 'api/autocomplete/' + tableName + '/search';
+                    var data = { term: request.term, columnName1: columnName1 };
+
+                    if (columnName2) {
+                        data.columnName2 = columnName2;
+                    }
+
+                    $.ajax({
+                        url: url,
+                        data: data,
+                        success: function (data) {
+                            response(data);
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+}
