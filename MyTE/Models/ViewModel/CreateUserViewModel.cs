@@ -29,4 +29,9 @@ public class CreateUserViewModel
     [Required]
     [DataType(DataType.Password)]
     public string Password { get; set; }
+
+    [DataType(DataType.Password)]
+    [Display(Name = "Confirmar senha")]
+    [Compare("Password", ErrorMessage = "As senhas digitadas não correspondem.")]
+    public string ConfirmPassword { get; set; }
 }
