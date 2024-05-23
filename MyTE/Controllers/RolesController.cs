@@ -6,7 +6,6 @@ using System.Reflection.Emit;
 
 namespace MyTE.Controllers
 {
-    //[Authorize(Roles = "admin")]
     [Authorize(Policy = "RequerPerfilAdmin")]
     public class RolesController : Controller
     {

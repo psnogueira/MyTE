@@ -8,7 +8,7 @@ using MyTE.Models;
 using MyTE.Models.ViewModel;
 using MyTE.Pagination;
 
-//[Authorize(Roles = "admin")]
+[Authorize(Policy = "RequerPerfilAdmin")]
 public class UsersController : Controller
 {
     private readonly UserManager<ApplicationUser> _userManager;
@@ -33,7 +33,8 @@ public class UsersController : Controller
 
         if (!string.IsNullOrEmpty(searchString))
         {
-            usersQuery = usersQuery.Where(s => s.FirstName.Contains(searchString));
+            usersQuery = usersQuery.Where(s => s.LastName.Contains(searchString)
+                                               || s.Email.Contains(searchString));
         }
 
         if(departmentType.HasValue && departmentType != 0)
@@ -108,7 +109,7 @@ public class UsersController : Controller
                         }
                     }
                 }
-
+                TempData["SuccessMessage"] = "Usuário cadastrado com sucesso!";
                 return RedirectToAction(nameof(Index));
             }
 
@@ -166,6 +167,7 @@ public class UsersController : Controller
                 var result = await _userManager.UpdateAsync(user);
                 if (result.Succeeded)
                 {
+                    TempData["SuccessMessage2"] = "Usuário editado com sucesso!";
                     return RedirectToAction(nameof(Index));
                 }
 

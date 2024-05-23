@@ -53,11 +53,17 @@
                 <label asp-for="RoleId" class="control-label text-secondary"></label>
                 <span asp-validation-for="RoleId" class="text-danger"></span>
             </div>
-
-            <div class="form-floating mb-3">
-                <input asp-for="Password" type="password" class="form-control" placeholder="."/>
-                <label asp-for="Password" class="control-label text-secondary"></label>
-                <span asp-validation-for="Password" class="text-danger"></span>
+            <div class="row">
+                <div class="col form-floating mb-3">
+                    <input asp-for="Password" type="password" class="form-control" placeholder="." />
+                    <label asp-for="Password" class="ms-3 ps-2 control-label text-secondary"></label>
+                    <span asp-validation-for="Password" class="text-danger"></span>
+                </div>
+                <div class="col form-floating mb-3">
+                    <input asp-for="ConfirmPassword" type="password" class="form-control" placeholder="." />
+                    <label asp-for="ConfirmPassword" class="ms-3 ps-2 control-label text-secondary"></label>
+                    <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                </div>
             </div>
             <button type="submit" class="btn btn-primary btn-lg fw-bold w-100">Create</button>
         </form>

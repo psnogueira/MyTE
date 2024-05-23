@@ -1,9 +1,7 @@
-﻿@model EditUserViewModel
+﻿@model MyTE.Models.ViewModel.EditUserViewModel
 @{
     Layout = "~/Views/Shared/_LayoutRegister.cshtml";
 }
-@model MyTE.Models.ViewModel.EditUserViewModel
-
 
 <div class="d-flex flex-wrap justify-content-between dvh-100">
     <div class="col-md-5 h-100 mx-auto">
@@ -42,16 +40,12 @@
                 </div>
             </div>
             <div class="form-floating mb-3">
-                <select asp-for="DepartmentId" class="form-control" asp-items="ViewBag.Departments">
-                    <option selected disabled value="">-------</option>
-                </select>
+                <select asp-for="DepartmentId" class="form-control" asp-items="ViewBag.Departments"></select>
                 <label asp-for="DepartmentId" class="control-label text-secondary"></label>
                 <span asp-validation-for="DepartmentId" class="text-danger"></span>
             </div>
             <div class="form-floating mb-3">
-                <select asp-for="RoleId" class="form-control" asp-items="ViewBag.Roles">
-                    <option selected disabled value="">-------</option>
-                </select>
+                <select asp-for="RoleId" class="form-control" asp-items="ViewBag.Roles"></select>
                 <label asp-for="RoleId" class="control-label text-secondary"></label>
                 <span asp-validation-for="RoleId" class="text-danger"></span>
             </div>

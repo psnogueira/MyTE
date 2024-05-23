@@ -56,37 +56,6 @@ namespace MyTE.Controllers
             return View(viewModel);
         }
         
-        public async Task<IActionResult> UserIndex(string searchString, int? pageNumber, WBSType? wbsType)
-        {
-            int pageSize = 5;
-            ViewData["CurrentFilter"] = searchString;
-            var wbs = from s in _context.WBS
-                           select s;
-            
-            IQueryable<WBSType> wbsQuery = from m in _context.WBS
-                                           orderby m.Type
-                                           select m.Type;
-
-            if (!string.IsNullOrEmpty(searchString))
-            {
-                wbs = wbs.Where(s => s.Code.Contains(searchString)
-                                       || s.Desc.Contains(searchString));
-            }
-
-            if (wbsType.HasValue)
-            {
-                wbs = wbs.Where(x => x.Type == wbsType.Value);
-            }
-
-            var viewModel = new WBSViewModel
-            {
-                WBSList = await PaginatedList<WBS>.CreateAsync(wbs.AsNoTracking(), pageNumber ?? 1, pageSize),
-                Type = new SelectList(await wbsQuery.Distinct().ToListAsync()),
-                WBS = new WBS(),
-                CurrentFilter = searchString
-            };
-            return View(viewModel);
-        }
 
         // GET: WBS/Details/5
         [Authorize(Policy = "RequerPerfilAdmin")]
