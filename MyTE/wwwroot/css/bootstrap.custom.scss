@@ -1,0 +1,100 @@
+/*:root {
+    --violet-1000: #081F5C;
+    --violet-500: #334EAC;
+    --violet-300: #7096D1;
+    --violet-100: #D0E3FF;
+    --violet-50: #EDF1F6;
+    --primary-1000: var(--violet-1000);
+    --primary-500: var(--violet-500);
+    --primary-300: var(--violet-300);
+    --primary-100: var(--violet-100);
+    --primary-50: var(--violet-50);
+}*/
+
+$primary: #334EAC;
+$secondary: #7096D1;
+
+@import "../lib/bootstrap/scss/bootstrap";
+
+.fs-10px{
+    font-size: 10px;
+}
+
+.text-invert {
+    filter: invert(1);
+    mix-blend-mode: difference;
+}
+
+.bg-violet {
+    background: #EDF1F6;
+}
+
+.btn-outline-secondary:hover{
+    color: white;
+}
+
+.w-40rem{
+    width: 40rem;
+}
+
+.w-20rem {
+    width: 25.3rem;
+}
+
+.h-20rem{
+    height: 20rem;
+}
+
+.h-40rem {
+    height: 48rem;
+}
+
+.rotate-90 {
+    transform: rotate(90deg);
+}
+
+.img-end {
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: -100;
+    width: 50%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: $primary;
+    font-weight: 700;
+    font-size: 25px;
+    text-decoration: none;
+}
+
+.logo-sm {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: $primary;
+    font-weight: 700;
+    font-size: 20px;
+    text-decoration: none;
+}
+
+.logo-sm:hover{
+    color: $primary;
+}
+
+.logo img {
+    height: 35px;
+}
+
+.logo-sm img {
+    height: 30px;
+}
+
+.dvh-100 {
+    height: 100dvh;
+}

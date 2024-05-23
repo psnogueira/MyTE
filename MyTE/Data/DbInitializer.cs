@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿// Esse arquivo configura as inicializações do projeto conforme definido no Program.cs
+
+using Microsoft.AspNetCore.Identity;
 using MyTE.Models;
 
 namespace MyTE.Data
@@ -48,9 +50,10 @@ namespace MyTE.Data
 
             if (admin == null)
             {
-                // Assume que IT é o primeiro departamento e seu ID é 1
+                // Procura pelo departamento de TI para atribuir ao Admin e caso não encontre atribui a ele o ID do primeiro departamento existente no banco de dados 
                 var departmentId = context.Department.FirstOrDefault(d => d.Name == "TI")?.DepartmentId ?? 1;
 
+                // Cadastra o usuário Admin
                 admin = new ApplicationUser
                 {
                     UserName = adminEmail,

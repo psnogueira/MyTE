@@ -2,11 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using MyTE.Data;
 using MyTE.Models;
+using MyTE.Models.Enum;
+using MyTE.Models.ViewModel;
+using MyTE.Pagination;
 
 namespace MyTE.Controllers
 {
@@ -20,12 +24,72 @@ namespace MyTE.Controllers
         }
 
         // GET: WBS
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string searchString, int? pageNumber, WBSType? wbsType)
         {
-            return View(await _context.WBS.ToListAsync());
+            int pageSize = 5;
+            ViewData["CurrentFilter"] = searchString;
+            var wbs = from s in _context.WBS
+                           select s;
+            
+            IQueryable<WBSType> wbsQuery = from m in _context.WBS
+                                           orderby m.Type
+                                           select m.Type;
+
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                wbs = wbs.Where(s => s.Code.Contains(searchString)
+                                       || s.Desc.Contains(searchString));
+            }
+
+            if (wbsType.HasValue)
+            {
+                wbs = wbs.Where(x => x.Type == wbsType.Value);
+            }
+
+            var viewModel = new WBSViewModel
+            {
+                WBSList = await PaginatedList<WBS>.CreateAsync(wbs.AsNoTracking(), pageNumber ?? 1, pageSize),
+                Type = new SelectList(await wbsQuery.Distinct().ToListAsync()),
+                WBS = new WBS(),
+                CurrentFilter = searchString
+            };
+            return View(viewModel);
+        }
+        
+        public async Task<IActionResult> UserIndex(string searchString, int? pageNumber, WBSType? wbsType)
+        {
+            int pageSize = 5;
+            ViewData["CurrentFilter"] = searchString;
+            var wbs = from s in _context.WBS
+                           select s;
+            
+            IQueryable<WBSType> wbsQuery = from m in _context.WBS
+                                           orderby m.Type
+                                           select m.Type;
+
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                wbs = wbs.Where(s => s.Code.Contains(searchString)
+                                       || s.Desc.Contains(searchString));
+            }
+
+            if (wbsType.HasValue)
+            {
+                wbs = wbs.Where(x => x.Type == wbsType.Value);
+            }
+
+            var viewModel = new WBSViewModel
+            {
+                WBSList = await PaginatedList<WBS>.CreateAsync(wbs.AsNoTracking(), pageNumber ?? 1, pageSize),
+                Type = new SelectList(await wbsQuery.Distinct().ToListAsync()),
+                WBS = new WBS(),
+                CurrentFilter = searchString
+            };
+            return View(viewModel);
         }
 
         // GET: WBS/Details/5
+        [Authorize(Policy = "RequerPerfilAdmin")]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -44,6 +108,7 @@ namespace MyTE.Controllers
         }
 
         // GET: WBS/Create
+        [Authorize(Policy = "RequerPerfilAdmin")]
         public IActionResult Create()
         {
             return View();
@@ -60,12 +125,14 @@ namespace MyTE.Controllers
             {
                 _context.Add(wBS);
                 await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = "WBS criada com sucesso!";
                 return RedirectToAction(nameof(Index));
             }
             return View(wBS);
         }
 
         // GET: WBS/Edit/5
+        [Authorize(Policy = "RequerPerfilAdmin")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -111,33 +178,35 @@ namespace MyTE.Controllers
                         throw;
                     }
                 }
+                TempData["SuccessMessage2"] = "WBS editada com sucesso!";
                 return RedirectToAction(nameof(Index));
             }
             return View(wBS);
         }
 
         // GET: WBS/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
+        //[Authorize(Policy = "RequerPerfilAdmin")]
+        //public async Task<IActionResult> Delete(int? id)
+        //{
+        //    if (id == null)
+        //    {
+        //        return NotFound();
+        //    }
 
-            var wBS = await _context.WBS
-                .FirstOrDefaultAsync(m => m.WBSId == id);
-            if (wBS == null)
-            {
-                return NotFound();
-            }
+        //    var wBS = await _context.WBS
+        //        .FirstOrDefaultAsync(m => m.WBSId == id);
+        //    if (wBS == null)
+        //    {
+        //        return NotFound();
+        //    }
 
-            return View(wBS);
-        }
+        //    return View(wBS);
+        //}
 
         // POST: WBS/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        //[HttpPost, ActionName("Delete")]
+        //    [ValidateAntiForgeryToken]
+            public async Task<IActionResult> Delete(int id)
         {
             var wBS = await _context.WBS.FindAsync(id);
             if (wBS != null)

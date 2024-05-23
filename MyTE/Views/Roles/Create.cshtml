@@ -1,22 +1,36 @@
 ﻿@using Microsoft.AspNetCore.Identity
 @model IdentityRole
 
-<div class="row">
-    <div class="col-md-6">
-        <form method="post">
-            <h5>Criar novo Nível de Acesso</h5>
-            <hr />
+@{
+    ViewData["Title"] = "Criar";
+}
+
+<div class="d-flex justify-content-between align-items-center position-relative">
+    <div class="col-md-5 d-flex flex-column justify-content-evenly ">
+        <a class="position-absolute top-0 mt-2 start-0 d-flex align-items-center gap-1 text-primary fs-5 text-decoration-none" asp-action="Index">
+            <i class="bi bi-arrow-left-short fs-3"></i>Voltar
+        </a>
+        <h1 class="mb-3 text-primary fw-bold">Criar nova role</h1>
+        <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-floating">
-                <input asp-for="Name" class="form-control" aria-required="true" />
-                <label asp-for="Name"></label>
+            <div class="form-floating mb-3">
+                <input asp-for="Name" class="form-control" placeholder="nome" />
+                <label asp-for="Name" class="form-label text-secondary"></label>
                 <span asp-validation-for="Name" class="text-danger"></span>
             </div>
-            <div class="row">
-                <button type="submit" class="btn btn-primary">Salvar</button>
+            <div class="form-group">
+                <input type="submit" value="Criar" class="btn btn-primary btn-lg w-100 fw-bold" />
             </div>
         </form>
     </div>
 
-
+    <div class="col-md-6">
+        <img class=" w-100" src="~/img/artSq.jpg" alt="Arte decorativa" />
+    </div>
 </div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

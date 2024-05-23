@@ -241,23 +241,6 @@ namespace MyTE.Data.Migrations
                     b.ToTable("Department");
                 });
 
-            modelBuilder.Entity("MyTE.Models.Departmente", b =>
-                {
-                    b.Property<int>("DepartmentId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("DepartmentId"));
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.HasKey("DepartmentId");
-
-                    b.ToTable("Departmente");
-                });
 
             modelBuilder.Entity("MyTE.Models.Employee", b =>
                 {

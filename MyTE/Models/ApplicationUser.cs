@@ -1,12 +1,16 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿//Essa classe foi criada para subtituir a classe IdentityUser adicionando novas colunas para a tabela de usuários no banco de dados. Ela estende a classe IdentityUser. É a base para o cadastro de usuários, login e autenticação com Identity. 
+
+using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace MyTE.Models
 {
     public class ApplicationUser : IdentityUser
+
     {
-        [Required(ErrorMessage ="O nome do funcionário é obrigatório.")]
+
+        [Required(ErrorMessage = "O nome do funcionário é obrigatório.")]
         [Display(Name = "Nome")]
         [StringLength(50, ErrorMessage = "O nome do funcionário deve ter no máximo 50 caracteres.")]
         public string FirstName { get; set; }
@@ -31,6 +35,15 @@ namespace MyTE.Models
         public int DepartmentId { get; set; }
 
         public virtual Department Department { get; set; }
+
+        public string RoleId { get; set; }
+
+
+        [NotMapped]
+        public string FullName
+        {
+            get { return $"{FirstName} {LastName}"; }
+        }
 
     }
 }

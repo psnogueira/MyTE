@@ -5,6 +5,7 @@ using System.Diagnostics;
 
 namespace MyTE.Controllers
 {
+    [Authorize(Policy = "Usuario")]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
