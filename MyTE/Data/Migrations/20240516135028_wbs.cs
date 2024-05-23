@@ -10,17 +10,6 @@ namespace MyTE.Data.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropForeignKey(
-                name: "FK_Employee_Departmente_DepartmenteDepartmentId",
-                table: "Employee");
-
-            migrationBuilder.DropIndex(
-                name: "IX_Employee_DepartmenteDepartmentId",
-                table: "Employee");
-
-            migrationBuilder.DropColumn(
-                name: "DepartmenteDepartmentId",
-                table: "Employee");
 
             migrationBuilder.CreateTable(
                 name: "WBS",
@@ -43,24 +32,6 @@ namespace MyTE.Data.Migrations
         {
             migrationBuilder.DropTable(
                 name: "WBS");
-
-            migrationBuilder.AddColumn<int>(
-                name: "DepartmenteDepartmentId",
-                table: "Employee",
-                type: "int",
-                nullable: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Employee_DepartmenteDepartmentId",
-                table: "Employee",
-                column: "DepartmenteDepartmentId");
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_Employee_Departmente_DepartmenteDepartmentId",
-                table: "Employee",
-                column: "DepartmenteDepartmentId",
-                principalTable: "Departmente",
-                principalColumn: "DepartmentId");
         }
     }
 }
