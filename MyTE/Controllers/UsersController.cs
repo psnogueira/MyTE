@@ -53,7 +53,7 @@ public class UsersController : Controller
             userRoles[user.Id] = roles;
         }
 
-        var viewModel = new EditUserViewModel
+        var viewModel = new UserViewModel
         {
             UsersList = users,
             User = new ApplicationUser(),
@@ -143,6 +143,8 @@ public class UsersController : Controller
             RoleId = user.RoleId
         };
 
+
+
         return View(model);
     }
 
@@ -166,15 +168,34 @@ public class UsersController : Controller
                 var result = await _userManager.UpdateAsync(user);
                 if (result.Succeeded)
                 {
+                    //Remover role anterior
+                    var roles = await _userManager.GetRolesAsync(user);
+                    foreach(var role in roles)
+                    {
+                        await _userManager.RemoveFromRoleAsync(user, role);
+                    }
+                         
+                    // Adiciona o usuário ao papel (role) especificado
+                    var newRole = await _roleManager.FindByIdAsync(model.RoleId);
+                    if (newRole != null)
+                    {
+                        var roleResult = await _userManager.AddToRoleAsync(user, newRole.Name);
+                        if (!roleResult.Succeeded)
+                        {
+                            foreach (var error in roleResult.Errors)
+                            {
+                                ModelState.AddModelError(string.Empty, error.Description);
+                            }
+                        }
+                    }
                     return RedirectToAction(nameof(Index));
-                }
-
-                foreach (var error in result.Errors)
-                {
-                    ModelState.AddModelError(string.Empty, error.Description);
                 }
             }
         }
+
+        ViewBag.Departments = new SelectList(_context.Department, "DepartmentId", "Name", model.DepartmentId);
+        ViewBag.Roles = new SelectList(_roleManager.Roles, "Id", "Name", model.RoleId);
+
         return View(model);
     }
 
