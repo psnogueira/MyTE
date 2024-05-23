@@ -64,6 +64,7 @@ namespace MyTE.Controllers
             if (!_manager.RoleExistsAsync(role.Name).GetAwaiter().GetResult())
             {
                 _manager.CreateAsync(new IdentityRole(role.Name)).GetAwaiter().GetResult();
+                TempData["SuccessMessage"] = "Role criada com sucesso!";
             }
 
             return RedirectToAction("Index");
@@ -85,7 +86,7 @@ namespace MyTE.Controllers
 
             return View(role);
         }
-
+        
         [HttpGet]
         public async Task<IActionResult> Edit(string id)
         {
@@ -99,7 +100,7 @@ namespace MyTE.Controllers
             {
                 return NotFound();
             }
-
+            TempData["SuccessMessage2"] = "Role editada com sucesso!";
             return View(role);
 
         }

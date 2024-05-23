@@ -84,30 +84,36 @@
     {
         if (TempData["SuccessMessage"] != null)
         {
-            <div class="alert alert-secondary shadow alert-dismissible fade show position-fixed bottom-0 end-0 p-3 m-3 rounded" role="alert">
-                <div class="alert-heading align-items-center">
-                    <strong class="me-4 pe-1">@TempData["SuccessMessage"]</strong>
-                    <small type="button" class="btn-close align-items-center" data-bs-dismiss="alert" aria-label="Close"></small>
+            <div class="alert alert-success d-flex align-items-center shadow alert-dismissible fade show position-fixed bottom-0 end-0 p-3 m-3 rounded" role="alert" >
+                <i class="bi bi-check-lg fs-1 me-3"></i>
+                <div>
+                    <div class="alert-heading align-items-center">
+                        <strong class="me-4 pe-1">@TempData["SuccessMessage"]</strong>
+                        <small type="button" class="btn-close align-items-center" data-bs-dismiss="alert" aria-label="Close"></small>
+                    </div>
+                    Você pode encontrá-la na tabela.
                 </div>
-                Você pode encontrá-la na lista.
             </div>
         }
         if (TempData["SuccessMessage2"] != null)
         {
-            <div class="alert alert-secondary shadow alert-dismissible fade show position-fixed bottom-0 end-0 p-3 m-3 rounded" role="alert">
-                <div class="alert-heading align-items-center">
-                    <strong class="me-4 pe-1">@TempData["SuccessMessage2"]</strong>
-                    <small type="button" class="btn-close align-items-center" data-bs-dismiss="alert" aria-label="Close"></small>
+            <div class="alert alert-success d-flex align-items-center shadow alert-dismissible fade show position-fixed bottom-0 end-0 p-3 m-3 rounded" role="alert">
+                <i class="bi bi-check-lg fs-1 me-3"></i>
+                <div>
+                    <div class="alert-heading align-items-center">
+                        <strong class="me-4 pe-1">@TempData["SuccessMessage2"]</strong>
+                        <small type="button" class="btn-close align-items-center" data-bs-dismiss="alert" aria-label="Close"></small>
+                    </div>
+                    Você pode encontrá-la na tabela.
                 </div>
-                Você pode encontrá-la na lista.
             </div>
         }
 
         <div class="container mt-3">
             <h1 class="fw-bold display-2 text-white mb-3">WBS</h1>
-            <div class="d-flex align-items-center justify-content-between my-3">
-                <form asp-action="Index" method="get">
-                    <div class="form-actions input-group w-40rem">
+            <div class="row justify-content-between my-3">
+                <form class="col-7" asp-action="Index" method="get">
+                    <div class="form-actions input-group w-100">
                         <select class="form-control" asp-for="WBSType" asp-items="Model.Type">
                             <option value="">Todos</option>
                         </select>
@@ -116,7 +122,9 @@
                         <a class="btn btn-outline-primary align-content-center" asp-action="Index">Lista completa</a>
                     </div>
                 </form>
-                <a asp-action="Create" class="btn btn-primary"><i class="bi bi-plus-lg"></i> Nova WBS</a>
+                <div class="col d-flex justify-content-end">
+                    <a asp-action="Create" class="btn btn-primary"><i class="bi bi-plus-lg"></i> Nova WBS</a>
+                </div>
             </div>
         </div>
 

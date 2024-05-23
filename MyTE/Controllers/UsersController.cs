@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using MyTE.Data;
 using MyTE.Models;
 
-[Authorize(Roles = "admin")]
+//[Authorize(Roles = "admin")]
 public class UsersController : Controller
 {
     private readonly UserManager<ApplicationUser> _userManager;
