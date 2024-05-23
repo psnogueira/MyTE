@@ -36,10 +36,12 @@ namespace MyTE.Models
 
         public virtual Department Department { get; set; }
 
+        [Display(Name = "Nível de Acesso")]
         public string RoleId { get; set; }
 
 
         [NotMapped]
+        [Display(Name = "Nome Completo")]
         public string FullName
         {
             get { return $"{FirstName} {LastName}"; }
