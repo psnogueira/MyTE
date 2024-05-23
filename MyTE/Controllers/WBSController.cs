@@ -206,14 +206,15 @@ namespace MyTE.Controllers
         // POST: WBS/Delete/5
         //[HttpPost, ActionName("Delete")]
         //    [ValidateAntiForgeryToken]
-            public async Task<IActionResult> Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
             var wBS = await _context.WBS.FindAsync(id);
-            if (wBS != null)
+            if (wBS == null)
             {
-                _context.WBS.Remove(wBS);
+                return NotFound();
             }
 
+            _context.WBS.Remove(wBS);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
