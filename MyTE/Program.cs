@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using MyTE.Data;
+using MyTE.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,16 +11,20 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-builder.Services.AddIdentity<IdentityUser, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = true)
+// Substitui AddDefaultIdentity por AddIdentity que é uma forma mais detalhada possibilitando habilitar o gerencimaneto de Roles e usa como base ApplicationUser em vez de IdentityUser
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultUI()
     .AddDefaultTokenProviders();
 
+// Define política para autorização apenas do perfil admin para acessar algumas funcionalidades
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("RequerPerfilAdmin",
         policy => policy.RequireRole("admin"));
+    options.AddPolicy("Usuario",
+        policy => policy.RequireRole("user", "admin"));
 });
 
 builder.Services.AddControllersWithViews();
@@ -59,6 +64,7 @@ app.MapControllerRoute(
 
 app.MapRazorPages();
 
+// Cria um escopo de serviço para inicializar o banco de dados e logar erros se ocorrerem durante a inicialização (DbInitializer).
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
