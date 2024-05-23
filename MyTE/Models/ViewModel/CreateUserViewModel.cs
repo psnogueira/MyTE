@@ -1,10 +1,10 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
+using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-public class EditUserViewModel
+public class CreateUserViewModel
 {
-    public string Id { get; set; }
-
     [Required]
     [EmailAddress]
     public string Email { get; set; }
@@ -25,4 +25,8 @@ public class EditUserViewModel
 
     [Required]
     public string RoleId { get; set; }
+
+    [Required]
+    [DataType(DataType.Password)]
+    public string Password { get; set; }
 }
