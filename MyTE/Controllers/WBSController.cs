@@ -185,13 +185,13 @@ namespace MyTE.Controllers
         }
 
         // GET: WBS/Delete/5
-        [Authorize(Policy = "RequerPerfilAdmin")]
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
+        //[Authorize(Policy = "RequerPerfilAdmin")]
+        //public async Task<IActionResult> Delete(int? id)
+        //{
+        //    if (id == null)
+        //    {
+        //        return NotFound();
+        //    }
 
         //    var wBS = await _context.WBS
         //        .FirstOrDefaultAsync(m => m.WBSId == id);
@@ -205,8 +205,8 @@ namespace MyTE.Controllers
 
         // POST: WBS/Delete/5
         //[HttpPost, ActionName("Delete")]
-        //[ValidateAntiForgeryToken]
-        public async Task<IActionResult> Delete(int id)
+        //    [ValidateAntiForgeryToken]
+            public async Task<IActionResult> Delete(int id)
         {
             var wBS = await _context.WBS.FindAsync(id);
             if (wBS != null)

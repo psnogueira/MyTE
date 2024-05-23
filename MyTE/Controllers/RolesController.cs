@@ -142,11 +142,10 @@ namespace MyTE.Controllers
             var role = await _manager.FindByIdAsync(id);
             if (role != null)
             {
-                _manager.DeleteAsync(role);
+                await _manager.DeleteAsync(role);
             }
 
             return RedirectToAction("Index");
-
         }
 
     }

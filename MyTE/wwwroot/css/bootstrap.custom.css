@@ -11906,6 +11906,10 @@ textarea.form-control-lg {
     display: none !important;
   }
 }
+.fs-10px {
+  font-size: 10px;
+}
+
 .text-invert {
   filter: invert(1);
   mix-blend-mode: difference;

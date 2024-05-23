@@ -16,6 +16,10 @@ $secondary: #7096D1;
 
 @import "../lib/bootstrap/scss/bootstrap";
 
+.fs-10px{
+    font-size: 10px;
+}
+
 .text-invert {
     filter: invert(1);
     mix-blend-mode: difference;

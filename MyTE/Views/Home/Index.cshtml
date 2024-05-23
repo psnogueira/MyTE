@@ -2,17 +2,10 @@
     ViewData["Title"] = "Home Page";
 }
 
-@if (!this.User.Identity.IsAuthenticated){
-<div class="row justify-content-evenly align-items-center">
-    <div class="col-6">
-        <h1 class="fw-bold text-primary mb-3">Sua Ferramenta Completa de Gestão de Tempo</h1>
-        <p>Gerencie seu tempo com eficiência e precisão usando o MyTE. Registre pontos, acompanhe horas trabalhadas e gerencie projetos, WBS, registros e departamentos de forma simples e prática. Otimize sua produtividade e organização com nossa ferramenta inovadora</p>
-        <a class="btn btn-primary" asp-area="Identity" asp-page="/Account/Login">Entre agora</a>
-    </div>
-    <img class="col-5" src="~/img/Tempo3.png" alt="Alternate Text" />
-    </div>
-}
-else
-{
-    <h1>Bem-vindo!</h1>
-}
+
+<div class="text-center">
+    <h1 class="display-4">Welcome</h1>
+    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+</div>
+
+
