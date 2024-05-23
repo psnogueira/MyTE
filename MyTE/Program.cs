@@ -24,7 +24,7 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("RequerPerfilAdmin",
         policy => policy.RequireRole("admin"));
     options.AddPolicy("Usuario",
-        policy => policy.RequireRole("User", "admin"));
+        policy => policy.RequireRole("user", "admin"));
 });
 
 builder.Services.AddControllersWithViews();

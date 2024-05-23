@@ -46,7 +46,8 @@ public class UsersController : Controller
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create(CreateUserViewModel model)
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Create([Bind("Email", "FirstName", "LastName", "HiringDate", "PID", "DepartmentId", "RoleId", "Password")] CreateUserViewModel model)
     {
         if (ModelState.IsValid)
         {
@@ -149,5 +150,17 @@ public class UsersController : Controller
             }
         }
         return View(model);
+    }
+
+    public async Task<IActionResult> Delete(string id)
+    {
+        var user = await _userManager.FindByIdAsync(id);
+        if (user != null)
+        {
+            _userManager.DeleteAsync(user);
+        }
+
+        return RedirectToAction("Index");
+
     }
 }
