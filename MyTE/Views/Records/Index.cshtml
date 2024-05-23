@@ -8,20 +8,21 @@
 <h1>Registro de Horas</h1>
 
 
-
+<form asp-action="Index" method="post">
     
     
     <div class="row">
         <div class="col-4">
             <div class="form-group">
-                <label>Data Inicial</label>
-                <input type="date" name="startDate" class="form-control" />
+                <label>Data</label>
+            <input type="date" name="dataSearch" class="form-control" />
             </div>
         </div>
         <div class=" col-3">
             <button type="submit" class="btn  btn-primary">Filtrar</button>
         </div>
     </div>
+</form>
 <form asp-action="Persist" method="post">
 
     <table class="table">
@@ -62,7 +63,9 @@
             }
             <tr>
                 <td>Total Dia</td>
-                @for (int i = 0; i <= 15; i++) {
+                
+                @for (int i = 0; i <= 15; i++)
+                {
                     <td>
                         <input class="form-control" value="@(Model.First().TotalHoursDay[@i])" readonly/>
                     </td>

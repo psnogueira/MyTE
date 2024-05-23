@@ -16,15 +16,27 @@ namespace MyTE.Controllers
         }
 
         // GET: Records
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(DateTime? dataSearch)
         {
 
             var consultaWbs = from obj in _context.WBS select obj;
             var consultaRecord = from obj in _context.Record select obj;
+            int year = 0;
+            int month = 0;
+            int day = 0;
+            if (dataSearch != null)
+            {
+                year = dataSearch.Value.Year;
+                month = dataSearch.Value.Month;
+                day = dataSearch.Value.Day;
+            }
+            else
+            {
+                year = DateTime.Now.Year;
+                month = DateTime.Now.Month;
+                day = DateTime.Now.Day;
 
-            int year = DateTime.Now.Year;
-            int month = DateTime.Now.Month;
-            int day = DateTime.Now.Day;
+            }
             int dayInit = 0;
             int dayMax = 0;
 
@@ -131,96 +143,6 @@ namespace MyTE.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-
-        // GET: Records/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var @record = await _context.Record.FindAsync(id);
-            if (@record == null)
-            {
-                return NotFound();
-            }
-            return View(@record);
-        }
-
-        // POST: Records/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("RecordId,EmployeeId,WBSId,Date,Hours")] Record @record)
-        {
-            if (id != @record.RecordId)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(@record);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!RecordExists(@record.RecordId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            return View(@record);
-        }
-
-        // GET: Records/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var @record = await _context.Record
-                .FirstOrDefaultAsync(m => m.RecordId == id);
-            if (@record == null)
-            {
-                return NotFound();
-            }
-
-            return View(@record);
-        }
-
-        // POST: Records/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var @record = await _context.Record.FindAsync(id);
-            if (@record != null)
-            {
-                _context.Record.Remove(@record);
-            }
-
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
-
-        private bool RecordExists(int id)
-        {
-            return _context.Record.Any(e => e.RecordId == id);
-        }
-
         //#########################################################################
 
         private bool ValidateRecords(Dictionary<DateTime, double> myMap)
@@ -272,5 +194,4 @@ namespace MyTE.Controllers
         }
 
     }
-
 }
