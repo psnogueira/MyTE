@@ -8,14 +8,16 @@ using MyTE.Models;
 using MyTE.Models.ViewModel;
 using MyTE.Pagination;
 
-[Authorize(Roles = "admin")]
+[Authorize(Policy = "RequerPerfilAdmin")]
 public class UsersController : Controller
 {
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly RoleManager<IdentityRole> _roleManager;
     private readonly ApplicationDbContext _context;
 
-    public UsersController(UserManager<ApplicationUser> userManager, ApplicationDbContext context, RoleManager<IdentityRole> roleManager)
+    public UsersController(UserManager<ApplicationUser> userManager,
+        ApplicationDbContext context,
+        RoleManager<IdentityRole> roleManager)
     {
         _userManager = userManager;
         _context = context;
@@ -31,20 +33,21 @@ public class UsersController : Controller
             .Include(d => d.Department)
             .AsQueryable();
 
+
         if (!string.IsNullOrEmpty(searchString))
         {
-            usersQuery = usersQuery.Where(s => s.FirstName.Contains(searchString));
+            usersQuery = usersQuery.Where(s => s.LastName.Contains(searchString)
+                                               || s.Email.Contains(searchString));
         }
 
-        if(departmentType.HasValue && departmentType != 0)
+        if (departmentType.HasValue && departmentType != 0)
         {
             usersQuery = usersQuery.Where(d => d.DepartmentId == departmentType);
         }
 
-        //var users = _userManager.Users
-        //    .Include(u => u.Department)
-        //    .ToList();
-        var users = await PaginatedList<ApplicationUser>.CreateAsync(usersQuery.AsNoTracking(), pageNumber ?? 1, pagesize);
+        var users = await PaginatedList<ApplicationUser>
+            .CreateAsync(usersQuery
+            .AsNoTracking(), pageNumber ?? 1, pagesize);
         var userRoles = new Dictionary<string, IList<string>>();
 
         foreach (var user in users)
@@ -53,7 +56,7 @@ public class UsersController : Controller
             userRoles[user.Id] = roles;
         }
 
-        var viewModel = new UserViewModel
+        var viewModel = new EditUserViewModel
         {
             UsersList = users,
             User = new ApplicationUser(),
@@ -73,10 +76,22 @@ public class UsersController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create([Bind("Email", "FirstName", "LastName", "HiringDate", "PID", "DepartmentId", "RoleId", "Password","ConfirmPassword")] CreateUserViewModel model)
+    public async Task<IActionResult> Create([Bind("Email", "FirstName", "LastName", "HiringDate", "PID", "DepartmentId", "RoleId", "Password", "ConfirmPassword")] CreateUserViewModel model)
     {
         if (ModelState.IsValid)
         {
+            //Garante que caso ocorra erro de validação o Department e o Role sejam recarregados n página
+            ViewBag.Departments = new SelectList(_context.Department, "DepartmentId", "Name", model.DepartmentId);
+            ViewBag.Roles = new SelectList(_roleManager.Roles, "Id", "Name", model.RoleId);
+
+            // Verifica se o PID cadastrado já existe na tabela
+            var existingPid = await _context.Users.FirstOrDefaultAsync(p => p.PID == model.PID);
+            if (existingPid != null)
+            {
+                ModelState.AddModelError("PID", "PID já existe.");
+                return View(model);
+            }
+
             var user = new ApplicationUser
             {
                 NormalizedUserName = model.Email,
@@ -90,7 +105,6 @@ public class UsersController : Controller
                 DepartmentId = model.DepartmentId,
                 RoleId = model.RoleId
             };
-
 
             var result = await _userManager.CreateAsync(user, model.Password);
             if (result.Succeeded)
@@ -108,7 +122,7 @@ public class UsersController : Controller
                         }
                     }
                 }
-
+                TempData["SuccessMessage"] = "Usuário cadastrado com sucesso!";
                 return RedirectToAction(nameof(Index));
             }
 
@@ -117,7 +131,7 @@ public class UsersController : Controller
                 ModelState.AddModelError(string.Empty, error.Description);
             }
         }
-        return View(model);
+        return View("Error", ModelState);
     }
 
     public async Task<IActionResult> Edit(string id)
@@ -143,8 +157,6 @@ public class UsersController : Controller
             RoleId = user.RoleId
         };
 
-
-
         return View(model);
     }
 
@@ -168,34 +180,16 @@ public class UsersController : Controller
                 var result = await _userManager.UpdateAsync(user);
                 if (result.Succeeded)
                 {
-                    //Remover role anterior
-                    var roles = await _userManager.GetRolesAsync(user);
-                    foreach(var role in roles)
-                    {
-                        await _userManager.RemoveFromRoleAsync(user, role);
-                    }
-                         
-                    // Adiciona o usuário ao papel (role) especificado
-                    var newRole = await _roleManager.FindByIdAsync(model.RoleId);
-                    if (newRole != null)
-                    {
-                        var roleResult = await _userManager.AddToRoleAsync(user, newRole.Name);
-                        if (!roleResult.Succeeded)
-                        {
-                            foreach (var error in roleResult.Errors)
-                            {
-                                ModelState.AddModelError(string.Empty, error.Description);
-                            }
-                        }
-                    }
+                    TempData["SuccessMessage2"] = "Usuário editado com sucesso!";
                     return RedirectToAction(nameof(Index));
+                }
+
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError(string.Empty, error.Description);
                 }
             }
         }
-
-        ViewBag.Departments = new SelectList(_context.Department, "DepartmentId", "Name", model.DepartmentId);
-        ViewBag.Roles = new SelectList(_roleManager.Roles, "Id", "Name", model.RoleId);
-
         return View(model);
     }
 
@@ -207,7 +201,8 @@ public class UsersController : Controller
             await _userManager.DeleteAsync(user);
         }
 
-        return RedirectToAction("Index");
+        return RedirectToAction(nameof(Index));
 
     }
+
 }
