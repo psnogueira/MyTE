@@ -1,5 +1,4 @@
-﻿@* @model IEnumerable<MyTE.Models.WBS> *@
-@model MyTE.Models.ViewModel.WBSViewModel
+﻿@model MyTE.Models.ViewModel.WBSViewModel
 
 @{
     ViewData["Title"] = "WBS";
@@ -27,7 +26,7 @@
             </div>
         </div>
 
-        <img class="position-absolute object-fit-cover w-100 h-20rem top-0 z-n1" src="~/img/ArtH3.jpg" alt="Arte ilustrativa" />
+        <img class="position-absolute object-fit-cover w-100 h-20rem top-0 z-n1" src="~/img/ArtHz.jpg" alt="Arte ilustrativa" />
 
         <div class="bg-white container rounded table-responsive">
             <table class="table text-center align-middle">
@@ -84,27 +83,31 @@
     {
         if (TempData["SuccessMessage"] != null)
         {
-            <div class="alert alert-success d-flex align-items-center shadow alert-dismissible fade show position-fixed bottom-0 end-0 p-3 m-3 rounded" role="alert" >
-                <i class="bi bi-check-lg fs-1 me-3"></i>
-                <div>
-                    <div class="alert-heading align-items-center">
-                        <strong class="me-4 pe-1">@TempData["SuccessMessage"]</strong>
-                        <small type="button" class="btn-close align-items-center" data-bs-dismiss="alert" aria-label="Close"></small>
+            <div class="sucesso">
+                <div class="alert alert-success d-flex align-items-center shadow alert-dismissible fade show position-fixed bottom-0 end-0 p-3 m-3 rounded" role="alert">
+                    <i class="bi bi-check-lg fs-1 me-3"></i>
+                    <div>
+                        <div class="alert-heading align-items-center">
+                            <strong class="me-4 pe-1">@TempData["SuccessMessage"]</strong>
+                            <small type="button" class="btn-close align-items-center" data-bs-dismiss="alert" aria-label="Close"></small>
+                        </div>
+                        Você pode encontrá-la na tabela.
                     </div>
-                    Você pode encontrá-la na tabela.
                 </div>
             </div>
         }
         if (TempData["SuccessMessage2"] != null)
         {
-            <div class="alert alert-success d-flex align-items-center shadow alert-dismissible fade show position-fixed bottom-0 end-0 p-3 m-3 rounded" role="alert">
-                <i class="bi bi-check-lg fs-1 me-3"></i>
-                <div>
-                    <div class="alert-heading align-items-center">
-                        <strong class="me-4 pe-1">@TempData["SuccessMessage2"]</strong>
-                        <small type="button" class="btn-close align-items-center" data-bs-dismiss="alert" aria-label="Close"></small>
+            <div class="sucesso">
+                <div class="alert alert-success d-flex align-items-center shadow alert-dismissible fade show position-fixed bottom-0 end-0 p-3 m-3 rounded" role="alert">
+                    <i class="bi bi-check-lg fs-1 me-3"></i>
+                    <div>
+                        <div class="alert-heading align-items-center">
+                            <strong class="me-4 pe-1">@TempData["SuccessMessage2"]</strong>
+                            <small type="button" class="btn-close align-items-center" data-bs-dismiss="alert" aria-label="Close"></small>
+                        </div>
+                        Você pode encontrá-la na tabela.
                     </div>
-                    Você pode encontrá-la na tabela.
                 </div>
             </div>
         }
@@ -128,7 +131,7 @@
             </div>
         </div>
 
-        <img class="position-absolute object-fit-cover w-100 h-20rem top-0 z-n1" src="~/img/ArtH3.jpg" alt="Arte ilustrativa" />
+        <img class="position-absolute object-fit-cover w-100 h-20rem top-0 z-n1" src="~/img/ArtHz.jpg" alt="Arte ilustrativa" />
 
         <div class="bg-white container rounded table-responsive">
             <table class="table text-center align-middle">

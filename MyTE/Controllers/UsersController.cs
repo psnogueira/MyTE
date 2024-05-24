@@ -33,6 +33,12 @@ public class UsersController : Controller
             .Include(d => d.Department)
             .AsQueryable();
 
+        var departments = _context.Department.ToList();
+
+        // Create SelectList with department options
+        var departmentList = new SelectList(
+            departments.Select(d => new { Value = d.DepartmentId, Text = d.Name }),
+            "Value", "Text");
 
         if (!string.IsNullOrEmpty(searchString))
         {
@@ -56,9 +62,11 @@ public class UsersController : Controller
             userRoles[user.Id] = roles;
         }
 
-        var viewModel = new EditUserViewModel
+        var viewModel = new UserViewModel
         {
             UsersList = users,
+            Type = departmentList, // Set the populated SelectList
+            DepartmentType = departmentType != null ? departments.FirstOrDefault(d => d.DepartmentId == departmentType) : null, // Set selected department object (optional)
             User = new ApplicationUser(),
             CurrentFilter = searchString,
             UserRoles = userRoles,
