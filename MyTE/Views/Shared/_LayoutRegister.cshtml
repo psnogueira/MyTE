@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html lang="en" class="overflow-hidden">
+<html lang="en" class="vh-100">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -27,14 +27,8 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Roles" asp-action="Index">Roles</a>
                         </li>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle text-dark" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                Usuários
-                            </a>
-                            <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" asp-controller="Employees" asp-action="Index">Usuários</a></li>
-                                <li><a class="dropdown-item" asp-area="Identity" asp-page="/Account/Register">Cadastrar novo</a></li>
-                            </ul>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Users" asp-action="Index">Usuários</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="WBS" asp-action="Index">WBS</a>

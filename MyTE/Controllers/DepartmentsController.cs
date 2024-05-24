@@ -25,12 +25,12 @@ namespace MyTE.Controllers
         // GET: Departments
         public async Task<IActionResult> Index(string searchString, int? pageNumber)
         {
-            int pageSize = 7;
+            int pageSize = 5;
             ViewData["CurrentFilter"] = searchString;
             var department = from s in _context.Department
                       select s;
 
-            if (!String.IsNullOrEmpty(searchString))
+            if (!string.IsNullOrEmpty(searchString))
             {
 
                 department = department.Where(s => s.Name.Contains(searchString));
@@ -80,6 +80,7 @@ namespace MyTE.Controllers
             {
                 _context.Add(department);
                 await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = "Departamento criado com sucesso!";
                 return RedirectToAction(nameof(Index));
             }
             return View(department);
@@ -131,6 +132,7 @@ namespace MyTE.Controllers
                         throw;
                     }
                 }
+                TempData["SuccessMessage2"] = "Departamento editado com sucesso!";
                 return RedirectToAction(nameof(Index));
             }
             return View(department);

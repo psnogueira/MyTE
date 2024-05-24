@@ -12,7 +12,8 @@ namespace MyTE.Models
 
         [Display(Name = "Código")]
         [Required(ErrorMessage = "Código da WBS é obrigatório.")]
-        [StringLength(16, ErrorMessage = "Código da WBS deve ter no máximo 10 caracteres.")]
+        [StringLength(10, MinimumLength = 4, ErrorMessage = "Código da WBS deve ter no máximo 10 caracteres e no mínimo 4.")]
+        [RegularExpression("^[a-zA-Z0-9]*$", ErrorMessage = "Apenas letras e números são permitidos.")]
         public string Code { get; set; }
 
         [Display(Name = "Descrição")]
