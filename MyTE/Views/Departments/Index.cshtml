@@ -29,6 +29,7 @@
 
 <div class="container mt-3">
     <h1 class="fw-bold display-2 text-white mb-3">@ViewData["Title"]</h1>
+    
     <div class="d-flex align-items-center justify-content-between my-3">
         <form asp-action="Index" method="get">
             <div class="form-actions input-group w-20rem">
@@ -36,6 +37,9 @@
                 <input class="btn btn-outline-secondary" type="submit" value="Procurar" />
                 <a class="btn btn-outline-secondary align-content-center" asp-action="Index">Lista completa</a>
             </div>
+        </form>
+        <form asp-action="ExportToCSV">
+            <button type="submit" class="btn btn-success">Gerar CSV</button>
         </form>
         <a asp-action="Create" class="btn btn-primary"><i class="bi bi-plus-lg"></i> Novo departamento</a>
         @* <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#create">
