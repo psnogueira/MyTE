@@ -11,7 +11,7 @@
     <div class="d-flex align-items-center justify-content-between my-3">
         <form asp-action="Index" method="get">
             <div class="form-actions input-group">
-                <input type="text" class="form-control col-3" id="roleName" name="SearchString" value="@ViewData["CurrentFilter"]" placeholder="Burcar por Id ou nome" />
+                <input type="text" class="form-control col-3" name="SearchString" value="@ViewData["CurrentFilter"]" placeholder="Burcar por Id ou nome" id="autoComplete" data-table="Roles" data-column1="Name" data-column2="" />
                 <input class="btn btn-outline-primary" type="submit" value="Procurar" />
                 <a class="btn btn-outline-primary align-content-center" asp-action="Index">Lista completa</a>
             </div>
@@ -129,31 +129,6 @@
 </div>
 
 @section Scripts {
-    <script>
-        $(document).ready(function () {
-            // O ID deve ser igual ao colocado no input do search
-            $("#roleName").autocomplete({
-                source: function (request, response) {
-                    var tableName = "Roles"; // O ID deve ser igual ao colocado no input do search
-                    var columnName1 = "Name"; // Nome da primeira coluna usada no Auto-complete
-                    var columnName2 = ""; // Nome da segunda coluna usada no Auto-complete
-                    var url = 'api/autocomplete/' + tableName + '/search';
-                    var data = { term: request.term, columnName1: columnName1 };
-
-                    if (columnName2) {
-                        data.columnName2 = columnName2;
-                    }
-
-                    $.ajax({
-                        url: url,
-                        data: data,
-                        success: function (data) {
-                            response(data);
-                        }
-                    });
-                }
-            });
-        });
-    </script>
+    <script src="../wwwroot/js/site.js"></script>
 
 }

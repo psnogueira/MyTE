@@ -132,10 +132,6 @@ public class UsersController : Controller
                 ModelState.AddModelError(string.Empty, error.Description);
             }
         }
-        else
-        {
-            response = Request.Crea();
-        }
         return View("Error", ModelState);
     }
 
@@ -207,6 +203,16 @@ public class UsersController : Controller
         }
 
         return RedirectToAction(nameof(Index));
+    }
 
+    [HttpGet]
+    public async Task<IActionResult> CheckPID(string pid)
+    {
+        var user = await _userManager.Users.SingleOrDefaultAsync(u => u.PID == pid);
+        if (user != null)
+        {
+            return Ok(new { exists = true });
+        }
+        return Ok(new { exists = false });
     }
 }
