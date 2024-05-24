@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MyTE.Data;
 using MyTE.DTO;
@@ -9,15 +10,19 @@ namespace MyTE.Controllers
     public class RecordsController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public RecordsController(ApplicationDbContext context)
+        public RecordsController(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         // GET: Records
         public async Task<IActionResult> Index(DateTime? dataSearch)
         {
+
+            var UserId = _userManager.GetUserId(User);
 
             var consultaWbs = from obj in _context.WBS select obj;
             var consultaRecord = from obj in _context.Record select obj;
@@ -59,7 +64,7 @@ namespace MyTE.Controllers
                 for (int i = dayInit; i <= dayMax; i++) {
 
                     //pegar usuario da sessao, entender como fazer isso
-                    var consultaRecordFinal = consultaRecord.Where(s => s.EmployeeId == 1 && s.Data == new DateTime(year, month, i) && s.WBSId == wbs.WBSId);
+                    var consultaRecordFinal = consultaRecord.Where(s => s.UserId == UserId && s.Data == new DateTime(year, month, i) && s.WBSId == wbs.WBSId);
 
                     Record? result = consultaRecordFinal.FirstOrDefault();
 
@@ -71,7 +76,7 @@ namespace MyTE.Controllers
                         Record record = new Record();
                         record.Data = new DateTime(year, month, i);
                         //pegar usuario da sessao, entender como fazer isso
-                        record.EmployeeId = 1;
+                        record.UserId = UserId;
                         record.WBSId = wbs.WBSId;
                         records.Add(record);
                     }
@@ -85,30 +90,6 @@ namespace MyTE.Controllers
                 list.Add(dto);
             }
             return View(await Task.FromResult(list));
-        }
-
-        // GET: Records/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var @record = await _context.Record
-                .FirstOrDefaultAsync(m => m.RecordId == id);
-            if (@record == null)
-            {
-                return NotFound();
-            }
-
-            return View(@record);
-        }
-
-        // GET: Records/Create
-        public IActionResult Create()
-        {
-            return View();
         }
 
         // POST: Records/Persist
@@ -129,7 +110,7 @@ namespace MyTE.Controllers
                 {
 
                     var recordsExclude = await _context.Record.Where(
-                            r => r.EmployeeId == records[0].EmployeeId
+                            r => r.UserId == records[0].UserId
                             && r.Data >= records[0].Data && r.Data <= records[records.Count()-1].Data
                         ).ToListAsync();
                     _context.Record.RemoveRange(recordsExclude);
@@ -142,8 +123,6 @@ namespace MyTE.Controllers
             }
             return RedirectToAction(nameof(Index));
         }
-
-        //#########################################################################
 
         private bool ValidateRecords(Dictionary<DateTime, double> myMap)
         {
