@@ -5,17 +5,21 @@
     Layout = "~/Views/Shared/_LayoutRegister.cshtml";
 }
 
-<div class="d-flex justify-content-between  ">
+<div class="d-flex justify-content-between ">
     <div class="col-md-5 h-100 d-flex flex-column justify-content-evenly mx-auto">
-        <h1 class="text-primary fw-bold mt-3 mb-4">@ViewData["Title"]</h1>
+        <h1 class="text-primary fw-bold my-3">@ViewData["Title"]</h1>
         <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
             <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
             <div class="row">
                 <div class="col form-floating mb-3">
-                    @* Input Nome *@
+                    <input asp-for="Input.FirstName" class="form-control" aria-required="true" placeholder="Nome" />
+                    <label asp-for="Input.FirstName" class="ms-3 ps-2 text-secondary">Nome</label>
+                    <span asp-validation-for="Input.FirstName" class="text-danger"></span>
                 </div>
                 <div class="col form-floating mb-3">
-                    @* Input sobrenome *@
+                    <input asp-for="Input.LastName" class="form-control" aria-required="true" placeholder="Sobrenome" />
+                    <label asp-for="Input.LastName" class="ms-3 ps-2 text-secondary">Sobrenome</label>
+                    <span asp-validation-for="Input.LastName" class="text-danger"></span>
                 </div>
             </div>
             <div class="form-floating mb-3">
@@ -25,14 +29,22 @@
             </div>
             <div class="row">
                 <div class="col form-floating mb-3">
-                    @* Input data de contratação *@
+                    <input asp-for="Input.HiringDate" type="date" class="form-control" aria-required="true" placeholder="dd/mm/aaaa" />
+                    <label asp-for="Input.HiringDate" class="ms-3 ps-2 text-secondary">Data de contratação</label>
+                    <span asp-validation-for="Input.HiringDate" class="text-danger"></span>
                 </div>
                 <div class="col form-floating mb-3">
-                    @* Input PID *@
+                    <input asp-for="Input.PID" class="form-control" aria-required="true" placeholder="PID" />
+                    <label asp-for="Input.PID" class="ms-3 ps-2 text-secondary">PID</label>
+                    <span asp-validation-for="Input.PID" class="text-danger"></span>
                 </div>
             </div>
             <div class="form-floating mb-3">
-                @* Input departamento *@
+                <select asp-for="Input.DepartmentId" class="form-select" asp-items="@Model.Input.Departments" aria-required="true">
+                    <option disabled selected>------</option>
+                </select>
+                <label asp-for="Input.DepartmentId" class="text-secondary">Selecione o Departamento</label>
+                <span asp-validation-for="Input.DepartmentId" class="text-danger"></span>
             </div>
             <div class="form-floating mb-3">
                 <select asp-for="Input.Role" class="form-select" asp-items="@Model.Input.RolesList" aria-required="true">
@@ -56,8 +68,8 @@
             <button id="registerSubmit" type="submit" class="w-100 btn btn-lg fw-bold btn-primary">Cadastrar</button>
         </form>
     </div>
-    <div class="col-md-6 h-100 overflow-hidden">
-        <img class="img-fluid img-login" src="~/img/art.jpg" alt="Arte ilustrativa" />
+    <div class="col-md-6">
+        <img class="w-100 h-40rem" src="~/img/Art.jpg" alt="Arte ilustrativa" />
     </div>
 </div>
 

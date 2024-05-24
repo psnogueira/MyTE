@@ -137,36 +137,15 @@ namespace MyTE.Controllers
             return View(role);
         }
 
-        [HttpGet]
         public async Task<IActionResult> Delete(string id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var role = await _manager.FindByIdAsync(id);
-            if (role == null)
-            {
-                return NotFound();
-            }
-
-            return View(role);
-
-        }
-
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(string id)
         {
             var role = await _manager.FindByIdAsync(id);
             if (role != null)
             {
-                _manager.DeleteAsync(role);
+                await _manager.DeleteAsync(role);
             }
 
-            return RedirectToAction(nameof(Index));
-
+            return RedirectToAction("Index");
         }
 
     }

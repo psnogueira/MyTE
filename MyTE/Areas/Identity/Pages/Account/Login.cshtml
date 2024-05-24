@@ -6,12 +6,11 @@
     Layout = "~/Views/Shared/_LayoutLogin.cshtml";
 }
 
-
-<div class="d-flex justify-content-between align-items-center dvh-100">
+<div class="d-flex flex-wrap justify-content-between align-items-center dvh-100">
     <div class="col-md-5 h-100 d-flex flex-column justify-content-between mx-auto">
         <h1 class="logo mt-5"><img src="~/img/logo.png" alt="Logo" /> MyTE</h1>
         <section>
-            <h1 class="text-primary display-5 fw-bold mb-5">@ViewData["Title"]</h1>
+            <h1 class="text-primary display-5 fw-bold mb-3">@ViewData["Title"]</h1>
             <form id="account" method="post">
                 <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
                 <div class="form-floating mb-3">
@@ -19,15 +18,23 @@
                     <label asp-for="Input.Email" class="form-label text-secondary">Email</label>
                     <span asp-validation-for="Input.Email" class="text-danger"></span>
                 </div>
-                <div class="form-floating mb-3">
-                    <input asp-for="Input.Password" class="form-control" autocomplete="current-password" aria-required="true" placeholder="password" />
-                    <label asp-for="Input.Password" class="form-label text-secondary">Senha</label>
-                    <span asp-validation-for="Input.Password" class="text-danger"></span>
+
+                <div class="input-group mb-3">
+                    <div class="form-floating">
+                        <input asp-for="Input.Password" class="form-control" id="floatingPassword" autocomplete="current-password" aria-required="true" placeholder="password" />
+                        <label asp-for="Input.Password" class="form-label text-secondary">Senha</label>
+                        <span asp-validation-for="Input.Password" class="text-danger"></span>
+                    </div>
+                    <span class="input-group-text btn btn-primary d-flex align-items-center" id="togglePassword">
+                        <i class="bi bi-eye" id="eyeIcon"></i>
+                    </span>
                 </div>
+
                 <div class="checkbox mb-3">
                     <label asp-for="Input.RememberMe" class="form-label">
                         <input class="form-check-input" asp-for="Input.RememberMe" />
-                        @Html.DisplayNameFor(m => m.Input.RememberMe)
+                        Lembre de mim
+                        @* @Html.DisplayNameFor(m => m.Input.RememberMe) *@
                     </label>
                 </div>
                 <div>
@@ -43,10 +50,27 @@
         </div>
     </div>
     <div class="col-md-6 h-100 overflow-hidden">
-        <img class="img-fluid img-login" src="~/img/art.jpg" alt="Arte ilustrativa" />
+        <img class="img-fluid img-login" src="~/img/Art.jpg" alt="Arte decorativa" />
     </div>
 </div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(() => {
+            $('#togglePassword').click(() => {
+                const input = $('#floatingPassword');
+                const icon = $('#eyeIcon');
+                if (input.attr('type') === 'password') {
+                    input.attr('type', 'text');
+                    icon.removeClass('bi-eye').addClass('bi-eye-slash');
+                } else {
+                    input.attr('type', 'password');
+                    icon.removeClass('bi-eye-slash').addClass('bi-eye');
+                }
+            });
+        });
+    </script>
 }
