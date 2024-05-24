@@ -32,7 +32,7 @@ public class UsersController : Controller
         var usersQuery = _context.Users
             .Include(d => d.Department)
             .AsQueryable();
-
+    
 
         if (!string.IsNullOrEmpty(searchString))
         {
@@ -56,7 +56,7 @@ public class UsersController : Controller
             userRoles[user.Id] = roles;
         }
 
-        var viewModel = new EditUserViewModel
+        var viewModel = new UserViewModel
         {
             UsersList = users,
             User = new ApplicationUser(),
@@ -78,6 +78,7 @@ public class UsersController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create([Bind("Email", "FirstName", "LastName", "HiringDate", "PID", "DepartmentId", "RoleId", "Password", "ConfirmPassword")] CreateUserViewModel model)
     {
+        HttpResponseMessage response;
         if (ModelState.IsValid)
         {
             //Garante que caso ocorra erro de validação o Department e o Role sejam recarregados n página
@@ -130,6 +131,10 @@ public class UsersController : Controller
             {
                 ModelState.AddModelError(string.Empty, error.Description);
             }
+        }
+        else
+        {
+            response = Request.Crea();
         }
         return View("Error", ModelState);
     }
@@ -204,5 +209,4 @@ public class UsersController : Controller
         return RedirectToAction(nameof(Index));
 
     }
-
 }
