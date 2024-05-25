@@ -38,6 +38,7 @@
                 <tr>
                     <td>
                         <select name="listRecordDTO[@i].WBSId" class="form-control">
+                            <option>Selecione a WBS</option>
                             @foreach (var wbs in ViewBag.WBSList)
                             {
                                 <option value="@wbs.WBSId">@wbs.Code - @wbs.Desc</option>
@@ -50,11 +51,11 @@
                         <td>
                             @if (record.Data.DayOfWeek == DayOfWeek.Saturday || record.Data.DayOfWeek == DayOfWeek.Sunday)
                             {
-                                <input type="text" value=" " class="form-control bg-secondary-subtle" readonly />
+                                <input type="text" value="" class="form-control bg-secondary-subtle" readonly />
                             }
                             else
                             {
-                                <input type="text" value="" placeholder="" name="listRecordDTO[@i].records[@j].Hours" class="form-control" oninput="updateTotal(@i, @j)" />
+                                <input type="text" value="" name="listRecordDTO[@i].records[@j].Hours" class="form-control" oninput="updateTotal(@i, @j)" />
                                 <input type="hidden" name="listRecordDTO[@i].records[@j].UserId" value="@record.UserId" class="form-control" />
                                 <input type="hidden" name="listRecordDTO[@i].records[@j].WBSId" value="" class="form-control" />
                                 <input type="hidden" name="listRecordDTO[@i].records[@j].Data" value="@record.Data" class="form-control" />
@@ -71,7 +72,8 @@
                 @for (int i = 0; i < Model.First().records.Count(); i++)
                 {
                     <td>
-                        <input id="totalDay_@i" class="form-control" value="0.00" readonly />
+                        <span id="totalDay_@i">0.00</span>
+                        <div id="errorDay_@i" class="text-danger" style="display: none;">A soma das horas trabalhadas em um dia não pode ultrapassar 24h.</div>
                     </td>
                 }
                 <td></td>
@@ -108,7 +110,20 @@
                 totalDay += value;
             }
         });
-        document.getElementById(`totalDay_${colIndex}`).value = totalDay.toFixed(2);
+
+        var totalDayElement = document.getElementById(`totalDay_${colIndex}`);
+        totalDayElement.innerText = totalDay.toFixed(2);
+
+        // Verifica se a quantidade de horas não ultrapassa 24h por dia
+        var errorElement = document.getElementById(`errorDay_${colIndex}`);
+
+        if (totalDay > 24) {
+            totalDayElement.classList.add("text-danger", "fw-bold");
+            errorElement.style.display = "block";
+        } else {
+            totalDayElement.classList.remove("text-danger", "fw-bold");
+            errorElement.style.display = "none";
+        }
     }
 </script>
 
