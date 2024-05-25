@@ -214,5 +214,19 @@ public class UsersController : Controller
             return Ok(new { exists = true });
         }
         return Ok(new { exists = false });
+
+
+    }
+
+    [AcceptVerbs("Get", "Post")]
+    public IActionResult VerifyEmail(string email)
+    {
+        var user = _context.Users.FirstOrDefault(u => u.Email == email);
+        if (user != null)
+        {
+            return Json($"O email <b>{email}</b> já está em uso.");
+        }
+
+        return Json(true);
     }
 }

@@ -249,5 +249,8 @@
 </div> *@
 
 @section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
     <script src="../wwwroot/js/site.js"></script>
 }
