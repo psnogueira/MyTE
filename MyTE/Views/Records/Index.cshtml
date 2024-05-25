@@ -2,48 +2,39 @@
 
 @{
     ViewData["Title"] = "Index";
-    
 }
 
 <h1>Registro de Horas</h1>
 
-
 <form asp-action="Index" method="post">
-    
-    
     <div class="row">
         <div class="col-4">
             <div class="form-group">
                 <label>Data</label>
-            <input type="date" name="dataSearch" class="form-control" />
+                <input type="date" name="dataSearch" class="form-control" />
             </div>
         </div>
-        <div class=" col-3">
-            <button type="submit" class="btn  btn-primary">Filtrar</button>
+        <div class="col-3">
+            <button type="submit" class="btn btn-primary">Filtrar</button>
         </div>
     </div>
 </form>
-<form asp-action="Persist" method="post">
 
+<form asp-action="Persist" method="post">
     <table class="table">
         <thead>
             <tr>
-                <th>
-                    WBS
-                </th>
-                @foreach (var record in Model.First().records) {
-                    <th>
-                        @Html.DisplayFor(modelItem => record.Data.Day)
-                     </th>
+                <th>WBS</th>
+                @foreach (var record in Model.First().records)
+                {
+                    <th>@Html.DisplayFor(modelItem => record.Data.Day)/@Html.DisplayFor(modelItem => record.Data.Month)</th>
                 }
-                <th>
-                   Total
-                </th>
+                <th>Total WBS</th>
             </tr>
         </thead>
         <tbody>
             @for (int i = 0; i < Model.Count(); i++)
-                {
+            {
                 var item = Model.ElementAt(i);
                 <tr>
                     <td>@Html.DisplayFor(modelItem => item.WBS.Code)</td>
@@ -51,23 +42,30 @@
                     {
                         var record = Model.ElementAt(i).records.ElementAt(j);
                         <td>
-                            <input type="text" name="listRecordDTO[@i].records[@j].Hours" value="@record.Hours" class="form-control" />
-                            <input type="hidden" name="listRecordDTO[@i].records[@j].UserId" value="@record.UserId" class="form-control" />
-                            <input type="hidden" name="listRecordDTO[@i].records[@j].WBSId" value="@record.WBSId" class="form-control" />
-                            <input type="hidden" name="listRecordDTO[@i].records[@j].Data" value="@record.Data" class="form-control" />
+                            @if (record.Data.DayOfWeek == DayOfWeek.Saturday || record.Data.DayOfWeek == DayOfWeek.Sunday)
+                            {
+                                <input type="text" value=" " class="form-control bg-secondary-subtle" readonly />
+                            }
+                            else
+                            {
+                                <input type="text" value=" " placeholder="" name="listRecordDTO[@i].records[@j].Hours" class="form-control" oninput="updateTotal(@i, @j)" />
+                                <input type="hidden" name="listRecordDTO[@i].records[@j].UserId" value="@record.UserId" class="form-control" />
+                                <input type="hidden" name="listRecordDTO[@i].records[@j].WBSId" value="@record.WBSId" class="form-control" />
+                                <input type="hidden" name="listRecordDTO[@i].records[@j].Data" value="@record.Data" class="form-control" />
+                            }
                         </td>
                     }
-                    <td>@Html.DisplayFor(modelItem => item.TotalHours)</td>
-                
+                    <td>
+                        <span id="totalWBS_@i">@item.TotalHours</span>
+                    </td>
                 </tr>
             }
             <tr>
-                <td>Total Dia</td>
-                
+                <td class="fw-bold">Total Dia</td>
                 @for (int i = 0; i <= 15; i++)
                 {
                     <td>
-                        <input class="form-control" value="@(Model.First().TotalHoursDay[@i])" readonly/>
+                        <input id="totalDay_@i" class="form-control" value="@(Model.First().TotalHoursDay[@i])" readonly />
                     </td>
                 }
                 <td></td>
@@ -78,3 +76,32 @@
         <input type="submit" value="Salvar" class="btn btn-primary" />
     </p>
 </form>
+
+<script>
+    function updateTotal(rowIndex, colIndex) {
+        var totalWBS = 0;
+        var totalDay = 0;
+
+        // Update total for the WBS row
+        var rowInputs = document.querySelectorAll(`[name^='listRecordDTO[${rowIndex}].records']`);
+        rowInputs.forEach(input => {
+            if (input.type === 'text' && !input.readOnly) {
+                var value = parseFloat(input.value);
+                if (!isNaN(value)) {
+                    totalWBS += value;
+                }
+            }
+        });
+        document.getElementById(`totalWBS_${rowIndex}`).innerText = totalWBS.toFixed(2);
+
+        // Update total for the day column
+        var colInputs = document.querySelectorAll(`[name$='records[${colIndex}].Hours']`);
+        colInputs.forEach(input => {
+            var value = parseFloat(input.value);
+            if (!isNaN(value)) {
+                totalDay += value;
+            }
+        });
+        document.getElementById(`totalDay_${colIndex}`).value = totalDay.toFixed(2);
+    }
+</script>
