@@ -1,7 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
-using MyTE.Models;
 using MyTE.Pagination;
-using System.ComponentModel.DataAnnotations;
 
 namespace MyTE.Models.ViewModel
 {

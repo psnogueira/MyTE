@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Reflection.Emit;
 
 namespace MyTE.Controllers
 {
@@ -27,27 +26,6 @@ namespace MyTE.Controllers
             }
 
             return View(await roles.ToListAsync());
-        }
-
-        [Produces("application/json")]
-        [HttpGet("search")]
-        public IActionResult AutoComplete()
-        {
-            try
-            {
-                string term = HttpContext.Request.Query["term"].ToString();
-                var roleName = _manager.Roles
-                    .Where(r => r.Name.Contains(term) || r.Id.Contains(term))
-                    .Select(r => r.Name)
-                    .ToList();
-
-                return Ok(roleName);
-
-            }
-            catch (Exception)
-            {
-                return BadRequest();
-            }
         }
 
         [HttpGet]
