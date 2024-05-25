@@ -24,7 +24,7 @@
     <table class="table">
         <thead>
             <tr>
-                <th>WBS</th>
+                <th class="col-wbs">WBS</th>
                 @foreach (var record in Model.First().records)
                 {
                     <th>@Html.DisplayFor(modelItem => record.Data.Day)/@Html.DisplayFor(modelItem => record.Data.Month)</th>
@@ -33,14 +33,20 @@
             </tr>
         </thead>
         <tbody>
-            @for (int i = 0; i < Model.Count(); i++)
+            @for (int i = 0; i < 4; i++) // Substitui uma linha para cada WBS por 4 linhas onde podem ser escolhidas as WBS através de um select
             {
-                var item = Model.ElementAt(i);
                 <tr>
-                    <td>@Html.DisplayFor(modelItem => item.WBS.Code)</td>
-                    @for (int j = 0; j < item.records.Count(); j++)
+                    <td>
+                        <select name="listRecordDTO[@i].WBSId" class="form-control">
+                            @foreach (var wbs in ViewBag.WBSList)
+                            {
+                                <option value="@wbs.WBSId">@wbs.Code - @wbs.Desc</option>
+                            }
+                        </select>
+                    </td>
+                    @for (int j = 0; j < Model.First().records.Count(); j++)
                     {
-                        var record = Model.ElementAt(i).records.ElementAt(j);
+                        var record = Model.First().records.ElementAt(j);
                         <td>
                             @if (record.Data.DayOfWeek == DayOfWeek.Saturday || record.Data.DayOfWeek == DayOfWeek.Sunday)
                             {
@@ -48,24 +54,24 @@
                             }
                             else
                             {
-                                <input type="text" value=" " placeholder="" name="listRecordDTO[@i].records[@j].Hours" class="form-control" oninput="updateTotal(@i, @j)" />
+                                <input type="text" value="" placeholder="" name="listRecordDTO[@i].records[@j].Hours" class="form-control" oninput="updateTotal(@i, @j)" />
                                 <input type="hidden" name="listRecordDTO[@i].records[@j].UserId" value="@record.UserId" class="form-control" />
-                                <input type="hidden" name="listRecordDTO[@i].records[@j].WBSId" value="@record.WBSId" class="form-control" />
+                                <input type="hidden" name="listRecordDTO[@i].records[@j].WBSId" value="" class="form-control" />
                                 <input type="hidden" name="listRecordDTO[@i].records[@j].Data" value="@record.Data" class="form-control" />
                             }
                         </td>
                     }
                     <td>
-                        <span id="totalWBS_@i">@item.TotalHours</span>
+                        <span id="totalWBS_@i">0.00</span>
                     </td>
                 </tr>
             }
             <tr>
                 <td class="fw-bold">Total Dia</td>
-                @for (int i = 0; i <= 15; i++)
+                @for (int i = 0; i < Model.First().records.Count(); i++)
                 {
                     <td>
-                        <input id="totalDay_@i" class="form-control" value="@(Model.First().TotalHoursDay[@i])" readonly />
+                        <input id="totalDay_@i" class="form-control" value="0.00" readonly />
                     </td>
                 }
                 <td></td>
@@ -82,7 +88,7 @@
         var totalWBS = 0;
         var totalDay = 0;
 
-        // Update total for the WBS row
+        // Atualiza o total da linha (soma de horas da WBS)
         var rowInputs = document.querySelectorAll(`[name^='listRecordDTO[${rowIndex}].records']`);
         rowInputs.forEach(input => {
             if (input.type === 'text' && !input.readOnly) {
@@ -94,7 +100,7 @@
         });
         document.getElementById(`totalWBS_${rowIndex}`).innerText = totalWBS.toFixed(2);
 
-        // Update total for the day column
+        // Atualiza o total da coluna (soma do dia)
         var colInputs = document.querySelectorAll(`[name$='records[${colIndex}].Hours']`);
         colInputs.forEach(input => {
             var value = parseFloat(input.value);
@@ -105,3 +111,9 @@
         document.getElementById(`totalDay_${colIndex}`).value = totalDay.toFixed(2);
     }
 </script>
+
+<style>
+    .col-wbs {
+        width: 20%;
+    }
+</style>

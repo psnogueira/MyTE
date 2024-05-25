@@ -89,6 +89,9 @@ namespace MyTE.Controllers
                 dto.TotalHoursDay = totalHoursDay;
                 list.Add(dto);
             }
+
+            ViewBag.WBSList = await _context.WBS.ToListAsync();
+
             return View(await Task.FromResult(list));
         }
 
