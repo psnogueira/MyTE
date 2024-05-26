@@ -1,15 +1,14 @@
-﻿#nullable disable
+﻿// Esse arquivo foi alterado para incluir os inputs para as informações das colunas adicionadas à tabela de usuários. Serve de base para a View Register. 
+
+#nullable disable
 
 using System.ComponentModel.DataAnnotations;
-using System.Text;
-using System.Text.Encodings.Web;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.AspNetCore.WebUtilities;
 using MyTE.Data;
 using MyTE.Models;
 
@@ -23,7 +22,9 @@ namespace MyTE.Areas.Identity.Pages.Account
         private readonly IUserEmailStore<ApplicationUser> _emailStore;
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
+        // Acrescenta Role Manager para gerenciamento de Roles
         private readonly RoleManager<IdentityRole> _roleManager;
+        // Acrescenta o contexto do banco de dados para obter a lista de departamentos disponíveis para atribuir ao usuário que está sendo criado
         private readonly ApplicationDbContext _context;
 
         public RegisterModel(
@@ -32,6 +33,7 @@ namespace MyTE.Areas.Identity.Pages.Account
             SignInManager<ApplicationUser> signInManager,
             ILogger<RegisterModel> logger,
             IEmailSender emailSender,
+            // Acrescenta Role Manager e contexto do banco de dados ao construtor
             RoleManager<IdentityRole> roleManager,
             ApplicationDbContext context)
         {
@@ -41,6 +43,7 @@ namespace MyTE.Areas.Identity.Pages.Account
             _signInManager = signInManager;
             _logger = logger;
             _emailSender = emailSender;
+            // Faz atribuição do Role Manager e do contexto do banco de dados
             _roleManager = roleManager;
             _context = context;
         }
@@ -53,23 +56,24 @@ namespace MyTE.Areas.Identity.Pages.Account
 
         public class InputModel
         {
+            // Ajusta e traduz os campos já existentes de E-mail, senha e confirmação de senha 
             [Required]
             [EmailAddress]
-            [Display(Name = "Email")]
+            [Display(Name = "E-mail")]
             public string Email { get; set; }
 
             [Required]
-            [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
+            [StringLength(100, ErrorMessage = "A senha deve ter no mínimo 6 caracteres.", MinimumLength = 6)]
             [DataType(DataType.Password)]
-            [Display(Name = "Password")]
+            [Display(Name = "Senha")]
             public string Password { get; set; }
 
             [DataType(DataType.Password)]
-            [Display(Name = "Confirm password")]
-            [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
+            [Display(Name = "Confirmar senha")]
+            [Compare("Password", ErrorMessage = "As senhas digitadas não correspondem.")]
             public string ConfirmPassword { get; set; }
 
-            // Colunas novas inseridas
+            // Cria os inputs para as colunas novas que foram inseridas na tabela de usuários
             [Required(ErrorMessage = "O nome do funcionário é obrigatório.")]
             [Display(Name = "Nome")]
             [StringLength(50, ErrorMessage = "O nome do funcionário deve ter no máximo 50 caracteres.")]
@@ -135,6 +139,7 @@ namespace MyTE.Areas.Identity.Pages.Account
 
             if (ModelState.IsValid)
             {
+                // Substitui o método CreateUser() adicionando as informações obtidas nos input às colunas adicionadas à tabela de usuários
                 var user = new ApplicationUser
                 {
                     UserName = Input.Email,
@@ -184,7 +189,7 @@ namespace MyTE.Areas.Identity.Pages.Account
                 }
             }
 
-            // Se algo falhar, redisplay do formulário
+            // Se algo falhar, carrega novamente o formulário e certifica-se de que as listas de departamentos e roles são recarregadas
             var departments = _context.Department.Select(d => new SelectListItem
             {
                 Value = d.DepartmentId.ToString(),
@@ -197,13 +202,13 @@ namespace MyTE.Areas.Identity.Pages.Account
                 Value = i
             }).ToList();
 
-            // Certifica-se de que as listas de departamentos e roles são recarregadas
             Input.Departments = departments;
             Input.RolesList = roles;
 
             return Page();
         }
 
+        // Substitui onde era utilizado IdentityUser por ApplicationUser (Classe com colunas adicionais)
         private ApplicationUser CreateUser()
         {
             try
@@ -218,6 +223,7 @@ namespace MyTE.Areas.Identity.Pages.Account
             }
         }
 
+        // Substitui onde era utilizado IdentityUser por ApplicationUser (Classe com colunas adicionais)
         private IUserEmailStore<ApplicationUser> GetEmailStore()
         {
             if (!_userManager.SupportsUserEmail)

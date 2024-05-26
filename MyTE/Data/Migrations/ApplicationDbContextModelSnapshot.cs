@@ -261,6 +261,32 @@ namespace MyTE.Data.Migrations
                     b.ToTable("Department");
                 });
 
+            modelBuilder.Entity("MyTE.Models.Record", b =>
+                {
+                    b.Property<int>("RecordId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RecordId"));
+
+                    b.Property<DateTime>("Data")
+                        .HasColumnType("datetime2");
+
+                    b.Property<double>("Hours")
+                        .HasColumnType("float");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("WBSId")
+                        .HasColumnType("int");
+
+                    b.HasKey("RecordId");
+
+                    b.ToTable("Record");
+                });
+
             modelBuilder.Entity("MyTE.Models.WBS", b =>
                 {
                     b.Property<int>("WBSId")
@@ -271,8 +297,8 @@ namespace MyTE.Data.Migrations
 
                     b.Property<string>("Code")
                         .IsRequired()
-                        .HasMaxLength(16)
-                        .HasColumnType("nvarchar(16)");
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
 
                     b.Property<string>("Desc")
                         .IsRequired()
