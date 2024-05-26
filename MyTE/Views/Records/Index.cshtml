@@ -8,14 +8,14 @@
 
 <form asp-action="Index" method="post">
     <div class="row">
+        <div class="fw-bold">Selecione a data:</div>
         <div class="col-4">
             <div class="form-group">
-                <label>Data</label>
                 <input type="date" name="dataSearch" class="form-control" />
             </div>
         </div>
         <div class="col-3">
-            <button type="submit" class="btn btn-primary">Filtrar</button>
+            <button type="submit" class="btn btn-primary">Ir para</button>
         </div>
     </div>
 </form>
@@ -42,7 +42,7 @@
                     {
                         var record = Model.ElementAt(i).records.ElementAt(j);
                         <td>
-                            <input type="text" name="listRecordDTO[@i].records[@j].Hours" value="@record.Hours" class="form-control" oninput="updateTotal(@i, @j)" />
+                            <input type="text" name="listRecordDTO[@i].records[@j].Hours" value="@record.Hours" class="form-control @(record.Data.DayOfWeek == DayOfWeek.Saturday || record.Data.DayOfWeek == DayOfWeek.Sunday ? "bg-dark-subtle" : "")" oninput="updateTotal(@i, @j)" @(record.Data.DayOfWeek == DayOfWeek.Saturday || record.Data.DayOfWeek == DayOfWeek.Sunday ? "readonly" : "") />
                             <input type="hidden" name="listRecordDTO[@i].records[@j].UserId" value="@record.UserId" class="form-control" />
                             <input type="hidden" name="listRecordDTO[@i].records[@j].WBSId" value="@record.WBSId" class="form-control" />
                             <input type="hidden" name="listRecordDTO[@i].records[@j].Data" value="@record.Data" class="form-control" />
@@ -50,7 +50,7 @@
                         </td>
                     }
                     <td>
-                        <span id="totalWBS_@i">0.0</span>
+                        <span class="fw-bold" id="totalWBS_@i">0.0</span>
                     </td>
                 </tr>
             }
@@ -58,9 +58,9 @@
                 <td class="fw-bold">Total Dia</td>
                 @for (int i = 0; i <= 15; i++)
                 {
-                    <td>
-                        <input type="hidden" class="form-control" value="@(Model.First().TotalHoursDay[@i])" readonly />
-                        <span id="totalDay_@i">0.0</span>
+                    <td class="fw-bold">
+                        <input type="hidden" class="form-control fw-bold" value="@(Model.First().TotalHoursDay[@i])" readonly />
+                        <span class="fw-bold" id="totalDay_@i">0.0</span>
                         <div id="errorDay_@i" class="text-danger" style="display: none;">A soma das horas trabalhadas em um dia não pode ultrapassar 24h.</div>
                     </td>
                 }
