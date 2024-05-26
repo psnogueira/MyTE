@@ -78,20 +78,15 @@ public class UsersController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create([Bind("Email", "FirstName", "LastName", "HiringDate", "PID", "DepartmentId", "RoleId", "Password", "ConfirmPassword")] CreateUserViewModel model)
     {
-        HttpResponseMessage response;
         if (ModelState.IsValid)
         {
             //Garante que caso ocorra erro de validação o Department e o Role sejam recarregados n página
             ViewBag.Departments = new SelectList(_context.Department, "DepartmentId", "Name", model.DepartmentId);
             ViewBag.Roles = new SelectList(_roleManager.Roles, "Id", "Name", model.RoleId);
 
-            // Verifica se o PID cadastrado já existe na tabela
-            var existingPid = await _context.Users.FirstOrDefaultAsync(p => p.PID == model.PID);
-            if (existingPid != null)
-            {
-                ModelState.AddModelError("PID", "PID já existe.");
-                return View(model);
-            }
+
+            // Gera o PID automaticamente
+            var generatedPID = await GeneratePIDAsync();
 
             var user = new ApplicationUser
             {
@@ -102,7 +97,7 @@ public class UsersController : Controller
                 FirstName = model.FirstName,
                 LastName = model.LastName,
                 HiringDate = model.HiringDate,
-                PID = model.PID,
+                PID = generatedPID,
                 DepartmentId = model.DepartmentId,
                 RoleId = model.RoleId
             };
@@ -219,14 +214,34 @@ public class UsersController : Controller
     }
 
     [AcceptVerbs("Get", "Post")]
-    public IActionResult VerifyEmail(string email)
+    public IActionResult VerifyEmail(string email, string id)
     {
         var user = _context.Users.FirstOrDefault(u => u.Email == email);
         if (user != null)
         {
+            // Se o e-mail existir, mas for do usuário que está sendo editado, não há problema
+            if (user.Id == id)
+            {
+                return Json(true);
+            }
             return Json($"O email <b>{email}</b> já está em uso.");
         }
-
         return Json(true);
     }
+
+    private async Task<string> GeneratePIDAsync()
+    {
+        string pid;
+        bool pidExists;
+
+        do
+        {
+            pid = Guid.NewGuid().ToString("N").Substring(0, 11);
+            pidExists = await _context.Users.AnyAsync(u => u.PID == pid);
+        } while (pidExists);
+
+        return pid.ToUpper();
+    }
+
+
 }

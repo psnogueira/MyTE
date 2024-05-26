@@ -2,31 +2,62 @@
 <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
 
 <script>
-$(document).ready(function () {
-    // Adiciona método personalizado de validação para o campo Nome
-    $.validator.addMethod("noNumbersOrSpecialChars", function (value, element) {
-        return this.optional(element) || /^[a-zA-Z\s]*$/.test(value);
-    }, "O Nome não deve conter números ou caracteres especiais.");
+    //Validação de Formulárop
+    $(document).ready(function () {
+        // Adiciona método personalizado de validação para o campo Nome
+        $.validator.addMethod("noNumbersOrSpecialChars", function (value, element) {
+            return this.optional(element) || /^[a-zA-Z\s]*$/.test(value);
+        }, "O Nome não deve conter números ou caracteres especiais.");
 
-    // Aplica a validação ao formulário usando o plugin jQuery Validate
-    $("form").validate({
-        rules: {
-            Nome: {
-                noNumbersOrSpecialChars: true
-            },
-            Password: {
-                required: true,
-                pattern: /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!#\$%\^&\*()\-\+=\[\]{};':""\\|,.<>\/?]).{6,}$/
-            }
-        },
-            messages: {
+        // Aplica a validação ao formulário usando o plugin jQuery Validate
+        $("form").validate({
+            rules: {
+                Nome: {
+                    noNumbersOrSpecialChars: true
+                },
                 Password: {
-                    required: "Por favor, insira a senha.",
-                    pattern: "A senha deve conter pelo menos 6 caracteres, incluindo um número, uma letra maiúscula, uma letra minúscula e um caractere especial."
+                    required: true,
+                    pattern: /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!#\$%\^&\*()\-\+=\[\]{};':""\\|,.<>\/?]).{6,}$/
                 }
-            }
-    });
+            },
+                messages: {
+                    Password: {
+                        required: "Por favor, insira a senha.",
+                        pattern: "A senha deve conter pelo menos 6 caracteres, incluindo um número, uma letra maiúscula, uma letra minúscula e um caractere especial."
+                    }
+                }
+        });
 
 });
+
+
+
+// AutoComplete
+    $(document).ready(function () {
+        // Obtenha os valores dos atributos data-* no input de pesquisa
+        var inputElement = $("#autoComplete");
+        var tableName = inputElement.data("table");
+        var columnName1 = inputElement.data("column1");
+        var columnName2 = inputElement.data("column2");
+
+        inputElement.autocomplete({
+            source: function (request, response) {
+                var url = 'api/autocomplete/' + tableName + '/search';
+                var data = { term: request.term, columnName1: columnName1 };
+
+                if (columnName2) {
+                    data.columnName2 = columnName2;
+                }
+
+                $.ajax({
+                    url: url,
+                    data: data,
+                    success: function (data) {
+                        response(data);
+                    }
+                });
+            }
+        });
+    });
 
 </script>

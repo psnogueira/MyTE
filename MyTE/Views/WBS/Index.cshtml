@@ -282,5 +282,7 @@
 }
 
 @section Scripts {
-    <script src="../wwwroot/js/site.js"></script>
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }
