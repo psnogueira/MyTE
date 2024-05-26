@@ -27,7 +27,7 @@
                 <th>WBS</th>
                 @foreach (var record in Model.First().records)
                 {
-                    <th>@Html.DisplayFor(modelItem => record.Data.Day)/@Html.DisplayFor(modelItem => record.Data.Month)</th>
+                    <th>@record.Data.ToString("ddd dd/MM", new System.Globalization.CultureInfo("pt-BR"))</th>
                 }
                 <th>Total WBS</th>
             </tr>
@@ -90,17 +90,9 @@
 }
 
 <script>
-    function updateTotalsOnLoad() {
-        var rowCount = @Model.Count();
-        var colCount = @Model.First().records.Count();
-
-        for (var rowIndex = 0; rowIndex < rowCount; rowIndex++) {
-            updateRowTotal(rowIndex);
-        }
-
-        for (var colIndex = 0; colIndex < colCount; colIndex++) {
-            updateColumnTotal(colIndex);
-        }
+    function updateTotal(rowIndex, colIndex) {
+        updateRowTotal(rowIndex);
+        updateColumnTotal(colIndex);
     }
 
     function updateRowTotal(rowIndex) {
@@ -137,6 +129,19 @@
         } else {
             totalDayElement.classList.remove("text-danger", "fw-bold");
             errorElement.style.display = "none";
+        }
+    }
+
+    function updateTotalsOnLoad() {
+        var rowCount = @Model.Count();
+        var colCount = @Model.First().records.Count();
+
+        for (var rowIndex = 0; rowIndex < rowCount; rowIndex++) {
+            updateRowTotal(rowIndex);
+        }
+
+        for (var colIndex = 0; colIndex < colCount; colIndex++) {
+            updateColumnTotal(colIndex);
         }
     }
 
