@@ -90,11 +90,21 @@
 }
 
 <script>
-    function updateTotal(rowIndex, colIndex) {
-        var totalWBS = 0;
-        var totalDay = 0;
+    function updateTotalsOnLoad() {
+        var rowCount = @Model.Count();
+        var colCount = @Model.First().records.Count();
 
-        // Atualiza o total da linha (soma de horas da WBS)
+        for (var rowIndex = 0; rowIndex < rowCount; rowIndex++) {
+            updateRowTotal(rowIndex);
+        }
+
+        for (var colIndex = 0; colIndex < colCount; colIndex++) {
+            updateColumnTotal(colIndex);
+        }
+    }
+
+    function updateRowTotal(rowIndex) {
+        var totalWBS = 0;
         var rowInputs = document.querySelectorAll(`[name^='listRecordDTO[${rowIndex}].records']`);
         rowInputs.forEach(input => {
             if (input.type === 'text' && !input.readOnly) {
@@ -105,8 +115,10 @@
             }
         });
         document.getElementById(`totalWBS_${rowIndex}`).innerText = totalWBS.toFixed(1);
+    }
 
-        // Atualiza o total da coluna (soma do dia)
+    function updateColumnTotal(colIndex) {
+        var totalDay = 0;
         var colInputs = document.querySelectorAll(`[name$='records[${colIndex}].Hours']`);
         colInputs.forEach(input => {
             var value = parseFloat(input.value);
@@ -118,9 +130,7 @@
         var totalDayElement = document.getElementById(`totalDay_${colIndex}`);
         totalDayElement.innerText = totalDay.toFixed(1);
 
-        // Verifica se a quantidade de horas não ultrapassa 24h por dia
         var errorElement = document.getElementById(`errorDay_${colIndex}`);
-
         if (totalDay > 24) {
             totalDayElement.classList.add("text-danger", "fw-bold");
             errorElement.style.display = "block";
@@ -129,10 +139,8 @@
             errorElement.style.display = "none";
         }
     }
-</script>
 
-<style>
-    .col-wbs {
-        width: 20%;
-    }
-</style>
+    document.addEventListener("DOMContentLoaded", function () {
+        updateTotalsOnLoad();
+    });
+</script>
