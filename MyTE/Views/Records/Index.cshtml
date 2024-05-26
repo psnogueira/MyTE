@@ -1,0 +1,80 @@
+﻿@model IEnumerable<MyTE.DTO.RecordDTO>
+
+@{
+    ViewData["Title"] = "Index";
+    
+}
+
+<h1>Registro de Horas</h1>
+
+
+<form asp-action="Index" method="post">
+    
+    
+    <div class="row">
+        <div class="col-4">
+            <div class="form-group">
+                <label>Data</label>
+            <input type="date" name="dataSearch" class="form-control" />
+            </div>
+        </div>
+        <div class=" col-3">
+            <button type="submit" class="btn  btn-primary">Filtrar</button>
+        </div>
+    </div>
+</form>
+<form asp-action="Persist" method="post">
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    WBS
+                </th>
+                @foreach (var record in Model.First().records) {
+                    <th>
+                        @Html.DisplayFor(modelItem => record.Data.Day)
+                     </th>
+                }
+                <th>
+                   Total
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (int i = 0; i < Model.Count(); i++)
+                {
+                var item = Model.ElementAt(i);
+                <tr>
+                    <td>@Html.DisplayFor(modelItem => item.WBS.Code)</td>
+                    @for (int j = 0; j < item.records.Count(); j++)
+                    {
+                        var record = Model.ElementAt(i).records.ElementAt(j);
+                        <td>
+                            <input type="text" name="listRecordDTO[@i].records[@j].Hours" value="@record.Hours" class="form-control" />
+                            <input type="hidden" name="listRecordDTO[@i].records[@j].UserId" value="@record.UserId" class="form-control" />
+                            <input type="hidden" name="listRecordDTO[@i].records[@j].WBSId" value="@record.WBSId" class="form-control" />
+                            <input type="hidden" name="listRecordDTO[@i].records[@j].Data" value="@record.Data" class="form-control" />
+                        </td>
+                    }
+                    <td>@Html.DisplayFor(modelItem => item.TotalHours)</td>
+                
+                </tr>
+            }
+            <tr>
+                <td>Total Dia</td>
+                
+                @for (int i = 0; i <= 15; i++)
+                {
+                    <td>
+                        <input class="form-control" value="@(Model.First().TotalHoursDay[@i])" readonly/>
+                    </td>
+                }
+                <td></td>
+            </tr>
+        </tbody>
+    </table>
+    <p>
+        <input type="submit" value="Salvar" class="btn btn-primary" />
+    </p>
+</form>
