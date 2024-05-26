@@ -89,6 +89,7 @@ namespace MyTE.Controllers
                 dto.TotalHoursDay = totalHoursDay;
                 list.Add(dto);
             }
+
             return View(await Task.FromResult(list));
         }
 
@@ -117,7 +118,7 @@ namespace MyTE.Controllers
                     _context.AddRange(records);
                     await _context.SaveChangesAsync();
                 }
-
+                TempData["SuccessMessage"] = "Registro de horas salvo com sucesso!";
                 return RedirectToAction(nameof(Index));
                 
             }
@@ -137,7 +138,6 @@ namespace MyTE.Controllers
                 if (item.Value > 0 && (item.Key.DayOfWeek.Equals(DayOfWeek.Sunday) || item.Key.DayOfWeek.Equals(DayOfWeek.Saturday)))
                 {
                     Console.WriteLine("A Data: " + item.Key + " não é considerada um dia útil.");
-                    return false;
                 }
                 if (item.Value > 24)
                 {
