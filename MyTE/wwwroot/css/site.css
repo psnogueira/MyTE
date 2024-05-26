@@ -25,3 +25,8 @@ btn-orange {
     background-color: #ff6600;
     color: white;
 }
+
+.text-dark.active {
+    color: #334EAC !important;
+    font-weight: bold;
+}
