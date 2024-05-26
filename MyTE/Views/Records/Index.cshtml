@@ -24,7 +24,7 @@
     <table class="table">
         <thead>
             <tr>
-                <th class="col-wbs">WBS</th>
+                <th>WBS</th>
                 @foreach (var record in Model.First().records)
                 {
                     <th>@Html.DisplayFor(modelItem => record.Data.Day)/@Html.DisplayFor(modelItem => record.Data.Month)</th>
@@ -33,46 +33,34 @@
             </tr>
         </thead>
         <tbody>
-            @for (int i = 0; i < 4; i++) // Substitui uma linha para cada WBS por 4 linhas onde podem ser escolhidas as WBS através de um select
+            @for (int i = 0; i < Model.Count(); i++)
             {
+                var item = Model.ElementAt(i);
                 <tr>
-                    <td>
-                        <select name="listRecordDTO[@i].WBSId" class="form-control">
-                            <option>Selecione a WBS</option>
-                            @foreach (var wbs in ViewBag.WBSList)
-                            {
-                                <option value="@wbs.WBSId">@wbs.Code - @wbs.Desc</option>
-                            }
-                        </select>
-                    </td>
-                    @for (int j = 0; j < Model.First().records.Count(); j++)
+                    <td>@Html.DisplayFor(modelItem => item.WBS.Code) - @Html.DisplayFor(modelItem => item.WBS.Desc)</td>
+                    @for (int j = 0; j < item.records.Count(); j++)
                     {
-                        var record = Model.First().records.ElementAt(j);
+                        var record = Model.ElementAt(i).records.ElementAt(j);
                         <td>
-                            @if (record.Data.DayOfWeek == DayOfWeek.Saturday || record.Data.DayOfWeek == DayOfWeek.Sunday)
-                            {
-                                <input type="text" value="" class="form-control bg-secondary-subtle" readonly />
-                            }
-                            else
-                            {
-                                <input type="text" value="" name="listRecordDTO[@i].records[@j].Hours" class="form-control" oninput="updateTotal(@i, @j)" />
-                                <input type="hidden" name="listRecordDTO[@i].records[@j].UserId" value="@record.UserId" class="form-control" />
-                                <input type="hidden" name="listRecordDTO[@i].records[@j].WBSId" value="" class="form-control" />
-                                <input type="hidden" name="listRecordDTO[@i].records[@j].Data" value="@record.Data" class="form-control" />
-                            }
+                            <input type="text" name="listRecordDTO[@i].records[@j].Hours" value="@record.Hours" class="form-control" oninput="updateTotal(@i, @j)" />
+                            <input type="hidden" name="listRecordDTO[@i].records[@j].UserId" value="@record.UserId" class="form-control" />
+                            <input type="hidden" name="listRecordDTO[@i].records[@j].WBSId" value="@record.WBSId" class="form-control" />
+                            <input type="hidden" name="listRecordDTO[@i].records[@j].Data" value="@record.Data" class="form-control" />
+
                         </td>
                     }
                     <td>
-                        <span id="totalWBS_@i">0.00</span>
+                        <span id="totalWBS_@i">0.0</span>
                     </td>
                 </tr>
             }
             <tr>
                 <td class="fw-bold">Total Dia</td>
-                @for (int i = 0; i < Model.First().records.Count(); i++)
+                @for (int i = 0; i <= 15; i++)
                 {
                     <td>
-                        <span id="totalDay_@i">0.00</span>
+                        <input type="hidden" class="form-control" value="@(Model.First().TotalHoursDay[@i])" readonly />
+                        <span id="totalDay_@i">0.0</span>
                         <div id="errorDay_@i" class="text-danger" style="display: none;">A soma das horas trabalhadas em um dia não pode ultrapassar 24h.</div>
                     </td>
                 }
@@ -84,6 +72,22 @@
         <input type="submit" value="Salvar" class="btn btn-primary" />
     </p>
 </form>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="sucesso">
+        <div class="alert alert-success d-flex align-items-center shadow alert-dismissible fade show position-fixed bottom-0 end-0 p-3 m-3 rounded" role="alert">
+            <i class="bi bi-check-lg fs-1 me-3"></i>
+            <div>
+                <div class="alert-heading align-items-center">
+                    <strong class="me-4 pe-1">@TempData["SuccessMessage"]</strong>
+                    <small type="button" class="btn-close align-items-center" data-bs-dismiss="alert" aria-label="Close"></small>
+                </div>
+                Você pode encontrá-lo na tabela.
+            </div>
+        </div>
+    </div>
+}
 
 <script>
     function updateTotal(rowIndex, colIndex) {
@@ -100,7 +104,7 @@
                 }
             }
         });
-        document.getElementById(`totalWBS_${rowIndex}`).innerText = totalWBS.toFixed(2);
+        document.getElementById(`totalWBS_${rowIndex}`).innerText = totalWBS.toFixed(1);
 
         // Atualiza o total da coluna (soma do dia)
         var colInputs = document.querySelectorAll(`[name$='records[${colIndex}].Hours']`);
@@ -112,7 +116,7 @@
         });
 
         var totalDayElement = document.getElementById(`totalDay_${colIndex}`);
-        totalDayElement.innerText = totalDay.toFixed(2);
+        totalDayElement.innerText = totalDay.toFixed(1);
 
         // Verifica se a quantidade de horas não ultrapassa 24h por dia
         var errorElement = document.getElementById(`errorDay_${colIndex}`);
