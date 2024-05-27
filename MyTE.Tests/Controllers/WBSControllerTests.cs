@@ -27,25 +27,29 @@ namespace MyTE.Tests.Controllers
             // Configura o contexto com dados de teste
             using (var context = new ApplicationDbContext(options))
             {
-                context.WBS.Add(new Models.WBS { Code = "001", Desc = "Description1", Type = (WBSType)1 });
-                context.WBS.Add(new Models.WBS { Code = "002", Desc = "Description2", Type = (WBSType)2 });
-                await context.SaveChangesAsync();
-            }
+                // Limpa o banco de dados antes de cada teste
+                context.Database.EnsureDeleted();
+                context.Database.EnsureCreated();
 
-            using (var context = new ApplicationDbContext(options))
-            {
+                var codeFirst = "001";
+
+                context.WBS.Add(new Models.WBS { Code = codeFirst, Desc = "Description1", Type = (WBSType) 1 });
+                context.WBS.Add(new Models.WBS { Code = "002", Desc = "Description2", Type = (WBSType) 2 });
+                context.WBS.Add(new Models.WBS { Code = "003", Desc = "Description3", Type = (WBSType) 1 });
+                await context.SaveChangesAsync();
+
                 var controller = new WBSController(context);
 
                 // Act
-                var result = await controller.Index(null, null, null); // Aguarda a conclusão da Task
+                var result = await controller.Index(null, null, null); 
 
                 // Assert
-                var viewResult = Assert.IsType<ViewResult>(result); // Verifica o tipo do resultado
+                var viewResult = Assert.IsType<ViewResult>(result); 
                 var viewModel = Assert.IsType<WBSViewModel>(viewResult.Model);
 
                 Assert.NotNull(viewModel.WBSList);
                 Assert.NotNull(viewModel.Type);
-                Assert.Equal("001", viewModel.WBSList.First().Code);
+                Assert.Equal(codeFirst, viewModel.WBSList.First().Code);
             }
         }
 
@@ -60,21 +64,24 @@ namespace MyTE.Tests.Controllers
             // Configurar o contexto com dados para teste
             using (var context = new ApplicationDbContext(options))
             {
-                context.WBS.Add(new WBS { WBSId = 3, Code = "003", Desc = "Description3", Type = (WBSType)1 });
-                await context.SaveChangesAsync();
-            }
+                // Limpa o banco de dados antes de cada teste
+                context.Database.EnsureDeleted();
+                context.Database.EnsureCreated();
 
-            using (var context = new ApplicationDbContext(options))
-            {
+                var wbsIdValid = 1;
+
+                context.WBS.Add(new WBS { WBSId = wbsIdValid, Code = "001", Desc = "Description1", Type = (WBSType) 1 });
+                await context.SaveChangesAsync();
+
                 var controller = new WBSController(context);
 
                 // Act
-                var result = await controller.Details(3);
+                var result = await controller.Details(wbsIdValid);
 
                 // Assert
                 var viewResult = Assert.IsType<ViewResult>(result);
                 var model = Assert.IsAssignableFrom<WBS>(viewResult.ViewData.Model);
-                Assert.Equal(3, model.WBSId);
+                Assert.Equal(wbsIdValid, model.WBSId);
             }
         }
 
@@ -88,10 +95,16 @@ namespace MyTE.Tests.Controllers
 
             using (var context = new ApplicationDbContext(options))
             {
+                // Limpa o banco de dados antes de cada teste
+                context.Database.EnsureDeleted();
+                context.Database.EnsureCreated();
+
+                var wbsIdInvalid = 999;
+
                 var controller = new WBSController(context);
 
                 // Act
-                var result = await controller.Details(999); // ID inválido
+                var result = await controller.Details(wbsIdInvalid); 
 
                 // Assert
                 Assert.IsType<NotFoundResult>(result);
@@ -109,16 +122,19 @@ namespace MyTE.Tests.Controllers
             // Configura o contexto com um item de teste
             using (var context = new ApplicationDbContext(options))
             {
-                context.WBS.Add(new WBS { WBSId = 4, Code = "004", Desc = "Description4", Type = (WBSType) 2 });
-                await context.SaveChangesAsync();
-            }
+                // Limpa o banco de dados antes de cada teste
+                context.Database.EnsureDeleted();
+                context.Database.EnsureCreated();
 
-            using (var context = new ApplicationDbContext(options))
-            {
+                var wbsIdValid = 1;
+
+                context.WBS.Add(new WBS { WBSId = wbsIdValid, Code = "001", Desc = "Description1", Type = (WBSType) 1 });
+                await context.SaveChangesAsync();
+
                 var controller = new WBSController(context);
 
                 // Act
-                var result = await controller.Delete(4);
+                var result = await controller.Delete(wbsIdValid);
 
                 // Assert
                 Assert.IsType<RedirectToActionResult>(result);
@@ -137,10 +153,16 @@ namespace MyTE.Tests.Controllers
 
             using (var context = new ApplicationDbContext(options))
             {
+                // Limpa o banco de dados antes de cada teste
+                context.Database.EnsureDeleted();
+                context.Database.EnsureCreated();
+
+                var wbsIdInvalid = 999;
+
                 var controller = new WBSController(context);
 
                 // Act
-                var result = await controller.Delete(999); // ID inválido
+                var result = await controller.Delete(wbsIdInvalid); // ID inválido
 
                 // Assert
                 Assert.IsType<NotFoundResult>(result);
@@ -157,6 +179,10 @@ namespace MyTE.Tests.Controllers
 
             using (var context = new ApplicationDbContext(options))
             {
+                // Limpa o banco de dados antes de cada teste
+                context.Database.EnsureDeleted();
+                context.Database.EnsureCreated();
+
                 var controller = new WBSController(context);
 
                 // Act
@@ -177,33 +203,34 @@ namespace MyTE.Tests.Controllers
 
             using (var context = new ApplicationDbContext(options))
             {
-                var controller = new WBSController(context);
+                // Limpa o banco de dados antes de cada teste
+                context.Database.EnsureDeleted();
+                context.Database.EnsureCreated();
 
+                var controller = new WBSController(context);
                 var tempData = new Mock<ITempDataDictionary>();
                 controller.TempData = tempData.Object;
 
-                var wBS = new WBS
+                var validWbsCode = "001";
+
+                var validWbs = new WBS
                 {
                     WBSId = 1,
-                    Code = "001",
+                    Code = validWbsCode,
                     Desc = "Description1",
-                    Type = (WBSType)1
+                    Type = (WBSType) 1
                 };
 
                 // Act
-                var result = await controller.Create(wBS);
+                var result = await controller.Create(validWbs);
 
                 // Assert
                 var redirectToActionResult = Assert.IsType<RedirectToActionResult>(result);
                 Assert.Equal("Index", redirectToActionResult.ActionName);
-            }
-
-            // Verifica se a WBS foi adicionada a base de dados
-            using (var context = new ApplicationDbContext(options))
-            {
+  
                 Assert.Equal(1, context.WBS.Count());
                 var wBS = context.WBS.FirstOrDefault();
-                Assert.Equal("001", wBS.Code);
+                Assert.Equal(validWbsCode, validWbs.Code);
             }
         }
 
@@ -217,25 +244,30 @@ namespace MyTE.Tests.Controllers
 
             using (var context = new ApplicationDbContext(options))
             {
+                // Limpa o banco de dados antes de cada teste
+                context.Database.EnsureDeleted();
+                context.Database.EnsureCreated();
+
                 var controller = new WBSController(context);
 
                 // Simula erro de validação de admin
                 controller.ModelState.AddModelError("Code", "Required");
 
-                var wBS = new WBS
+                var wbs = new WBS
                 {
                     WBSId = 1,
+                    Code = "001",
                     Desc = "Description1",
                     Type = (WBSType)1
                 };
 
                 // Act
-                var result = await controller.Create(wBS);
+                var result = await controller.Create(wbs);
 
                 // Assert
                 var viewResult = Assert.IsType<ViewResult>(result);
                 var model = Assert.IsAssignableFrom<WBS>(viewResult.ViewData.Model);
-                Assert.Equal(wBS, model);
+                Assert.Equal(wbs, model);
             }
         }
 
@@ -249,21 +281,24 @@ namespace MyTE.Tests.Controllers
 
             using (var context = new ApplicationDbContext(options))
             {
-                context.WBS.Add(new WBS { WBSId = 1, Code = "001", Desc = "Description1", Type = (WBSType)1 });
-                context.SaveChanges();
-            }
+                // Limpa o banco de dados antes de cada teste
+                context.Database.EnsureDeleted();
+                context.Database.EnsureCreated();
 
-            using (var context = new ApplicationDbContext(options))
-            {
+                var wbsId = 1;
+
+                context.WBS.Add(new WBS { WBSId = wbsId, Code = "001", Desc = "Description1", Type = (WBSType)1 });
+                context.SaveChanges();
+
                 var controller = new WBSController(context);
 
                 // Act
-                var result = await controller.Edit(1);
+                var result = await controller.Edit(wbsId);
 
                 // Assert
                 var viewResult = Assert.IsType<ViewResult>(result);
                 var model = Assert.IsType<WBS>(viewResult.ViewData.Model);
-                Assert.Equal(1, model.WBSId);
+                Assert.Equal(wbsId, model.WBSId);
             }
         }
 
@@ -277,16 +312,20 @@ namespace MyTE.Tests.Controllers
 
             using (var context = new ApplicationDbContext(options))
             {
-                context.WBS.Add(new WBS { WBSId = 1, Code = "001", Desc = "Description1", Type = (WBSType) 1 });
-                context.SaveChanges();
-            }
+                // Limpa o banco de dados antes de cada teste
+                context.Database.EnsureDeleted();
+                context.Database.EnsureCreated();
 
-            using (var context = new ApplicationDbContext(options))
-            {
+                var validWbsId = 1;
+                var invalidWbsId = 2;
+
+                context.WBS.Add(new WBS { WBSId = validWbsId, Code = "001", Desc = "Description1", Type = (WBSType) 1 });
+                context.SaveChanges();
+
                 var controller = new WBSController(context);
 
                 // Act
-                var result = await controller.Edit(2);
+                var result = await controller.Edit(invalidWbsId);
 
                 // Assert
                 Assert.IsType<NotFoundResult>(result);
@@ -303,30 +342,38 @@ namespace MyTE.Tests.Controllers
 
             using (var context = new ApplicationDbContext(options))
             {
-                context.WBS.Add(new WBS { WBSId = 1, Code = "001", Desc = "Description1", Type = (WBSType) 1 });
-                context.SaveChanges();
-            }
+                // Limpa o banco de dados antes de cada teste
+                context.Database.EnsureDeleted();
+                context.Database.EnsureCreated();
+                
+                var wbsId = 1;
+                var descriptionOld = "Old Description";
 
-            using (var context = new ApplicationDbContext(options))
-            {
+
+                context.WBS.Add(new WBS { WBSId = wbsId, Code = "001", Desc = descriptionOld, Type = (WBSType) 1 });
+                context.SaveChanges();
+
                 var controller = new WBSController(context);
+
+                var descriptionUpdated = "Description Updated";
 
                 // Inicializa TempData
                 var tempData = new Mock<ITempDataDictionary>();
                 controller.TempData = tempData.Object;
 
-                var wBS = new WBS { WBSId = 1, Code = "001", Desc = "Description1 Updated", Type = (WBSType)1 };
+                var existingWbs = await context.WBS.FindAsync(wbsId);
+                existingWbs.Desc = descriptionUpdated;
 
                 // Act
-                var result = await controller.Edit(1, wBS);
+                var result = await controller.Edit(wbsId, existingWbs);
 
                 // Assert
                 var redirectToActionResult = Assert.IsType<RedirectToActionResult>(result);
                 Assert.Equal("Index", redirectToActionResult.ActionName);
 
                 // Verify the WBS was updated in the database
-                var updatedWBS = context.WBS.Find(1);
-                Assert.Equal("Description1 Updated", updatedWBS.Desc);
+                var updatedWBS = context.WBS.Find(wbsId);
+                Assert.Equal(descriptionUpdated, updatedWBS.Desc);
             }
         }
 
@@ -340,21 +387,27 @@ namespace MyTE.Tests.Controllers
 
             using (var context = new ApplicationDbContext(options))
             {
+                // Limpa o banco de dados antes de cada teste
+                context.Database.EnsureDeleted();
+                context.Database.EnsureCreated();
+
                 var controller = new WBSController(context);
+
+                var wbsId = 1;
 
                 // Inicializa TempData
                 var tempData = new Mock<ITempDataDictionary>();
                 controller.TempData = tempData.Object;
 
                 // Adiciona um WBS para editar
-                var wBS = new WBS
+                var wbs = new WBS
                 {
                     WBSId = 1,
                     Code = "001",
                     Desc = "Description1",
                     Type = (WBSType) 2
                 };
-                context.WBS.Add(wBS);
+                context.WBS.Add(wbs);
                 await context.SaveChangesAsync();
 
                 // Atualiza o WBS com dados inválidos
@@ -370,7 +423,7 @@ namespace MyTE.Tests.Controllers
                 controller.ModelState.AddModelError("Code", "Required");
 
                 // Act
-                var result = await controller.Edit(1, updatedWBS);
+                var result = await controller.Edit(wbsId, updatedWBS);
 
                 // Assert
                 var viewResult = Assert.IsType<ViewResult>(result);
