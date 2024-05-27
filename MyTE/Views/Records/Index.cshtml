@@ -2,76 +2,93 @@
 
 @{
     ViewData["Title"] = "Index";
+
 }
 
-<h1>Registro de Horas</h1>
-
-<form asp-action="Index" method="post">
-    <div class="row">
-        <div class="fw-bold">Selecione a data:</div>
-        <div class="col-4">
-            <div class="form-group">
-                <input type="date" name="dataSearch" class="form-control" />
+    <h1>Registro de Horas</h1>
+    <div class="col-3">
+        <form asp-action="Index" method="post">
+            <div class="fw-bold">Selecione a data:</div>
+            <div class="input-group">
+                <input type="date" name="dataSearch" class="text-center form-control" />
+                <button type="submit" class="btn btn-primary">Ir para</button>
             </div>
-        </div>
-        <div class="col-3">
-            <button type="submit" class="btn btn-primary">Ir para</button>
-        </div>
+        </form>
     </div>
-</form>
+    
 
-<form asp-action="Persist" method="post">
-    <table class="table">
-        <thead>
-            <tr>
-                <th>WBS</th>
-                @foreach (var record in Model.First().records)
-                {
-                    <th>@record.Data.ToString("ddd dd/MM", new System.Globalization.CultureInfo("pt-BR"))</th>
-                }
-                <th>Total WBS</th>
-            </tr>
-        </thead>
-        <tbody>
-            @for (int i = 0; i < Model.Count(); i++)
-            {
-                var item = Model.ElementAt(i);
-                <tr>
-                    <td>@Html.DisplayFor(modelItem => item.WBS.Code) - @Html.DisplayFor(modelItem => item.WBS.Desc)</td>
-                    @for (int j = 0; j < item.records.Count(); j++)
+    <form asp-action="Persist" method="post">
+        <div class="table-responsive border rounded-4 mt-3">
+            <table class="table align-middle text-center table-bordered mb-0">
+                <thead>
+                    <tr class="table-secondary ">
+                        <th>WBS</th>
+                        @foreach (var record in Model.First().records)
+                        {
+                            var culture = new System.Globalization.CultureInfo("pt-BR");
+                            var dayOfWeek = record.Data.ToString("ddd", culture);
+                            var date = record.Data.ToString("dd/MM", culture);
+
+                            <th class="@(record.Data.DayOfWeek == DayOfWeek.Saturday || record.Data.DayOfWeek == DayOfWeek.Sunday ? "table-secondary" : "")">
+                                <span class=" fw-bold">@dayOfWeek</span>
+                                <span class="text-secondary fw-normal">@date</span>
+                            </th>
+                            @* <th>@record.Data.ToString("ddd dd/MM", new System.Globalization.CultureInfo("pt-BR"))</th> *@
+                        }
+                        <th class="col-1">Total WBS</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (int i = 0; i < Model.Count(); i++)
                     {
-                        var record = Model.ElementAt(i).records.ElementAt(j);
-                        <td>
-                            <input type="text" name="listRecordDTO[@i].records[@j].Hours" value="@record.Hours" class="form-control @(record.Data.DayOfWeek == DayOfWeek.Saturday || record.Data.DayOfWeek == DayOfWeek.Sunday ? "bg-dark-subtle" : "")" oninput="updateTotal(@i, @j)" @(record.Data.DayOfWeek == DayOfWeek.Saturday || record.Data.DayOfWeek == DayOfWeek.Sunday ? "readonly" : "") />
-                            <input type="hidden" name="listRecordDTO[@i].records[@j].UserId" value="@record.UserId" class="form-control" />
-                            <input type="hidden" name="listRecordDTO[@i].records[@j].WBSId" value="@record.WBSId" class="form-control" />
-                            <input type="hidden" name="listRecordDTO[@i].records[@j].Data" value="@record.Data" class="form-control" />
-
-                        </td>
+                        var item = Model.ElementAt(i);
+                        <tr>
+                            <td class="col-2">
+                                @Html.DisplayFor(modelItem => item.WBS.Code) - @Html.DisplayFor(modelItem => item.WBS.Desc)
+                                @* <select name="listRecordDTO[@i].WBSId" class="form-control text-center">
+                            <option value="">-------</option>
+                            @foreach (var wbs in ViewBag.WBSList as List<SelectListItem>)
+                            {
+                            <option value="@wbs.Value" oninput="@(item.WBSId == int.Parse(wbs.Value) ? "selected" : String.Empty)">@wbs.Text</option>
+                            }
+                            </select> *@
+                            </td>
+                            @for (int j = 0; j < item.records.Count(); j++)
+                            {
+                                var record = Model.ElementAt(i).records.ElementAt(j);
+                                <td class="@(record.Data.DayOfWeek == DayOfWeek.Saturday || record.Data.DayOfWeek == DayOfWeek.Sunday ? "table-secondary" : "")">
+                                    <input type="text" name="listRecordDTO[@i].records[@j].Hours" value="@record.Hours" class="form-control border-0 px-0 text-center @(record.Data.DayOfWeek == DayOfWeek.Saturday || record.Data.DayOfWeek == DayOfWeek.Sunday ? "bg-transparent" : "")" oninput="updateTotal(@i, @j)" @(record.Data.DayOfWeek == DayOfWeek.Saturday || record.Data.DayOfWeek == DayOfWeek.Sunday ? "disabled" : "") />
+                                    <input type="hidden" name="listRecordDTO[@i].records[@j].UserId" value="@record.UserId" class="form-control" />
+                                    <input type="hidden" name="listRecordDTO[@i].records[@j].WBSId" value="@record.WBSId" class="form-control" />
+                                    <input type="hidden" name="listRecordDTO[@i].records[@j].Data" value="@record.Data" class="form-control" />
+                                </td>
+                            }
+                            <td>
+                                <span class="fw-bold" id="totalWBS_@i">0.0</span>
+                            </td>
+                        </tr>
                     }
-                    <td>
-                        <span class="fw-bold" id="totalWBS_@i">0.0</span>
-                    </td>
-                </tr>
-            }
-            <tr>
-                <td class="fw-bold">Total Dia</td>
-                @for (int i = 0; i <= 15; i++)
-                {
-                    <td class="fw-bold">
-                        <input type="hidden" class="form-control fw-bold" value="@(Model.First().TotalHoursDay[@i])" readonly />
-                        <span class="fw-bold" id="totalDay_@i">0.0</span>
-                        <div id="errorDay_@i" class="text-danger" style="display: none;">A soma das horas trabalhadas em um dia não pode ultrapassar 24h.</div>
-                    </td>
-                }
-                <td></td>
-            </tr>
-        </tbody>
-    </table>
-    <p>
-        <input type="submit" value="Salvar" class="btn btn-primary" />
-    </p>
-</form>
+                    <tr>
+                        <td class="fw-bold">Total Dia</td>
+                        @for (int i = 0; i <= 15; i++)
+                        {
+                            <td class="fw-bold">
+                                <input type="hidden" class="form-control fw-bold" value="@(Model.First().TotalHoursDay[@i])" readonly />
+                                <span class="fw-bold" id="totalDay_@i">0.0</span>
+                                <div id="errorDay_@i" class="text-danger" style="display: none;">A soma das horas trabalhadas em um dia não pode ultrapassar 24h.</div>
+                            </td>
+                        }
+                        <td></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <p>
+            <input type="submit" value="Salvar" class="btn btn-primary" />
+        </p>
+    </form>
+
+
 
 @if (TempData["SuccessMessage"] != null)
 {
@@ -84,6 +101,22 @@
                     <small type="button" class="btn-close align-items-center" data-bs-dismiss="alert" aria-label="Close"></small>
                 </div>
                 Você pode encontrá-lo na tabela.
+            </div>
+        </div>
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="sucesso">
+        <div class="alert alert-danger d-flex align-items-center shadow alert-dismissible fade show position-fixed bottom-0 end-0 p-3 m-3 rounded" role="alert">
+            <i class="bi bi-exclamation-triangle-fill fs-1 me-3"></i>
+            <div>
+                <div class="alert-heading align-items-center">
+                    <strong class="me-4 pe-1">@TempData["ErrorMessage"]</strong>
+                    <small type="button" class="btn-close align-items-center" data-bs-dismiss="alert" aria-label="Close"></small>
+                </div>
+                Não foi possível salvar seu registro.
             </div>
         </div>
     </div>

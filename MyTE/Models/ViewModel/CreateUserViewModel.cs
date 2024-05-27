@@ -39,6 +39,7 @@ public class CreateUserViewModel
     public string RoleId { get; set; }
 
     [Required]
+    [Display(Name = "Senha")]
     [DataType(DataType.Password)]
     public string Password { get; set; }
 
