@@ -6,7 +6,12 @@
 }
 
 <h1>Registro de Horas</h1>
-
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["ErrorMessage"]
+    </div>
+}
 
 <form asp-action="Index" method="post">
     
