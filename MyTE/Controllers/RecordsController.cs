@@ -63,7 +63,7 @@ namespace MyTE.Controllers
                 List<Record> records = new List<Record>();
                 for (int i = dayInit; i <= dayMax; i++) {
 
-                    //pegar usuario da sessao, entender como fazer isso
+                    
                     var consultaRecordFinal = consultaRecord.Where(s => s.UserId == UserId && s.Data == new DateTime(year, month, i) && s.WBSId == wbs.WBSId);
 
                     Record? result = consultaRecordFinal.FirstOrDefault();
@@ -75,7 +75,6 @@ namespace MyTE.Controllers
                     } else {
                         Record record = new Record();
                         record.Data = new DateTime(year, month, i);
-                        //pegar usuario da sessao, entender como fazer isso
                         record.UserId = UserId;
                         record.WBSId = wbs.WBSId;
                         records.Add(record);
@@ -114,14 +113,26 @@ namespace MyTE.Controllers
                             && r.Data >= records[0].Data && r.Data <= records[records.Count()-1].Data
                         ).ToListAsync();
                     _context.Record.RemoveRange(recordsExclude);
-                    _context.AddRange(records);
+                    var recordsToSave = new List<Record>();
+                    foreach (var itemRecord in records)
+                    {
+                        if (itemRecord.Hours > 0)  
+                        {
+                            recordsToSave.Add(itemRecord);
+                        }
+                        
+                    }
+                    _context.AddRange(recordsToSave);
                     await _context.SaveChangesAsync();
                 }
 
                 return RedirectToAction(nameof(Index));
                 
             }
+            
             return RedirectToAction(nameof(Index));
+
+            
         }
 
         private bool ValidateRecords(Dictionary<DateTime, double> myMap)
