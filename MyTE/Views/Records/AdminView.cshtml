@@ -1,4 +1,4 @@
-﻿@model IEnumerable<MyTE.Models.BiweeklyRecord>
+﻿@model IEnumerable<MyTE.Models.ViewModel.AdminRecordViewModel>
 
 @{
     ViewData["Title"] = "Relatórios";
@@ -10,9 +10,9 @@
     <thead>
         <tr>
             <th>User</th>
-            <th>Periood</th>
+            <th>Period</th>
             <th>Total Hours</th>
-            <th>Detalhes</th>
+            <th>Details</th>
         </tr>
     </thead>
     <tbody>
@@ -23,15 +23,15 @@
                 <td>@record.StartDate.ToString("dd/MM/yyyy") - @record.EndDate.ToString("dd/MM/yyyy")</td>
                 <td>@record.TotalHours</td>
                 <td>
-                    <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#details_@record.BiweeklyRecordId" aria-expanded="false" aria-controls="details_@record.BiweeklyRecordId">
+                    <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#details_@record.UserEmail" aria-expanded="false" aria-controls="details_@record.UserEmail">
                         View Details
                     </button>
-                    <div class="collapse" id="details_@record.BiweeklyRecordId">
+                    <div class="collapse" id="details_@record.UserEmail">
                         <div class="card card-body">
                             <ul>
-                                @foreach (var detail in record.Records)
+                                @foreach (var detail in record.RecordsWithWBS)
                                 {
-                                    <li>@detail.Data.ToString("dd/MM/yyyy"): @detail.Hours hours</li>
+                                    <li>@detail.Data.ToString("dd/MM/yyyy"): @detail.Hours hours - WBS: @detail.WBSName - @detail.WBSDescription</li>
                                 }
                             </ul>
                         </div>
