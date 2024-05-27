@@ -182,7 +182,6 @@ namespace MyTE.Controllers
             return _context.Department.Any(e => e.DepartmentId == id);
         }
 
-
         [HttpPost]
         public IActionResult ExportToCSV()
         {
