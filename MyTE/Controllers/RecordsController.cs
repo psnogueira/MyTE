@@ -6,8 +6,6 @@ using Microsoft.EntityFrameworkCore;
 using MyTE.Data;
 using MyTE.DTO;
 using MyTE.Models;
-using MyTE.Pagination;
-using System.Xml;
 
 namespace MyTE.Controllers
 {
@@ -270,6 +268,8 @@ namespace MyTE.Controllers
                 if (item.Value > 0 && item.Value < 8)
                 {
                     Console.WriteLine("A Data: " + item.Key + " possui uma quantidade inferior ao minimo permitido (8 horas). Quantidade de horas registradas: " + item.Value);
+                    TempData["ErrorMessageText"] = "A data " + item.Key.Date.ToString("dd/MM") + " possui uma quantidade inferior ao minimo";
+                    TempData["ErrorMessageText2"] = "permitido (8 horas). Quantidade de horas registradas: " + item.Value;
                     //throw new Exception("A Data: " + item.Key + " possui uma quantidade inferior ao minimo permitido (8 horas). Quantidade de horas registradas: " + item.Value);
                     return false;
                 }
@@ -296,7 +296,6 @@ namespace MyTE.Controllers
                 if (!myMap.ContainsKey(record.Data))
                 {
                     myMap.Add(record.Data, record.Hours);
-
                 }
                 else
                 {
@@ -306,9 +305,7 @@ namespace MyTE.Controllers
                     myMap.Add(record.Data, record.Hours + oldValue);
                 }
             }
-
             return myMap;
         }
-
     }
 }

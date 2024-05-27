@@ -7,6 +7,7 @@
 $(document).ready(function () {
     // Set the timeout duration in milliseconds (e.g., 5000 for 5 seconds)
     const timeoutDuration = 5000;
+    const timeoutDuration2 = 10000;
 
     // Check if the success alert exists
     if ($($(".sucesso").is(":visible"))) {
@@ -14,6 +15,12 @@ $(document).ready(function () {
         setTimeout(function () {
             $(".sucesso").fadeOut();
         }, timeoutDuration);
+    }
+
+    if ($($(".erro").is(":visible"))) {
+        setTimeout(function () {
+            $(".erro").fadeOut();
+        }, timeoutDuration2);
     }
 });
 
