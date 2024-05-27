@@ -33,7 +33,7 @@ namespace MyTE.Controllers
             int year = 0;
             int month = 0;
             int day = 0;
-            if (dataSearch != null)
+            if (dataSearch != null && dataSearch > StartDateRestriction)
             {
                 year = dataSearch.Value.Year;
                 month = dataSearch.Value.Month;
