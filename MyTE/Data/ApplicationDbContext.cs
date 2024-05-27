@@ -10,7 +10,8 @@ namespace MyTE.Data
             : base(options)
         {
         }
-        public DbSet<Department> Department { get; set; } = default!;
-        public DbSet<WBS> WBS { get; set; } = default!;
+        public DbSet<MyTE.Models.Department> Department { get; set; } = default!;
+        public DbSet<MyTE.Models.WBS> WBS { get; set; } = default!;
+        public DbSet<MyTE.Models.Record> Record { get; set; } = default!;
     }
 }

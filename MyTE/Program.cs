@@ -29,11 +29,6 @@ builder.Services.AddAuthorization(options =>
 
 builder.Services.AddControllersWithViews();
 
-//builder.Services.AddControllersWithViews().AddRazorPagesOptions(options =>
-//{
-//    options.Conventions.AddAreaPageRoute("Identity", "/Account/Login", "");
-//});
-
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -60,7 +55,7 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    pattern: "{controller=Records}/{action=Index}/{id?}");
 
 app.MapRazorPages();
 

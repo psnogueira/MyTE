@@ -5,28 +5,55 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using MyTE.Data;
 using MyTE.Models;
+using MyTE.Models.ViewModel;
+using MyTE.Pagination;
 
-[Authorize(Roles = "admin")]
+[Authorize(Policy = "RequerPerfilAdmin")]
 public class UsersController : Controller
 {
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly RoleManager<IdentityRole> _roleManager;
     private readonly ApplicationDbContext _context;
 
-    public UsersController(UserManager<ApplicationUser> userManager, ApplicationDbContext context, RoleManager<IdentityRole> roleManager)
+    public UsersController(UserManager<ApplicationUser> userManager,
+        ApplicationDbContext context,
+        RoleManager<IdentityRole> roleManager)
     {
         _userManager = userManager;
         _context = context;
         _roleManager = roleManager;
     }
 
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index(string searchString, int? pageNumber, int? departmentType)
     {
+        int pagesize = 5;
+        ViewData["CurrentFilter"] = searchString;
 
-        var users = _userManager.Users
-            .Include(u => u.Department)
-            .ToList();
+        var usersQuery = _context.Users
+            .Include(d => d.Department)
+            .AsQueryable();
 
+        var departments = _context.Department.ToList();
+
+        // Create SelectList with department options
+        var departmentList = new SelectList(
+            departments.Select(d => new { Value = d.DepartmentId, Text = d.Name }),
+            "Value", "Text");
+
+        if (!string.IsNullOrEmpty(searchString))
+        {
+            usersQuery = usersQuery.Where(s => s.LastName.Contains(searchString)
+                                               || s.Email.Contains(searchString));
+        }
+
+        if (departmentType.HasValue && departmentType != 0)
+        {
+            usersQuery = usersQuery.Where(d => d.DepartmentId == departmentType);
+        }
+
+        var users = await PaginatedList<ApplicationUser>
+            .CreateAsync(usersQuery
+            .AsNoTracking(), pageNumber ?? 1, pagesize);
         var userRoles = new Dictionary<string, IList<string>>();
 
         foreach (var user in users)
@@ -35,7 +62,17 @@ public class UsersController : Controller
             userRoles[user.Id] = roles;
         }
 
-        return View(users);
+        var viewModel = new UserViewModel
+        {
+            UsersList = users,
+            Type = departmentList, // Set the populated SelectList
+            DepartmentType = departmentType != null ? departments.FirstOrDefault(d => d.DepartmentId == departmentType) : null, // Set selected department object (optional)
+            User = new ApplicationUser(),
+            CurrentFilter = searchString,
+            UserRoles = userRoles,
+        };
+
+        return View(viewModel);
     }
 
     public IActionResult Create()
@@ -47,10 +84,22 @@ public class UsersController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create([Bind("Email", "FirstName", "LastName", "HiringDate", "PID", "DepartmentId", "RoleId", "Password")] CreateUserViewModel model)
+    public async Task<IActionResult> Create([Bind("Email", "FirstName", "LastName", "HiringDate", "PID", "DepartmentId", "RoleId", "Password", "ConfirmPassword")] CreateUserViewModel model)
     {
         if (ModelState.IsValid)
         {
+            //Garante que caso ocorra erro de validação o Department e o Role sejam recarregados n página
+            ViewBag.Departments = new SelectList(_context.Department, "DepartmentId", "Name", model.DepartmentId);
+            ViewBag.Roles = new SelectList(_roleManager.Roles, "Id", "Name", model.RoleId);
+
+            // Verifica se o PID cadastrado já existe na tabela
+            var existingPid = await _context.Users.FirstOrDefaultAsync(p => p.PID == model.PID);
+            if (existingPid != null)
+            {
+                ModelState.AddModelError("PID", "PID já existe.");
+                return View(model);
+            }
+
             var user = new ApplicationUser
             {
                 NormalizedUserName = model.Email,
@@ -64,7 +113,6 @@ public class UsersController : Controller
                 DepartmentId = model.DepartmentId,
                 RoleId = model.RoleId
             };
-
 
             var result = await _userManager.CreateAsync(user, model.Password);
             if (result.Succeeded)
@@ -82,7 +130,7 @@ public class UsersController : Controller
                         }
                     }
                 }
-
+                TempData["SuccessMessage"] = "Usuário cadastrado com sucesso!";
                 return RedirectToAction(nameof(Index));
             }
 
@@ -91,7 +139,7 @@ public class UsersController : Controller
                 ModelState.AddModelError(string.Empty, error.Description);
             }
         }
-        return View(model);
+        return View("Error", ModelState);
     }
 
     public async Task<IActionResult> Edit(string id)
@@ -140,6 +188,7 @@ public class UsersController : Controller
                 var result = await _userManager.UpdateAsync(user);
                 if (result.Succeeded)
                 {
+                    TempData["SuccessMessage2"] = "Usuário editado com sucesso!";
                     return RedirectToAction(nameof(Index));
                 }
 
@@ -157,10 +206,11 @@ public class UsersController : Controller
         var user = await _userManager.FindByIdAsync(id);
         if (user != null)
         {
-            _userManager.DeleteAsync(user);
+            await _userManager.DeleteAsync(user);
         }
 
-        return RedirectToAction("Index");
+        return RedirectToAction(nameof(Index));
 
     }
+
 }
