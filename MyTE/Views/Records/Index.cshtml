@@ -61,7 +61,7 @@
                             var record = Model.ElementAt(i).records.ElementAt(j);
                             <td class="@(record.Data.DayOfWeek == DayOfWeek.Saturday || record.Data.DayOfWeek == DayOfWeek.Sunday ? "table-secondary" : "")">
                                 <input type="text" value="@(record.Hours == 0 ? "" : record.Hours.ToString())"
-                                       name="listRecordDTO[@i].records[@j].Hours"
+                                       name="listRecordDTO[@i].records[@j].Hourd"
                                        onchange="document.getElementById('recordHours_@record.RecordId').value = this.value"
                                        class="form-control border-0 px-0 text-center @(record.Data.DayOfWeek == DayOfWeek.Saturday || record.Data.DayOfWeek == DayOfWeek.Sunday ? "bg-transparent d-none" : "")"
                                        oninput="updateTotal(@i, @j)" @(record.Data.DayOfWeek == DayOfWeek.Saturday || record.Data.DayOfWeek == DayOfWeek.Sunday ? "disabled" : "") />
@@ -151,7 +151,7 @@
 
     function updateColumnTotal(colIndex) {
         var totalDay = 0;
-        var colInputs = document.querySelectorAll(`[name$='records[${colIndex}].Hours']`);
+        var colInputs = document.querySelectorAll(`[name$='records[${colIndex}].Hourd']`);
         colInputs.forEach(input => {
             var value = parseFloat(input.value);
             if (!isNaN(value)) {
