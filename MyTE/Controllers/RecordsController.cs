@@ -11,6 +11,7 @@ namespace MyTE.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
+        private static readonly DateTime StartDateRestriction = new DateTime(2024, 1, 1);
 
         public RecordsController(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
         {
@@ -21,7 +22,10 @@ namespace MyTE.Controllers
         // GET: Records
         public async Task<IActionResult> Index(DateTime? dataSearch)
         {
-
+            if(dataSearch < StartDateRestriction)
+            {
+                TempData["ErrorMessage"] = "A data de pesquisa deve ser maior que 01/01/2024";
+            }
             var UserId = _userManager.GetUserId(User);
 
             var consultaWbs = from obj in _context.WBS select obj;
@@ -141,19 +145,17 @@ namespace MyTE.Controllers
             {
                 if (item.Value > 0 && item.Value < 8)
                 {
-                    Console.WriteLine("A Data: " + item.Key + " possui uma quantidade inferior ao minimo permitido (8 horas). Quantidade de horas registradas: " + item.Value);
-                    //throw new Exception("A Data: " + item.Key + " possui uma quantidade inferior ao minimo permitido (8 horas). Quantidade de horas registradas: " + item.Value);
+                    TempData["ErrorMessage"] = "A Data: " + item.Key + " possui uma quantidade inferior ao minimo permitido (8 horas). Quantidade de horas registradas: " + item.Value;
                     return false;
                 }
                 if (item.Value > 0 && (item.Key.DayOfWeek.Equals(DayOfWeek.Sunday) || item.Key.DayOfWeek.Equals(DayOfWeek.Saturday)))
                 {
-                    Console.WriteLine("A Data: " + item.Key + " não é considerada um dia útil.");
+                    TempData["ErrorMessage"] = "A Data: " + item.Key + " não é considerada um dia útil.";
                     return false;
                 }
                 if (item.Value > 24)
                 {
-                    Console.WriteLine("A Data: " + item.Key + " possui uma quantidade superior ao máximo de horas de um dia (24 horas). Quantidade de horas registradas: " + item.Value);
-                    //throw new Exception("A Data: " + item.Key + " possui uma quantidade superior ao máximo de horas de um dia (24 horas). Quantidade de horas registradas: " + item.Value);
+                    TempData["ErrorMessage"] = "A Data: " + item.Key + " possui uma quantidade superior ao máximo de horas de um dia (24 horas). Quantidade de horas registradas: " + item.Value;
                     return false;
                 }
             }
