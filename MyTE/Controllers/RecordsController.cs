@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MyTE.Data;
@@ -108,18 +109,52 @@ namespace MyTE.Controllers
                 }
                 if (ValidateRecords(ConvertForMap(records)))
                 {
+                    var userId = records.First().UserId;
+                    var user = await _userManager.FindByIdAsync(userId);
+                    var userEmail = user.Email;
+                    var startDate = records.Min(r => r.Data);
+                    var endDate = records.Max(r => r.Data);
+                    var totalHours = records.Sum(r => r.Hours);
+
+                    // Check if a biweekly record already exists for this user and period
+                    var existingRecord = await _context.BiweeklyRecords
+                        .Include(b => b.Records)
+                        .FirstOrDefaultAsync(b => b.UserEmail == userEmail && b.StartDate == startDate && b.EndDate == endDate);
+
+                    if (existingRecord != null)
+                    {
+                        // Update existing record
+                        existingRecord.TotalHours = totalHours;
+                        existingRecord.Records = records;
+
+                        _context.Update(existingRecord);
+                    }
+                    else
+                    {
+                        // Create a new record
+                        var biweeklyRecord = new BiweeklyRecord
+                        {
+                            UserEmail = userEmail,
+                            StartDate = startDate,
+                            EndDate = endDate,
+                            TotalHours = totalHours,
+                            Records = records
+                        };
+
+                        _context.BiweeklyRecords.Add(biweeklyRecord);
+                    }
 
                     var recordsExclude = await _context.Record.Where(
-                            r => r.UserId == records[0].UserId
-                            && r.Data >= records[0].Data && r.Data <= records[records.Count()-1].Data
-                        ).ToListAsync();
+                        r => r.UserId == userId
+                        && r.Data >= startDate && r.Data <= endDate
+                    ).ToListAsync();
+
                     _context.Record.RemoveRange(recordsExclude);
-                    _context.AddRange(records);
+                    _context.Record.AddRange(records);
                     await _context.SaveChangesAsync();
                 }
 
                 return RedirectToAction(nameof(Index));
-                
             }
             return RedirectToAction(nameof(Index));
         }
@@ -171,6 +206,15 @@ namespace MyTE.Controllers
 
             return myMap;
         }
+
+        [Authorize(Policy = "RequerPerfilAdmin")]
+        public async Task<IActionResult> AdminView()
+        {
+            var biweeklyRecords = await _context.BiweeklyRecords.Include(b => b.Records).ToListAsync();
+            return View(biweeklyRecords);
+        }
+
+
 
     }
 }

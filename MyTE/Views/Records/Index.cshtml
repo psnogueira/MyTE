@@ -2,72 +2,66 @@
 
 @{
     ViewData["Title"] = "Index";
-    
 }
 
 <h1>Registro de Horas</h1>
 
-
 <form asp-action="Index" method="post">
-    
-    
     <div class="row">
+        <div class="fw-bold">Selecione a data:</div>
         <div class="col-4">
             <div class="form-group">
-                <label>Data</label>
-            <input type="date" name="dataSearch" class="form-control" />
+                <input type="date" name="dataSearch" class="form-control" />
             </div>
         </div>
-        <div class=" col-3">
-            <button type="submit" class="btn  btn-primary">Filtrar</button>
+        <div class="col-3">
+            <button type="submit" class="btn btn-primary">Ir para</button>
         </div>
     </div>
 </form>
-<form asp-action="Persist" method="post">
 
+<form asp-action="Persist" method="post">
     <table class="table">
         <thead>
             <tr>
-                <th>
-                    WBS
-                </th>
-                @foreach (var record in Model.First().records) {
-                    <th>
-                        @Html.DisplayFor(modelItem => record.Data.Day)
-                     </th>
+                <th>WBS</th>
+                @foreach (var record in Model.First().records)
+                {
+                    <th>@record.Data.ToString("ddd dd/MM", new System.Globalization.CultureInfo("pt-BR"))</th>
                 }
-                <th>
-                   Total
-                </th>
+                <th>Total WBS</th>
             </tr>
         </thead>
         <tbody>
             @for (int i = 0; i < Model.Count(); i++)
-                {
+            {
                 var item = Model.ElementAt(i);
                 <tr>
-                    <td>@Html.DisplayFor(modelItem => item.WBS.Code)</td>
+                    <td>@Html.DisplayFor(modelItem => item.WBS.Code) - @Html.DisplayFor(modelItem => item.WBS.Desc)</td>
                     @for (int j = 0; j < item.records.Count(); j++)
                     {
                         var record = Model.ElementAt(i).records.ElementAt(j);
                         <td>
-                            <input type="text" name="listRecordDTO[@i].records[@j].Hours" value="@record.Hours" class="form-control" />
+                            <input type="text" name="listRecordDTO[@i].records[@j].Hours" value="@record.Hours" class="form-control @(record.Data.DayOfWeek == DayOfWeek.Saturday || record.Data.DayOfWeek == DayOfWeek.Sunday ? "bg-dark-subtle" : "")" oninput="updateTotal(@i, @j)" @(record.Data.DayOfWeek == DayOfWeek.Saturday || record.Data.DayOfWeek == DayOfWeek.Sunday ? "readonly" : "") />
                             <input type="hidden" name="listRecordDTO[@i].records[@j].UserId" value="@record.UserId" class="form-control" />
                             <input type="hidden" name="listRecordDTO[@i].records[@j].WBSId" value="@record.WBSId" class="form-control" />
                             <input type="hidden" name="listRecordDTO[@i].records[@j].Data" value="@record.Data" class="form-control" />
+
                         </td>
                     }
-                    <td>@Html.DisplayFor(modelItem => item.TotalHours)</td>
-                
+                    <td>
+                        <span class="fw-bold" id="totalWBS_@i">0.0</span>
+                    </td>
                 </tr>
             }
             <tr>
-                <td>Total Dia</td>
-                
+                <td class="fw-bold">Total Dia</td>
                 @for (int i = 0; i <= 15; i++)
                 {
-                    <td>
-                        <input class="form-control" value="@(Model.First().TotalHoursDay[@i])" readonly/>
+                    <td class="fw-bold">
+                        <input type="hidden" class="form-control fw-bold" value="@(Model.First().TotalHoursDay[@i])" readonly />
+                        <span class="fw-bold" id="totalDay_@i">0.0</span>
+                        <div id="errorDay_@i" class="text-danger" style="display: none;">A soma das horas trabalhadas em um dia não pode ultrapassar 24h.</div>
                     </td>
                 }
                 <td></td>
@@ -78,3 +72,80 @@
         <input type="submit" value="Salvar" class="btn btn-primary" />
     </p>
 </form>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="sucesso">
+        <div class="alert alert-success d-flex align-items-center shadow alert-dismissible fade show position-fixed bottom-0 end-0 p-3 m-3 rounded" role="alert">
+            <i class="bi bi-check-lg fs-1 me-3"></i>
+            <div>
+                <div class="alert-heading align-items-center">
+                    <strong class="me-4 pe-1">@TempData["SuccessMessage"]</strong>
+                    <small type="button" class="btn-close align-items-center" data-bs-dismiss="alert" aria-label="Close"></small>
+                </div>
+                Você pode encontrá-lo na tabela.
+            </div>
+        </div>
+    </div>
+}
+
+<script>
+    function updateTotal(rowIndex, colIndex) {
+        updateRowTotal(rowIndex);
+        updateColumnTotal(colIndex);
+    }
+
+    function updateRowTotal(rowIndex) {
+        var totalWBS = 0;
+        var rowInputs = document.querySelectorAll(`[name^='listRecordDTO[${rowIndex}].records']`);
+        rowInputs.forEach(input => {
+            if (input.type === 'text' && !input.readOnly) {
+                var value = parseFloat(input.value);
+                if (!isNaN(value)) {
+                    totalWBS += value;
+                }
+            }
+        });
+        document.getElementById(`totalWBS_${rowIndex}`).innerText = totalWBS.toFixed(1);
+    }
+
+    function updateColumnTotal(colIndex) {
+        var totalDay = 0;
+        var colInputs = document.querySelectorAll(`[name$='records[${colIndex}].Hours']`);
+        colInputs.forEach(input => {
+            var value = parseFloat(input.value);
+            if (!isNaN(value)) {
+                totalDay += value;
+            }
+        });
+
+        var totalDayElement = document.getElementById(`totalDay_${colIndex}`);
+        totalDayElement.innerText = totalDay.toFixed(1);
+
+        var errorElement = document.getElementById(`errorDay_${colIndex}`);
+        if (totalDay > 24) {
+            totalDayElement.classList.add("text-danger", "fw-bold");
+            errorElement.style.display = "block";
+        } else {
+            totalDayElement.classList.remove("text-danger", "fw-bold");
+            errorElement.style.display = "none";
+        }
+    }
+
+    function updateTotalsOnLoad() {
+        var rowCount = @Model.Count();
+        var colCount = @Model.First().records.Count();
+
+        for (var rowIndex = 0; rowIndex < rowCount; rowIndex++) {
+            updateRowTotal(rowIndex);
+        }
+
+        for (var colIndex = 0; colIndex < colCount; colIndex++) {
+            updateColumnTotal(colIndex);
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        updateTotalsOnLoad();
+    });
+</script>
