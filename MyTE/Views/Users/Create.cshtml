@@ -33,11 +33,6 @@
                     <label asp-for="HiringDate" class="ms-3 ps-2 control-label text-secondary"></label>
                     <span asp-validation-for="HiringDate" class="text-danger"></span>
                 </div>
-                <div class="col form-floating mb-3">
-                    <input asp-for="PID" class="form-control" placeholder="." />
-                    <label asp-for="PID" class="ms-3 ps-2 control-label text-secondary"></label>
-                    <span asp-validation-for="PID" class="text-danger"></span>
-                </div>
             </div>
             <div class="form-floating mb-3">
                 <select asp-for="DepartmentId" class="form-control" asp-items="ViewBag.Departments">
@@ -60,12 +55,12 @@
                     <span asp-validation-for="Password" class="text-danger"></span>
                 </div>
                 <div class="col form-floating mb-3">
-                    <input asp-for="ConfirmPassword" type="password" class="form-control" placeholder="." />
+                    <input asp-for="ConfirmPassword" type="password" class="form-control" placeholder="." id="Password-error" />
                     <label asp-for="ConfirmPassword" class="ms-3 ps-2 control-label text-secondary"></label>
                     <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
                 </div>
             </div>
-            <button type="submit" class="btn btn-primary btn-lg fw-bold w-100">Criar</button>
+            <button type="submit" class="btn btn-primary btn-lg fw-bold w-100">Create</button>
         </form>
     </div>
     <div class="col-md-6  overflow-hidden">
@@ -75,4 +70,6 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+
+
 }

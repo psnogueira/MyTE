@@ -4,8 +4,12 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using MyTE.Data;
+using MyTE.Data.Migrations;
 using MyTE.DTO;
 using MyTE.Models;
+using MyTE.Models.ViewModel;
+using MyTE.Pagination;
+using System.Drawing.Printing;
 
 namespace MyTE.Controllers
 {
@@ -121,11 +125,48 @@ namespace MyTE.Controllers
                 }
                 if (ValidateRecords(ConvertForMap(records)))
                 {
+                    var userId = records.First().UserId;
+                    var user = await _userManager.FindByIdAsync(userId);
+                    var userEmail = user.Email;
+                    var employeeName = user.FullName;
+                    var startDate = records.Min(r => r.Data);
+                    var endDate = records.Max(r => r.Data);
+                    var totalHours = records.Sum(r => r.Hours);
+
+                    // Check if a biweekly record already exists for this user and period
+                    var existingRecord = await _context.BiweeklyRecords
+                        .Include(b => b.Records)
+                        .FirstOrDefaultAsync(b => b.UserEmail == userEmail && b.StartDate == startDate && b.EndDate == endDate && b.EmployeeName == employeeName);
+
+                    if (existingRecord != null)
+                    {
+                        // Update existing record
+                        existingRecord.TotalHours = totalHours;
+                        existingRecord.Records = records;
+
+                        _context.Update(existingRecord);
+                    }
+                    else
+                    {
+                        // Create a new record
+                        var biweeklyRecord = new BiweeklyRecord
+                        {
+                            UserEmail = userEmail,
+                            EmployeeName = employeeName,
+                            StartDate = startDate,
+                            EndDate = endDate,
+                            TotalHours = totalHours,
+                            Records = records
+                        };
+
+                        _context.BiweeklyRecords.Add(biweeklyRecord);
+                    }
 
                     var recordsExclude = await _context.Record.Where(
-                            r => r.UserId == records[0].UserId
-                            && r.Data >= records[0].Data && r.Data <= records[records.Count() - 1].Data
-                        ).ToListAsync();
+                        r => r.UserId == userId
+                        && r.Data >= startDate && r.Data <= endDate
+                    ).ToListAsync();
+
                     _context.Record.RemoveRange(recordsExclude);
                     var recordsToSave = new List<Record>();
                     foreach (var itemRecord in records)
@@ -138,6 +179,7 @@ namespace MyTE.Controllers
                     }
                     TempData["SuccessMessage"] = "Registro de horas salvo com sucesso!";
                     _context.AddRange(recordsToSave);
+                    _context.Record.AddRange(records);
                     await _context.SaveChangesAsync();
                 }
                 else
@@ -195,5 +237,66 @@ namespace MyTE.Controllers
             }
             return myMap;
         }
+
+
+        [Authorize(Policy = "RequerPerfilAdmin")]
+        public async Task<IActionResult> AdminView(string searchString, int? pageNumber)
+        {
+            var pageSize = 5;
+            ViewData["CurrentFilter"] = searchString;
+
+            var biweeklyRecords = _context.BiweeklyRecords
+                                    .Include(b => b.Records)                                    
+                                    .OrderByDescending(r => r.StartDate)
+                                    .AsQueryable();
+
+            if(!string.IsNullOrEmpty(searchString))
+            {
+                biweeklyRecords = biweeklyRecords
+                    .Where(r => r.UserEmail.Contains(searchString));
+            }
+
+            var viewModel = new AdminViewModel
+            {
+                ReportsList = await PaginatedList<BiweeklyRecord>
+                .CreateAsync(biweeklyRecords.AsNoTracking(), pageNumber ?? 1, pageSize),
+                CurrentFilter = searchString,
+                BiweeklyRecord = new BiweeklyRecord(),
+            };
+
+
+            return View(viewModel);
+        }
+
+        [Authorize(Policy = "RequerPerfilAdmin")]
+        public async Task<IActionResult> ViewDetails(int id)
+        {
+            var biweeklyRecord = await _context.BiweeklyRecords
+                                               .Include(b => b.Records)
+                                               .FirstOrDefaultAsync(b => b.BiweeklyRecordId == id);
+            if (biweeklyRecord == null)
+            {
+                return NotFound();
+            }
+
+            var recordDetails = biweeklyRecord.Records
+                                              .OrderBy(r => r.Data)  // Ordenar registros por data
+                                              .Select(r => new RecordDetail
+                                              {
+                                                  Record = r,
+                                                  WBS = _context.WBS.FirstOrDefault(w => w.WBSId == r.WBSId)
+                                              }).ToList();
+
+            var viewModel = new RecordDetailsViewModel
+            {
+                BiweeklyRecord = biweeklyRecord,
+                RecordDetails = recordDetails
+            };
+
+            return View(viewModel);
+        }
     }
+
+
 }
+
