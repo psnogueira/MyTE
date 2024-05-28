@@ -182,33 +182,5 @@ namespace MyTE.Controllers
             return _context.Department.Any(e => e.DepartmentId == id);
         }
 
-        [HttpPost]
-        public IActionResult ExportToCSV()
-        {
-            // Lista de Departamentos do banco de dados.
-            var departments = _context.Department.ToList();
-
-            // Criação do arquivo CSV pelo MemoryStream.
-            // Ele serve para ler e gravar dados em memória.
-            using (var memoryStream = new MemoryStream())
-            using (var streamWriter = new StreamWriter(memoryStream, Encoding.UTF8))
-            {
-                using (var csvWriter = new CsvWriter(streamWriter, CultureInfo.InvariantCulture))
-                {
-                    // Registro de dados no arquivo CSV.
-                    csvWriter.Context.RegisterClassMap<DepartmentMap>(); // Mapeamento de dados.
-                    csvWriter.WriteHeader<Department>();                 // Cabeçalho do arquivo.
-                    csvWriter.NextRecord();                              // Ir para próxima linha (obrigatório depois de .WriteHeader<>()).
-                    csvWriter.WriteRecords(departments);                 // Registros dos dados.
-
-                    csvWriter.Flush();          // Limpa o buffer de gravação.
-                    memoryStream.Position = 0;  // Posiciona o ponteiro no início do arquivo.
-                }
-
-                // Retorna o arquivo CSV para download.
-                // O arquivo é gerado em memória e não é salvo no servidor.
-                return File(memoryStream.ToArray(), "text/csv", "departments.csv");
-            }
-        }
     }
 }
