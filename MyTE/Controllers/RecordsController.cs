@@ -136,6 +136,7 @@ namespace MyTE.Controllers
                         }
 
                     }
+                    TempData["SuccessMessage"] = "Registro de horas salvo com sucesso!";
                     _context.AddRange(recordsToSave);
                     await _context.SaveChangesAsync();
                 }
@@ -144,9 +145,8 @@ namespace MyTE.Controllers
                     TempData["ErrorMessage"] = "Falha na validação dos registros.";
                     return RedirectToAction(nameof(Index));
                 }
-
             }
-            TempData["SuccessMessage"] = "Registro de horas salvo com sucesso!";
+            
             return RedirectToAction(nameof(Index));
         }
 
@@ -156,20 +156,19 @@ namespace MyTE.Controllers
             {
                 if (item.Value > 0 && item.Value < 8)
                 {
-                    Console.WriteLine("A Data: " + item.Key + " possui uma quantidade inferior ao minimo permitido (8 horas). Quantidade de horas registradas: " + item.Value);
                     TempData["ErrorMessageText"] = "A data " + item.Key.Date.ToString("dd/MM") + " possui uma quantidade inferior ao minimo";
                     TempData["ErrorMessageText2"] = "permitido (8 horas). Quantidade de horas registradas: " + item.Value;
-                    //throw new Exception("A Data: " + item.Key + " possui uma quantidade inferior ao minimo permitido (8 horas). Quantidade de horas registradas: " + item.Value);
                     return false;
                 }
                 if (item.Value > 0 && (item.Key.DayOfWeek.Equals(DayOfWeek.Sunday) || item.Key.DayOfWeek.Equals(DayOfWeek.Saturday)))
                 {
-                    TempData["ErrorMessage"] = "A Data: " + item.Key + " não é considerada um dia útil.";
+                    TempData["ErrorMessageText"] = "A data " + item.Key + " não é considerada um dia útil.";
                     return false;
                 }
                 if (item.Value > 24)
                 {
-                    TempData["ErrorMessage"] = "A Data: " + item.Key + " possui uma quantidade superior ao máximo de horas de um dia (24 horas). Quantidade de horas registradas: " + item.Value;
+                    TempData["ErrorMessageText"] = "A data " + item.Key + " possui uma quantidade superior ao máximo de horas de um dia (24 horas).";
+                    TempData["ErrorMessageText2"] = "Quantidade de horas registradas: " + item.Value;
                     return false;
                 }
             }
