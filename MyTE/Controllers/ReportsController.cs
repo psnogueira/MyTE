@@ -29,47 +29,97 @@ namespace MyTE.Controllers
             _csvService = csvService;
         }
 
-        public async Task<IActionResult> Index(int departmentId = 2)
+        public async Task<IActionResult> Index()
         {
-            // Configura a consulta para incluir o departamento do usuário.
-            var usersQuery = _context.Users.Include(u => u.Department).AsQueryable();
+            // Consulta LINQ para calcular a soma das horas da tabela Record para cada WBS.
+            var horasPorWBS = await _context.Record
+                                      .GroupBy(r => r.WBSId)
+                                      .Select(g => new
+                                      {
+                                          WBSId = g.Key,
+                                          TotalHoras = g.Sum(r => r.Hours)
+                                      })
+                                      .ToListAsync();
 
-            // Filtrar Users pelo ID do departamento.
-            if (departmentId != 0)
-            {
-                usersQuery = usersQuery.Where(u => u.DepartmentId == departmentId);
-            }
+            // Ordena a lista de horas por WBS em ordem decrescente.
+            var horasPorWBSList = horasPorWBS.OrderByDescending(h => h.TotalHoras).ToList();
 
-            // Transforma a consulta em uma lista para ser exibida na View.
-            var usersList = await usersQuery.ToListAsync();
+            // Dicionário para armazenar os resultados.
+            var horasPorWBSDicionario = horasPorWBSList.ToDictionary(item => item.WBSId, item => item.TotalHoras);
 
-            // Consulta para obter as WBS.
-            //var wbsQuery = _context.WBS.AsQueryable();
+            // Consulta LINQ para obter as descrições das WBS.
+            var wbsDescriptions = await _context.WBS
+                                      .Select(w => new
+                                      {
+                                          w.WBSId,
+                                          w.Desc
+                                      })
+                                      .ToListAsync();
 
-            return View(usersList);
+            // Dicionário para armazenar as descrições das WBS.
+            var wbsDescriptionsDictionary = wbsDescriptions.ToDictionary(item => item.WBSId, item => item.Desc);
+
+            // ViewBag para exibir os dados na View.
+            ViewBag.HorasPorWBS = horasPorWBSDicionario;
+            ViewBag.DescricoesWBS = wbsDescriptionsDictionary;
+
+            return View();
         }
 
         [HttpPost]
-        public async Task<IActionResult> ExportService()
+        public async Task<IActionResult> ExportWBS()
         {
-            // Lista de Departamentos do banco de dados.
-            var records = await _context.Department.ToListAsync();
+            // Consulta LINQ para obter a soma das horas da tabela Record para cada WBS.
+            var horasPorWBS = await _context.Record
+                                      .GroupBy(r => r.WBSId)
+                                      .Select(g => new
+                                      {
+                                          WBSId = g.Key,
+                                          TotalHoras = g.Sum(r => r.Hours)
+                                      })
+                                      .ToListAsync();
+
+            // Ordena a lista de horas por WBS em ordem decrescente.
+            var horasPorWBSList = horasPorWBS.OrderByDescending(h => h.TotalHoras).ToList();
+
+            // Consulta LINQ para obter as descrições das WBS.
+            var wbsDescriptions = await _context.WBS
+                                      .Select(w => new
+                                      {
+                                          w.WBSId,
+                                          w.Code,
+                                          w.Desc
+                                      })
+                                      .ToListAsync();
+
+            // Lista combinada com os Ids, Códigos, Descrições e Total de horas.
+            var listaCombinada = (from h in horasPorWBSList
+                                  join d in wbsDescriptions
+                                  on h.WBSId equals d.WBSId
+                                  select new
+                                  {
+                                      WBSId = h.WBSId,
+                                      Code = d.Code,
+                                      Desc = d.Desc,
+                                      TotalHours = h.TotalHoras
+                                  }).ToList();
 
             // Configuração do arquivo CSV para download.
-            var fileName = "Reports.csv";
+            var fileName = $"Relatorio_{DateTime.Today.ToString("dd/MM/yyyy")}.csv";
             var contentType = "text/csv";
             var columnNames = new List<string>
             {
-                "Id do Departamento",
-                "Nome do Departamento"
+                "Id da WBS",
+                "Código",
+                "Descrição",
+                "Total de Horas"
             };
 
             // Escrever os dados em um arquivo CSV.
-            var csvData = _csvService.WriteCSV(records, columnNames);
+            var csvData = _csvService.WriteCSV(listaCombinada, columnNames);
 
             return File(csvData, contentType, fileName);
         }
-
 
     }
 }

@@ -1,34 +1,42 @@
-﻿@model IEnumerable<MyTE.Models.ApplicationUser>
+﻿@{
+    ViewBag.Title = "Relatórios";
+}
 
-Report
+<h2>Relatórios</h2>
 
-<form asp-action="ExportService">
-    <button type="submit" class="btn btn-primary">Gerar CSV (Service)</button>
-</form>
+<div class="d-grid gap-2 mt-4">
+    <form asp-action="ExportWBS">
+        <button type="submit" class="btn btn-success">Gerar CSV (WBS)</button>
+    </form>
+</div>
 
-<form asp-action="Service">
-    <button type="submit" class="btn btn-warning">Gerar CSV Dinâmico</button>
-</form>
-
-<h2>Funcionários</h2>
+<h2 class="mt-4">Horas de cada WBS</h2>
 <table class="table">
     <thead>
         <tr>
-            <th>Id</th>
-            <th>Nome do Funcionário</th>
-            <th>Departamento</th>
+            <th>Id WBS</th>
+            <th>Descrição</th>
+            <th>Total de Horas</th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>@item.Id</td>
-                <td>@item.FullName</td>
-                <td>@item.Department.Name</td>
-                <td></td>
-            </tr>
+        @{
+            bool primeiraLinha = true;
+            foreach (var item in ViewBag.HorasPorWBS)
+            {
+                string classeLinha = primeiraLinha ? "table-success" : "";
+                primeiraLinha = false;
+
+                var wbsDesc = ViewBag.DescricoesWBS[item.Key] as string ?? "Sem descrição";
+
+                <tr class="@classeLinha">
+                    <td>@item.Key</td>
+                    <td>@wbsDesc</td>
+                    <td>@item.Value</td>
+                    <td></td>
+                </tr>
+            }
         }
     </tbody>
 </table>
