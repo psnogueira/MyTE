@@ -19,7 +19,7 @@
                         <select class="form-control" asp-for="WBSType" asp-items="Model.Type">
                             <option value="">Todos</option>
                         </select>
-                        <input type="text" class="form-control w-25" id="wbsName" name="SearchString" value="@ViewData["CurrentFilter"]" placeholder="Buscar por código ou descrição" />
+                        <input type="text" class="form-control w-25" name="SearchString" value="@ViewData["CurrentFilter"]" placeholder="Buscar por código ou descrição" id="autoComplete" data-table="WBS" data-column1="Desc" data-column2="Code" />
                         <input class="btn btn-outline-primary" type="submit" value="Procurar" />
                         <a class="btn btn-outline-primary align-content-center" asp-action="Index">Lista completa</a>
                     </div>
@@ -111,7 +111,7 @@
                         <select class="form-control" asp-for="WBSType" asp-items="Model.Type">
                             <option value="">Todos</option>
                         </select>
-                        <input type="text" class="form-control w-25" id="wbsName" name="SearchString" value="@ViewData["CurrentFilter"]" placeholder="Buscar por código ou descrição" />
+                        <input type="text" class="form-control w-25" name="SearchString" value="@ViewData["CurrentFilter"]" placeholder="Buscar por código ou descrição" id="autoComplete" data-table="WBS" data-column1="Desc" data-column2="Code" />
                         <input class="btn btn-outline-primary" type="submit" value="Procurar" />
                         <a class="btn btn-outline-primary align-content-center" asp-action="Index">Lista completa</a>
                     </div>
@@ -282,30 +282,7 @@
 }
 
 @section Scripts {
-    <script>
-        $(document).ready(function () {
-            // O ID deve ser igual ao colocado no input do search
-            $("#wbsName").autocomplete({
-                source: function (request, response) {
-                    var tableName = "WBS"; // O ID deve ser igual ao colocado no input do search
-                    var columnName1 = "Code"; // Nome da primeira coluna usada no Auto-complete
-                    var columnName2 = "Desc"; // Nome da segunda coluna usada no Auto-complete
-                    var url = 'api/autocomplete/' + tableName + '/search';
-                    var data = { term: request.term, columnName1: columnName1 };
-
-                    if (columnName2) {
-                        data.columnName2 = columnName2;
-                    }
-
-                    $.ajax({
-                        url: url,
-                        data: data,
-                        success: function (data) {
-                            response(data);
-                        }
-                    });
-                }
-            });
-        });
-    </script>
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

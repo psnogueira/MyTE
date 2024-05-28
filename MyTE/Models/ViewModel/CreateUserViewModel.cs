@@ -1,12 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
 
-public class EditUserViewModel
+public class CreateUserViewModel
 {
-    public string? Id { get; set; }
-
     [Required(ErrorMessage = "O email é obrigatório.")]
-    [Remote(action: "VerifyEmail", controller: "Users", AdditionalFields = nameof(Id), ErrorMessage = "Este email já está em uso.")]
+    [Remote(action: "VerifyEmail", controller: "Users", ErrorMessage = "Este email já está em uso.")]
     [EmailAddress]
     public string? Email { get; set; }
 
@@ -27,9 +25,9 @@ public class EditUserViewModel
     [Display(Name = "Data de Contratação")]
     public DateTime HiringDate { get; set; }
 
-    [Required(ErrorMessage = "O código PID do funcionário é obrigatório.")]
-    [StringLength(11, MinimumLength = 11, ErrorMessage = "O PID do funcionário tem apenas 11 caracteres")]
-    public string? PID { get; set; }
+    //[Required(ErrorMessage = "O código PID do funcionário é obrigatório.")]
+    //[StringLength(11, MinimumLength = 11, ErrorMessage = "O PID do funcionário deve possuir 11 caracteres")]
+    //public string? PID { get; set; }
 
     [Required(ErrorMessage = "O departamento é obrigatório.")]
     [Display(Name = "Departamento")]
@@ -39,5 +37,19 @@ public class EditUserViewModel
     [Required(ErrorMessage = "O role é obrigatório.")]
     [Display(Name = "Nível de Acesso")]
     public string? RoleId { get; set; }
+
+    [Required(ErrorMessage = "A senha é obrigatório.")]
+    [DataType(DataType.Password)]
+    [RegularExpression(@"^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#\$%\^&\*()\-\+=\[\]{};':""\\|,.<>\/?]).{6,}$",
+    ErrorMessage = "A senha deve conter pelo menos 6 caracteres, incluindo um número, uma letra maiúscula, uma letra minúscula e um caractere especial.")]
+    [Display(Name = "Senha")]
+    public string? Password { get; set; }
+
+
+    [Required(ErrorMessage = "A confirmação de senha é obrigatório.")]
+    [DataType(DataType.Password)]
+    [Compare("Password", ErrorMessage = "As senhas digitadas não correspondem.")]
+    [Display(Name = "Confirmar senha")]
+    public string? ConfirmPassword { get; set; }
 
 }

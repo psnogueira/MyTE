@@ -1,181 +1,247 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
 using MyTE.Data;
-using MyTE.Data.Migrations;
 using MyTE.Models;
-using MyTE.Models.Enum;
 using MyTE.Models.ViewModel;
 using MyTE.Pagination;
-using System.Security.Cryptography;
 
-namespace MyTE.Controllers
+[Authorize(Policy = "RequerPerfilAdmin")]
+public class UsersController : Controller
 {
-    public class UsersController : Controller
+    private readonly UserManager<ApplicationUser> _userManager;
+    private readonly RoleManager<IdentityRole> _roleManager;
+    private readonly ApplicationDbContext _context;
+
+    public UsersController(UserManager<ApplicationUser> userManager,
+        ApplicationDbContext context,
+        RoleManager<IdentityRole> roleManager)
     {
-        private readonly UserManager<ApplicationUser> _manager;
-        private readonly RoleManager<IdentityRole> _roleManager;
+        _userManager = userManager;
+        _context = context;
+        _roleManager = roleManager;
+    }
 
-        private readonly ApplicationDbContext _context;
+    public async Task<IActionResult> Index(string searchString, int? pageNumber, int? departmentType)
+    {
+        int pagesize = 5;
+        ViewData["CurrentFilter"] = searchString;
 
-        public UsersController(UserManager<ApplicationUser> userManeger, SignInManager<ApplicationUser> signInManager, ApplicationDbContext context)
+        var usersQuery = _context.Users
+            .Include(d => d.Department)
+            .AsQueryable();
+    
+
+        if (!string.IsNullOrEmpty(searchString))
         {
-            _manager = userManeger;
-            _context = context;
+            usersQuery = usersQuery.Where(s => s.LastName.Contains(searchString)
+                                               || s.Email.Contains(searchString));
         }
 
-        public async Task<IActionResult> Index(string searchString, int? pageNumber, int? departmentType)
+        if (departmentType.HasValue && departmentType != 0)
         {
-            int pageSize = 7;
-            ViewData["CurrentFilter"] = searchString;
-
-            var usersQuery = _context.Users.Include(u => u.Department).AsQueryable();
-
-
-            if (departmentType.HasValue && departmentType != 0)
-            {
-                usersQuery = usersQuery.Where(u => u.DepartmentId == departmentType);
-            }
-
-            if (!string.IsNullOrEmpty(searchString))
-            {
-                usersQuery = usersQuery.Where(u => EF.Functions.Like(u.FirstName, $"%{searchString}%"));
-            }
-
-            var users = await PaginatedList<ApplicationUser>.CreateAsync(usersQuery.AsNoTracking(), pageNumber ?? 1, pageSize);
-            var userRoles = new Dictionary<string, IList<string>>();
-
-            foreach (var user in users)
-            {
-                var roles = await _manager.GetRolesAsync(user);
-                userRoles[user.Id] = roles;
-            }
-
-            var viewModel = new EditUserViewModel
-            {
-                UserList = users,
-                User = new ApplicationUser(),
-                CurrentFilter = searchString,
-                UserRoles = userRoles
-            };
-            return View(viewModel);
+            usersQuery = usersQuery.Where(d => d.DepartmentId == departmentType);
         }
 
-        [HttpGet]
-        public async Task<IActionResult> Edit(string id)
+        var users = await PaginatedList<ApplicationUser>
+            .CreateAsync(usersQuery
+            .AsNoTracking(), pageNumber ?? 1, pagesize);
+        var userRoles = new Dictionary<string, IList<string>>();
+
+        foreach (var user in users)
         {
-            if (string.IsNullOrEmpty(id))
+            var roles = await _userManager.GetRolesAsync(user);
+            userRoles[user.Id] = roles;
+        }
+
+        var viewModel = new UserViewModel
+        {
+            UsersList = users,
+            User = new ApplicationUser(),
+            CurrentFilter = searchString,
+            UserRoles = userRoles,
+        };
+
+        return View(viewModel);
+    }
+
+    public IActionResult Create()
+    {
+        ViewBag.Departments = new SelectList(_context.Department, "DepartmentId", "Name");
+        ViewBag.Roles = new SelectList(_roleManager.Roles, "Id", "Name");
+        return View();
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Create([Bind("Email", "FirstName", "LastName", "HiringDate", "PID", "DepartmentId", "RoleId", "Password", "ConfirmPassword")] CreateUserViewModel model)
+    {
+        if (ModelState.IsValid)
+        {
+            //Garante que caso ocorra erro de validação o Department e o Role sejam recarregados n página
+            ViewBag.Departments = new SelectList(_context.Department, "DepartmentId", "Name", model.DepartmentId);
+            ViewBag.Roles = new SelectList(_roleManager.Roles, "Id", "Name", model.RoleId);
+
+
+            // Gera o PID automaticamente
+            var generatedPID = await GeneratePIDAsync();
+
+            var user = new ApplicationUser
             {
-                return NotFound();
-            }
-
-            var user = _manager.Users.FirstOrDefault(u => u.Id == id);
-            
-            if (user == null)
-            {
-                return NotFound();
-            }
-
-            var viewModel = new EditUserViewModel
-            {
-                UserName = user.UserName,
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                HiringDate = user.HiringDate,
-                Email = user.Email,
-                PID = user.PID,
-                Department = user.Department,
-                Departments = await _context.Department
-                        .Select(d => new SelectListItem
-                        {
-                            Value = d.DepartmentId.ToString(),
-                            Text = d.Name
-                        }).ToListAsync(),
-
-                RolesList = await _context.Roles
-                        .Select(d => new SelectListItem
-                        {
-                            Value = d.Id.ToString(),
-                            Text = d.Name
-                        }).ToListAsync(),
-
+                NormalizedUserName = model.Email,
+                UserName = model.Email,
+                Email = model.Email,
+                EmailConfirmed = true,
+                FirstName = model.FirstName,
+                LastName = model.LastName,
+                HiringDate = model.HiringDate,
+                PID = generatedPID,
+                DepartmentId = model.DepartmentId,
+                RoleId = model.RoleId
             };
 
-
-
-            return View(viewModel);
-
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, EditUserViewModel user)
-        {
-            if (id != user.Id)
+            var result = await _userManager.CreateAsync(user, model.Password);
+            if (result.Succeeded)
             {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
+                // Adiciona o usuário ao papel (role) especificado
+                var role = await _roleManager.FindByIdAsync(model.RoleId);
+                if (role != null)
                 {
-                    var existingUser = await _manager.FindByIdAsync(id);
-                    if (existingUser == null)
+                    var roleResult = await _userManager.AddToRoleAsync(user, role.Name);
+                    if (!roleResult.Succeeded)
                     {
-                        return NotFound();
-                    }
-
-                    existingUser.UserName = user.UserName;
-                    existingUser.FirstName = user.FirstName;
-                    existingUser.LastName = user.LastName;
-                    existingUser.HiringDate = user.HiringDate;
-                    existingUser.Email = user.Email;
-                    existingUser.PID = user.PID;
-                    existingUser.Department = user.Department;
-
-                    await _manager.UpdateAsync(existingUser);
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (_manager.Users.FirstOrDefault(u => u.Id == id) == null)
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
+                        foreach (var error in roleResult.Errors)
+                        {
+                            ModelState.AddModelError(string.Empty, error.Description);
+                        }
                     }
                 }
-                return RedirectToAction("Index");
+                TempData["SuccessMessage"] = "Usuário cadastrado com sucesso!";
+                return RedirectToAction(nameof(Index));
             }
-            return View(user);
+
+            foreach (var error in result.Errors)
+            {
+                ModelState.AddModelError(string.Empty, error.Description);
+            }
+        }
+        return View("Error", ModelState);
+    }
+
+    public async Task<IActionResult> Edit(string id)
+    {
+        var user = await _userManager.FindByIdAsync(id);
+        if (user == null)
+        {
+            return NotFound();
         }
 
-        public async Task<IActionResult> Delete(string id)
+        ViewBag.Departments = new SelectList(_context.Department, "DepartmentId", "Name", user.DepartmentId);
+        ViewBag.Roles = new SelectList(_roleManager.Roles, "Id", "Name", user.RoleId);
+
+        var model = new EditUserViewModel
         {
-            var user = await _manager.FindByIdAsync(id);
+            Id = user.Id,
+            Email = user.Email,
+            FirstName = user.FirstName,
+            LastName = user.LastName,
+            HiringDate = user.HiringDate,
+            PID = user.PID,
+            DepartmentId = user.DepartmentId,
+            RoleId = user.RoleId
+        };
+
+        return View(model);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Edit(EditUserViewModel model)
+    {
+        if (ModelState.IsValid)
+        {
+            var user = await _userManager.FindByIdAsync(model.Id);
             if (user != null)
             {
-                _manager.DeleteAsync(user);
+                user.Email = model.Email;
+                user.UserName = model.Email; // Certifique-se de que o UserName é atualizado também
+                user.FirstName = model.FirstName;
+                user.LastName = model.LastName;
+                user.HiringDate = model.HiringDate;
+                user.PID = model.PID;
+                user.DepartmentId = model.DepartmentId;
+                user.RoleId = model.RoleId;
+
+                var result = await _userManager.UpdateAsync(user);
+                if (result.Succeeded)
+                {
+                    TempData["SuccessMessage2"] = "Usuário editado com sucesso!";
+                    return RedirectToAction(nameof(Index));
+                }
+
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError(string.Empty, error.Description);
+                }
             }
+        }
+        return View(model);
+    }
 
-            return RedirectToAction("Index");
-
+    public async Task<IActionResult> Delete(string id)
+    {
+        var user = await _userManager.FindByIdAsync(id);
+        if (user != null)
+        {
+            await _userManager.DeleteAsync(user);
         }
 
-
-        //public async Task<IActionResult> Edit(string id)
-        //{
-        //    var user = await _manager.FindByIdAsync(id);
-        //    if (user == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    return View(user);
-        //}
+        return RedirectToAction(nameof(Index));
     }
+
+    [HttpGet]
+    public async Task<IActionResult> CheckPID(string pid)
+    {
+        var user = await _userManager.Users.SingleOrDefaultAsync(u => u.PID == pid);
+        if (user != null)
+        {
+            return Ok(new { exists = true });
+        }
+        return Ok(new { exists = false });
+
+
+    }
+
+    [AcceptVerbs("Get", "Post")]
+    public IActionResult VerifyEmail(string email, string id)
+    {
+        var user = _context.Users.FirstOrDefault(u => u.Email == email);
+        if (user != null)
+        {
+            // Se o e-mail existir, mas for do usuário que está sendo editado, não há problema
+            if (user.Id == id)
+            {
+                return Json(true);
+            }
+            return Json($"O email <b>{email}</b> já está em uso.");
+        }
+        return Json(true);
+    }
+
+    private async Task<string> GeneratePIDAsync()
+    {
+        string pid;
+        bool pidExists;
+
+        do
+        {
+            pid = Guid.NewGuid().ToString("N").Substring(0, 11);
+            pidExists = await _context.Users.AnyAsync(u => u.PID == pid);
+        } while (pidExists);
+
+        return pid.ToUpper();
+    }
+
+
 }

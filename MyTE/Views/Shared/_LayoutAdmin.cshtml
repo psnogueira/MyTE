@@ -21,19 +21,22 @@
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                            <a class="nav-link text-dark @(ViewContext.RouteData.Values["Controller"].ToString() == "Home" && ViewContext.RouteData.Values["Action"].ToString() == "Index" ? "active" : "")" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Roles" asp-action="Index">Roles</a>
+                            <a class="nav-link text-dark @(ViewContext.RouteData.Values["Controller"].ToString() == "Roles" ? "active" : "")" asp-area="" asp-controller="Roles" asp-action="Index">Roles</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Users" asp-action="Index">Usuários</a>
+                            <a class="nav-link text-dark @(ViewContext.RouteData.Values["Controller"].ToString() == "Users" ? "active" : "")" asp-area="" asp-controller="Users" asp-action="Index">Users</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="WBS" asp-action="Index">WBS</a>
+                            <a class="nav-link text-dark @(ViewContext.RouteData.Values["Controller"].ToString() == "WBS" ? "active" : "")" asp-area="" asp-controller="WBS" asp-action="Index">WBS</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Departments" asp-action="Index">Departamentos</a>
+                            <a class="nav-link text-dark @(ViewContext.RouteData.Values["Controller"].ToString() == "Departments" ? "active" : "")" asp-area="" asp-controller="Departments" asp-action="Index">Departamentos</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark @(ViewContext.RouteData.Values["Controller"].ToString() == "Records" ? "active" : "")" asp-area="" asp-controller="Records" asp-action="Index">Registro de Horas</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Register">Register</a>
@@ -61,6 +64,7 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

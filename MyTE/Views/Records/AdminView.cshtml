@@ -1,0 +1,33 @@
+﻿@model IEnumerable<MyTE.Models.BiweeklyRecord>
+
+@{
+    ViewData["Title"] = "Relatórios";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>User</th>
+            <th>Período</th>
+            <th>Total de Horas</th>
+            <th>Detalhes</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var record in Model)
+        {
+            <tr>
+                <td>@record.UserEmail</td>
+                <td>@record.StartDate.ToString("dd/MM/yyyy") - @record.EndDate.ToString("dd/MM/yyyy")</td>
+                <td>@record.TotalHours</td>
+                <td>
+                    <a asp-action="ViewDetails" asp-route-id="@record.BiweeklyRecordId" class="btn btn-primary">
+                        View Details
+                    </a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

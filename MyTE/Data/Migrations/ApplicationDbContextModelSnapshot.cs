@@ -179,16 +179,14 @@ namespace MyTE.Data.Migrations
 
                     b.Property<string>("FirstName")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("HiringDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("LastName")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
@@ -206,8 +204,7 @@ namespace MyTE.Data.Migrations
 
                     b.Property<string>("PID")
                         .IsRequired()
-                        .HasMaxLength(11)
-                        .HasColumnType("nvarchar(11)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PasswordHash")
                         .HasColumnType("nvarchar(max)");
@@ -217,6 +214,10 @@ namespace MyTE.Data.Migrations
 
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("bit");
+
+                    b.Property<string>("RoleId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
@@ -243,6 +244,32 @@ namespace MyTE.Data.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
+            modelBuilder.Entity("MyTE.Models.BiweeklyRecord", b =>
+                {
+                    b.Property<int>("BiweeklyRecordId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("BiweeklyRecordId"));
+
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<double>("TotalHours")
+                        .HasColumnType("float");
+
+                    b.Property<string>("UserEmail")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("BiweeklyRecordId");
+
+                    b.ToTable("BiweeklyRecords");
+                });
+
             modelBuilder.Entity("MyTE.Models.Department", b =>
                 {
                     b.Property<int>("DepartmentId")
@@ -261,6 +288,37 @@ namespace MyTE.Data.Migrations
                     b.ToTable("Department");
                 });
 
+            modelBuilder.Entity("MyTE.Models.Record", b =>
+                {
+                    b.Property<int>("RecordId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RecordId"));
+
+                    b.Property<int?>("BiweeklyRecordId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("Data")
+                        .HasColumnType("datetime2");
+
+                    b.Property<double>("Hours")
+                        .HasColumnType("float");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("WBSId")
+                        .HasColumnType("int");
+
+                    b.HasKey("RecordId");
+
+                    b.HasIndex("BiweeklyRecordId");
+
+                    b.ToTable("Record");
+                });
+
             modelBuilder.Entity("MyTE.Models.WBS", b =>
                 {
                     b.Property<int>("WBSId")
@@ -271,8 +329,8 @@ namespace MyTE.Data.Migrations
 
                     b.Property<string>("Code")
                         .IsRequired()
-                        .HasMaxLength(16)
-                        .HasColumnType("nvarchar(16)");
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
 
                     b.Property<string>("Desc")
                         .IsRequired()
@@ -347,6 +405,18 @@ namespace MyTE.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("Department");
+                });
+
+            modelBuilder.Entity("MyTE.Models.Record", b =>
+                {
+                    b.HasOne("MyTE.Models.BiweeklyRecord", null)
+                        .WithMany("Records")
+                        .HasForeignKey("BiweeklyRecordId");
+                });
+
+            modelBuilder.Entity("MyTE.Models.BiweeklyRecord", b =>
+                {
+                    b.Navigation("Records");
                 });
 
             modelBuilder.Entity("MyTE.Models.Department", b =>

@@ -1,0 +1,34 @@
+﻿@model MyTE.Models.ViewModel.RecordDetailsViewModel
+
+@{
+    ViewData["Title"] = "Detalhes do Relatório Quinzenal";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<h2>Usuário: @Model.BiweeklyRecord.UserEmail</h2>
+<h3>Período: @Model.BiweeklyRecord.StartDate.ToString("dd/MM/yyyy") - @Model.BiweeklyRecord.EndDate.ToString("dd/MM/yyyy")</h3>
+<h4>Total de Horas: @Model.BiweeklyRecord.TotalHours</h4>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Data</th>
+            <th>Horas</th>
+            <th>WBS</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var detail in Model.RecordDetails)
+        {
+            if (detail.Record.Hours > 0)
+            {
+                <tr>
+                    <td>@detail.Record.Data.ToString("dd/MM/yyyy")</td>
+                    <td>@detail.Record.Hours</td>
+                    <td>@detail.WBS?.Code - @detail.WBS?.Desc</td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>

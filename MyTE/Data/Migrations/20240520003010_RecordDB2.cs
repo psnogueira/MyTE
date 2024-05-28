@@ -5,7 +5,7 @@
 namespace MyTE.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class alteracaowbs : Migration
+    public partial class RecordDB2 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

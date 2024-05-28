@@ -12,8 +12,8 @@ using MyTE.Data;
 namespace MyTE.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240516140718_addEmployee")]
-    partial class addEmployee
+    [Migration("20240519215555_RecordDB")]
+    partial class RecordDB
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -241,24 +241,6 @@ namespace MyTE.Data.Migrations
                     b.ToTable("Department");
                 });
 
-            modelBuilder.Entity("MyTE.Models.Departmente", b =>
-                {
-                    b.Property<int>("DepartmentId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("DepartmentId"));
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.HasKey("DepartmentId");
-
-                    b.ToTable("Departmente");
-                });
-
             modelBuilder.Entity("MyTE.Models.Employee", b =>
                 {
                     b.Property<int>("EmployeeId")
@@ -283,6 +265,31 @@ namespace MyTE.Data.Migrations
                     b.HasIndex("DepartmentId");
 
                     b.ToTable("Employee");
+                });
+
+            modelBuilder.Entity("MyTE.Models.Record", b =>
+                {
+                    b.Property<int>("RecordId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RecordId"));
+
+                    b.Property<DateTime>("Data")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("EmployeeId")
+                        .HasColumnType("int");
+
+                    b.Property<double>("Hours")
+                        .HasColumnType("float");
+
+                    b.Property<int>("WBSId")
+                        .HasColumnType("int");
+
+                    b.HasKey("RecordId");
+
+                    b.ToTable("Record");
                 });
 
             modelBuilder.Entity("MyTE.Models.WBS", b =>

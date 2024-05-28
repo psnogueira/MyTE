@@ -12,8 +12,8 @@ using MyTE.Data;
 namespace MyTE.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240520182235_CreateDataWBS")]
-    partial class CreateDataWBS
+    [Migration("20240520003010_RecordDB2")]
+    partial class RecordDB2
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -265,6 +265,31 @@ namespace MyTE.Data.Migrations
                     b.HasIndex("DepartmentId");
 
                     b.ToTable("Employee");
+                });
+
+            modelBuilder.Entity("MyTE.Models.Record", b =>
+                {
+                    b.Property<int>("RecordId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RecordId"));
+
+                    b.Property<DateTime>("Data")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("EmployeeId")
+                        .HasColumnType("int");
+
+                    b.Property<double>("Hours")
+                        .HasColumnType("float");
+
+                    b.Property<int>("WBSId")
+                        .HasColumnType("int");
+
+                    b.HasKey("RecordId");
+
+                    b.ToTable("Record");
                 });
 
             modelBuilder.Entity("MyTE.Models.WBS", b =>
