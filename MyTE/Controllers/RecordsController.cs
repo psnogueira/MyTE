@@ -48,14 +48,17 @@ namespace MyTE.Controllers
             int dayInit = 0;
             int dayMax = 0;
 
-            if (day <= 15) {
+            if (day <= 15)
+            {
                 dayInit = 1;
                 dayMax = 15;
-            } else {
+            }
+            else
+            {
                 dayInit = 16;
                 dayMax = DateTime.DaysInMonth(year, month);
             }
-            
+
             List<RecordDTO> list = new List<RecordDTO>();
             double[] totalHoursDay = new double[16];
 
@@ -64,18 +67,22 @@ namespace MyTE.Controllers
                 int posicaoInicial = 0;
                 double totalHoursWBS = 0d;
                 List<Record> records = new List<Record>();
-                for (int i = dayInit; i <= dayMax; i++) {
+                for (int i = dayInit; i <= dayMax; i++)
+                {
 
-                    
+
                     var consultaRecordFinal = consultaRecord.Where(s => s.UserId == UserId && s.Data == new DateTime(year, month, i) && s.WBSId == wbs.WBSId);
 
                     Record? result = consultaRecordFinal.FirstOrDefault();
 
-                    if (result != null && result.RecordId > 0) {
+                    if (result != null && result.RecordId > 0)
+                    {
                         totalHoursWBS += result.Hours;
                         records.Add(result);
                         totalHoursDay[posicaoInicial] = totalHoursDay[posicaoInicial] + result.Hours;
-                    } else {
+                    }
+                    else
+                    {
                         Record record = new Record();
                         record.Data = new DateTime(year, month, i);
                         record.UserId = UserId;
@@ -113,29 +120,30 @@ namespace MyTE.Controllers
 
                     var recordsExclude = await _context.Record.Where(
                             r => r.UserId == records[0].UserId
-                            && r.Data >= records[0].Data && r.Data <= records[records.Count()-1].Data
+                            && r.Data >= records[0].Data && r.Data <= records[records.Count() - 1].Data
                         ).ToListAsync();
                     _context.Record.RemoveRange(recordsExclude);
                     var recordsToSave = new List<Record>();
                     foreach (var itemRecord in records)
                     {
-                        if (itemRecord.Hours > 0)  
+                        if (itemRecord.Hours > 0)
                         {
                             recordsToSave.Add(itemRecord);
                         }
-                        
+
                     }
                     _context.AddRange(recordsToSave);
                     await _context.SaveChangesAsync();
                 }
+                else
+                {
+                    TempData["ErrorMessage"] = "Falha na validação dos registros.";
+                    return RedirectToAction(nameof(Index));
+                }
 
-                return RedirectToAction(nameof(Index));
-                
             }
-            
+            TempData["SuccessMessage"] = "Registro de horas salvo com sucesso!";
             return RedirectToAction(nameof(Index));
-
-            
         }
 
         private bool ValidateRecords(Dictionary<DateTime, double> myMap)

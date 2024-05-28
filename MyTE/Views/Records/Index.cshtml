@@ -47,30 +47,47 @@
                         <td class="col-2">
                             @Html.DisplayFor(modelItem => item.WBS.Code) - @Html.DisplayFor(modelItem => item.WBS.Desc)
                             @* <select name="listRecordDTO[@i].WBSId" class="form-control text-center" onchange="updateWBSId(this, @i)">
-                                <option value="">-------</option>
-                                @foreach (var wbs in ViewBag.WBSList as List<SelectListItem>)
-                                {
-                                    <option value="@wbs.Value" 
-                                    oninput="@(item.WBSId == int.Parse(wbs.Value) ? "selected" : String.Empty)"
-                                    >@wbs.Text</option>
-                                }
-                            </select> *@
+                        <option value="">-------</option>
+                        @foreach (var wbs in ViewBag.WBSList as List<SelectListItem>)
+                        {
+                        <option value="@wbs.Value"
+                        oninput="@(item.WBSId == int.Parse(wbs.Value) ? "selected" : String.Empty)"
+                        >@wbs.Text</option>
+                        }
+                        </select> *@
+
+                            @* <input type="text" id="recordHours_@record.RecordId" name="listRecordDTO[@i].records[@j].Hours"
+                        value="@record.Hours"
+                        class="form-control border-0 px-0 text-center @(record.Data.DayOfWeek == DayOfWeek.Saturday || record.Data.DayOfWeek == DayOfWeek.Sunday ? "bg-transparent d-none" : "")"
+                        oninput="updateTotal(@i, @j)" @(record.Data.DayOfWeek == DayOfWeek.Saturday || record.Data.DayOfWeek == DayOfWeek.Sunday ? "disabled" : "") /> *@
                         </td>
                         @for (int j = 0; j < item.records.Count(); j++)
                         {
                             var record = Model.ElementAt(i).records.ElementAt(j);
                             <td class="@(record.Data.DayOfWeek == DayOfWeek.Saturday || record.Data.DayOfWeek == DayOfWeek.Sunday ? "table-secondary" : "")">
-                                <input type="text" value="@(record.Hours == 0 ? "" : record.Hours.ToString())"
-                                       name="listRecordDTO[@i].records[@j].Hours"
-                                       onchange="document.getElementById('recordHours_@record.RecordId').value = this.value"
+                                <input type="text"
+                                       value="@(record.Hours == 0 ? "" : record.Hours.ToString())"
+                                       name="listRecordDTO[@i].records[@j].visibleHours"
+                                       onchange="updateHiddenInput(this, '@i', '@j')"
                                        class="form-control border-0 px-0 text-center @(record.Data.DayOfWeek == DayOfWeek.Saturday || record.Data.DayOfWeek == DayOfWeek.Sunday ? "bg-transparent d-none" : "")"
-                                       oninput="updateTotal(@i, @j)" @(record.Data.DayOfWeek == DayOfWeek.Saturday || record.Data.DayOfWeek == DayOfWeek.Sunday ? "disabled" : "") />
+                                       oninput="updateTotal(@i, @j)"
+                                @(record.Data.DayOfWeek == DayOfWeek.Saturday || record.Data.DayOfWeek == DayOfWeek.Sunday ? "disabled" : "") />
 
-                                <input type="hidden" id="recordHours_@record.RecordId" name="listRecordDTO[@i].records[@j].Hours" value="@record.Hours" class="form-control" />
-                                <input type="hidden" name="listRecordDTO[@i].records[@j].UserId" value="@record.UserId" class="form-control" />
-                                <input type="hidden" id="recordWBSId_@i-@j" name="listRecordDTO[@i].records[@j].WBSId" value="@record.WBSId" class="form-control" />
-                                <input type="hidden" name="listRecordDTO[@i].records[@j].Data" value="@record.Data" class="form-control" />
+                                <input type="hidden" id="recordHours_@i-@j"
+                                       name="listRecordDTO[@i].records[@j].Hours"
+                                       value="@record.Hours" class="form-control" />
+
+                                <input type="hidden" name="listRecordDTO[@i].records[@j].UserId"
+                                       value="@record.UserId" class="form-control" />
+
+                                <input type="hidden" id="recordWBSId_@i-@j"
+                                       name="listRecordDTO[@i].records[@j].WBSId"
+                                       value="@record.WBSId" class="form-control" />
+
+                                <input type="hidden" name="listRecordDTO[@i].records[@j].Data"
+                                       value="@record.Data" class="form-control" />
                             </td>
+
                         }
                         <td>
                             <span class="fw-bold" id="totalWBS_@i">0.0</span>
@@ -130,6 +147,15 @@
 }
 
 <script>
+    function updateHiddenInput(visibleInput, i, j) {
+        var hiddenInput = document.getElementById('recordHours_' + i + '-' + j);
+        if (visibleInput.value.trim() === "") {
+            hiddenInput.value = 0;
+        } else {
+            hiddenInput.value = visibleInput.value;
+        }
+    }
+
     function updateTotal(rowIndex, colIndex) {
         updateRowTotal(rowIndex);
         updateColumnTotal(colIndex);
@@ -151,7 +177,7 @@
 
     function updateColumnTotal(colIndex) {
         var totalDay = 0;
-        var colInputs = document.querySelectorAll(`[name$='records[${colIndex}].Hours']`);
+        var colInputs = document.querySelectorAll(`[name$='records[${colIndex}].visibleHours']`);
         colInputs.forEach(input => {
             var value = parseFloat(input.value);
             if (!isNaN(value)) {
