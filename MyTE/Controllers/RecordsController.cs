@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using MyTE.Data;
 using MyTE.DTO;
 using MyTE.Models;
+using MyTE.Models.ViewModel;
 
 namespace MyTE.Controllers
 {
@@ -221,48 +222,46 @@ namespace MyTE.Controllers
             return myMap;
         }
 
-        [Authorize(Policy = "RequerPerfilAdmin")]
 
+        [Authorize(Policy = "RequerPerfilAdmin")]
         public async Task<IActionResult> AdminView()
         {
             var biweeklyRecords = await _context.BiweeklyRecords
-                .Include(b => b.Records)
-                .ToListAsync();
+                                    .Include(b => b.Records)
+                                    .OrderByDescending(r => r.StartDate)
+                                    .ToListAsync();
+            return View(biweeklyRecords);
+        }
 
-            var viewModel = new List<MyTE.Models.ViewModel.AdminRecordViewModel>();
-
-            foreach (var biweeklyRecord in biweeklyRecords)
+        [Authorize(Policy = "RequerPerfilAdmin")]
+        public async Task<IActionResult> ViewDetails(int id)
+        {
+            var biweeklyRecord = await _context.BiweeklyRecords
+                                               .Include(b => b.Records)
+                                               .FirstOrDefaultAsync(b => b.BiweeklyRecordId == id);
+            if (biweeklyRecord == null)
             {
-                var recordWithWBSList = new List<MyTE.Models.ViewModel.RecordWithWBS>();
-
-                foreach (var record in biweeklyRecord.Records)
-                {
-                    var wbs = await _context.WBS
-                        .FirstOrDefaultAsync(w => w.WBSId == record.WBSId);
-
-                    recordWithWBSList.Add(new MyTE.Models.ViewModel.RecordWithWBS
-                    {
-                        Data = record.Data,
-                        Hours = record.Hours,
-                        WBSName = wbs != null ? wbs.Code : "N/A", // Assuming WBS has a Name property
-                         WBSDescription = wbs != null ? wbs.Desc : "N/A" // Assuming WBS has a Name property
-                    });
-                }
-
-                viewModel.Add(new MyTE.Models.ViewModel.AdminRecordViewModel
-                {
-                    UserEmail = biweeklyRecord.UserEmail,
-                    StartDate = biweeklyRecord.StartDate,
-                    EndDate = biweeklyRecord.EndDate,
-                    TotalHours = biweeklyRecord.TotalHours,
-                    RecordsWithWBS = recordWithWBSList
-                });
+                return NotFound();
             }
+
+            var recordDetails = biweeklyRecord.Records
+                                              .OrderBy(r => r.Data)  // Ordenar registros por data
+                                              .Select(r => new RecordDetail
+                                              {
+                                                  Record = r,
+                                                  WBS = _context.WBS.FirstOrDefault(w => w.WBSId == r.WBSId)
+                                              }).ToList();
+
+            var viewModel = new RecordDetailsViewModel
+            {
+                BiweeklyRecord = biweeklyRecord,
+                RecordDetails = recordDetails
+            };
 
             return View(viewModel);
         }
-
-
-
     }
+
+
 }
+

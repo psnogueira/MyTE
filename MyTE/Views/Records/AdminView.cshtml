@@ -1,4 +1,4 @@
-﻿@model IEnumerable<MyTE.Models.ViewModel.AdminRecordViewModel>
+﻿@model IEnumerable<MyTE.Models.BiweeklyRecord>
 
 @{
     ViewData["Title"] = "Relatórios";
@@ -10,9 +10,9 @@
     <thead>
         <tr>
             <th>User</th>
-            <th>Period</th>
-            <th>Total Hours</th>
-            <th>Details</th>
+            <th>Período</th>
+            <th>Total de Horas</th>
+            <th>Detalhes</th>
         </tr>
     </thead>
     <tbody>
@@ -23,19 +23,9 @@
                 <td>@record.StartDate.ToString("dd/MM/yyyy") - @record.EndDate.ToString("dd/MM/yyyy")</td>
                 <td>@record.TotalHours</td>
                 <td>
-                    <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#details_@record.UserEmail" aria-expanded="false" aria-controls="details_@record.UserEmail">
+                    <a asp-action="ViewDetails" asp-route-id="@record.BiweeklyRecordId" class="btn btn-primary">
                         View Details
-                    </button>
-                    <div class="collapse" id="details_@record.UserEmail">
-                        <div class="card card-body">
-                            <ul>
-                                @foreach (var detail in record.RecordsWithWBS)
-                                {
-                                    <li>@detail.Data.ToString("dd/MM/yyyy"): @detail.Hours hours - WBS: @detail.WBSName - @detail.WBSDescription</li>
-                                }
-                            </ul>
-                        </div>
-                    </div>
+                    </a>
                 </td>
             </tr>
         }
