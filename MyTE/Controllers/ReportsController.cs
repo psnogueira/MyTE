@@ -29,16 +29,31 @@ namespace MyTE.Controllers
             _csvService = csvService;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index(int departmentId = 2)
         {
-            return View();
+            // Configura a consulta para incluir o departamento do usuário.
+            var usersQuery = _context.Users.Include(u => u.Department).AsQueryable();
+
+            // Filtrar Users pelo ID do departamento.
+            if (departmentId != 0)
+            {
+                usersQuery = usersQuery.Where(u => u.DepartmentId == departmentId);
+            }
+
+            // Transforma a consulta em uma lista para ser exibida na View.
+            var usersList = await usersQuery.ToListAsync();
+
+            // Consulta para obter as WBS.
+            //var wbsQuery = _context.WBS.AsQueryable();
+
+            return View(usersList);
         }
 
         [HttpPost]
-        public IActionResult ExportService()
+        public async Task<IActionResult> ExportService()
         {
             // Lista de Departamentos do banco de dados.
-            var records = _context.Department.ToList();
+            var records = await _context.Department.ToListAsync();
 
             // Configuração do arquivo CSV para download.
             var fileName = "Reports.csv";
@@ -54,5 +69,7 @@ namespace MyTE.Controllers
 
             return File(csvData, contentType, fileName);
         }
+
+
     }
 }
