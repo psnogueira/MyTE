@@ -4,8 +4,13 @@
 @{
 }
 
-Report
+<h2>Report</h2>
 
-<form asp-action="ExportService">
-    <button type="submit" class="btn btn-primary">Gerar CSV (Service)</button>
-</form>
+<div class="d-grid gap-2 mt-4">
+    <form asp-action="ExportService">
+        <button type="submit" class="btn btn-primary">Gerar CSV (Service)</button>
+    </form>
+    <form asp-action="">
+        <button type="submit" class="btn btn-warning">Gerar CSV (WBS)</button>
+    </form>
+</div>
