@@ -25,6 +25,9 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark @(ViewContext.RouteData.Values["Controller"].ToString() == "WBS" ? "active" : "")" asp-area="" asp-controller="WBS" asp-action="Index">WBS</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark @(ViewContext.RouteData.Values["Action"].ToString() == "AdminView" ? "active" : "")" asp-area="" asp-controller="Records" asp-action="AdminView">Relatórios</a>
+                        </li>
                     </ul>
                     <partial name="_LoginPartial" />
                 </div>

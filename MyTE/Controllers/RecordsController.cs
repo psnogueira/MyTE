@@ -1,11 +1,15 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using MyTE.Data;
+using MyTE.Data.Migrations;
 using MyTE.DTO;
 using MyTE.Models;
 using MyTE.Models.ViewModel;
+using MyTE.Pagination;
+using System.Drawing.Printing;
 
 namespace MyTE.Controllers
 {
@@ -116,6 +120,7 @@ namespace MyTE.Controllers
                     var userId = records.First().UserId;
                     var user = await _userManager.FindByIdAsync(userId);
                     var userEmail = user.Email;
+                    var employeeName = user.FullName;
                     var startDate = records.Min(r => r.Data);
                     var endDate = records.Max(r => r.Data);
                     var totalHours = records.Sum(r => r.Hours);
@@ -123,7 +128,7 @@ namespace MyTE.Controllers
                     // Check if a biweekly record already exists for this user and period
                     var existingRecord = await _context.BiweeklyRecords
                         .Include(b => b.Records)
-                        .FirstOrDefaultAsync(b => b.UserEmail == userEmail && b.StartDate == startDate && b.EndDate == endDate);
+                        .FirstOrDefaultAsync(b => b.UserEmail == userEmail && b.StartDate == startDate && b.EndDate == endDate && b.EmployeeName == employeeName);
 
                     if (existingRecord != null)
                     {
@@ -139,6 +144,7 @@ namespace MyTE.Controllers
                         var biweeklyRecord = new BiweeklyRecord
                         {
                             UserEmail = userEmail,
+                            EmployeeName = employeeName,
                             StartDate = startDate,
                             EndDate = endDate,
                             TotalHours = totalHours,
@@ -224,13 +230,32 @@ namespace MyTE.Controllers
 
 
         [Authorize(Policy = "RequerPerfilAdmin")]
-        public async Task<IActionResult> AdminView()
+        public async Task<IActionResult> AdminView(string searchString, int? pageNumber)
         {
-            var biweeklyRecords = await _context.BiweeklyRecords
-                                    .Include(b => b.Records)
+            var pageSize = 5;
+            ViewData["CurrentFilter"] = searchString;
+
+            var biweeklyRecords = _context.BiweeklyRecords
+                                    .Include(b => b.Records)                                    
                                     .OrderByDescending(r => r.StartDate)
-                                    .ToListAsync();
-            return View(biweeklyRecords);
+                                    .AsQueryable();
+
+            if(!string.IsNullOrEmpty(searchString))
+            {
+                biweeklyRecords = biweeklyRecords
+                    .Where(r => r.UserEmail.Contains(searchString));
+            }
+
+            var viewModel = new AdminViewModel
+            {
+                ReportsList = await PaginatedList<BiweeklyRecord>
+                .CreateAsync(biweeklyRecords.AsNoTracking(), pageNumber ?? 1, pageSize),
+                CurrentFilter = searchString,
+                BiweeklyRecord = new BiweeklyRecord(),
+            };
+
+
+            return View(viewModel);
         }
 
         [Authorize(Policy = "RequerPerfilAdmin")]

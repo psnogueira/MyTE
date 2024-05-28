@@ -3,7 +3,7 @@
 
 @{
     ViewData["Title"] = "Role";
-    Layout = "~/Views/Shared/_LayoutRegister.cshtml";
+    Layout = "~/Views/Shared/_LayoutCRUD.cshtml";
 }
 
 <div class="container mt-3">
@@ -26,9 +26,6 @@
     <table class="table text-center align-middle">
         <thead>
             <tr>
-                <th class="col-2">
-                    @Html.DisplayNameFor(model => model.Id)
-                </th>
                 <th class="col-4">
                     @Html.DisplayNameFor(model => model.Name)
                 </th>
@@ -40,9 +37,6 @@
             @foreach (var item in Model)
             {
                 <tr>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Id)
-                    </td>
                     <td>
                         @Html.DisplayFor(modelItem => item.Name)
                     </td>

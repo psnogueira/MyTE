@@ -31,6 +31,7 @@ namespace MyTE.Controllers
                     { "Department", new[] { "Name", "" } },
                     { "Roles", new[] { "Name", "" } },
                     { "Users", new[] { "FirstName", "Email" } },
+                    { "BiweeklyRecords", new[] { "UserEmail", "" } }
 
                 };
 

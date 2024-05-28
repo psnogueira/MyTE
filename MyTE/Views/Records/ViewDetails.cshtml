@@ -1,34 +1,47 @@
 ﻿@model MyTE.Models.ViewModel.RecordDetailsViewModel
 
 @{
-    ViewData["Title"] = "Detalhes do Relatório Quinzenal";
+    ViewData["Title"] = "Relatórios";
+    Layout = "~/Views/Shared/_LayoutCRUD.cshtml";
 }
+<div class="container d-flex justify-content-between align-items-end mt-3">
+    <div class="d-flex flex-column">
+        <a class="text-white fs-5 text-decoration-none" asp-action="AdminView">
+            <i class="bi bi-arrow-left-short fs-3"></i>Voltar
+        </a>
+        <h1 class="fw-bold display-2 text-white">@ViewData["Title"]</h1>
 
-<h1>@ViewData["Title"]</h1>
+        <h2 class="fw-bold text-white mb-3">Usuário: @Model.BiweeklyRecord.UserEmail</h2>
+        <h3 class="fw-bold text-white mb-3">Período: @Model.BiweeklyRecord.StartDate.ToString("dd/MM/yyyy") - @Model.BiweeklyRecord.EndDate.ToString("dd/MM/yyyy")</h3>
+        <h4 class="fw-bold text-white">Total de Horas: @Model.BiweeklyRecord.TotalHours</h4>
+    </div>
+    <div class="my-3">
+        <a class="btn btn-primary align-content-end " asp-action="Index">Download</a>
+    </div>
+</div>
+<img class="position-absolute object-fit-cover w-100 h-22rem top-0 z-n1" src="~/img/ArtH3.jpg" alt="Arte ilustrativa" />
 
-<h2>Usuário: @Model.BiweeklyRecord.UserEmail</h2>
-<h3>Período: @Model.BiweeklyRecord.StartDate.ToString("dd/MM/yyyy") - @Model.BiweeklyRecord.EndDate.ToString("dd/MM/yyyy")</h3>
-<h4>Total de Horas: @Model.BiweeklyRecord.TotalHours</h4>
-
-<table class="table">
-    <thead>
-        <tr>
-            <th>Data</th>
-            <th>Horas</th>
-            <th>WBS</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var detail in Model.RecordDetails)
-        {
-            if (detail.Record.Hours > 0)
+<div class="bg-white container rounded table-responsive">
+    <table class="table text-center align-middle">
+        <thead>
+            <tr>
+                <th>Data</th>
+                <th>Horas</th>
+                <th>WBS</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var detail in Model.RecordDetails)
             {
-                <tr>
-                    <td>@detail.Record.Data.ToString("dd/MM/yyyy")</td>
-                    <td>@detail.Record.Hours</td>
-                    <td>@detail.WBS?.Code - @detail.WBS?.Desc</td>
-                </tr>
+                if (detail.Record.Hours > 0)
+                {
+                    <tr>
+                        <td>@detail.Record.Data.ToString("dd/MM/yyyy")</td>
+                        <td>@detail.Record.Hours</td>
+                        <td>@detail.WBS?.Code - @detail.WBS?.Desc</td>
+                    </tr>
+                }
             }
-        }
-    </tbody>
-</table>
+        </tbody>
+    </table>
+</div>
