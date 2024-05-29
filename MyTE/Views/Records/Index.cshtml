@@ -5,15 +5,31 @@
 
 }
 
-<div class="row align-items-center">
+<div class="row">
     <h1 class="col">Registro de Horas</h1>
-    <form class="col-3" asp-action="Index" method="post">
-        <div class="input-group">
-            <input type="date" name="dataSearch" class="text-center form-control" />
-            <button type="submit" class="btn btn-primary">Ir para</button>
-        </div>
-    </form>
+    <div class="col d-flex justify-content-end" aria-label="Navegação de Data">
+        <!-- Botão Anterior -->
+        <form asp-action="Navigate" method="post">
+            <input type="hidden" name="direction" value="previous" />
+            <button type="submit" class="btn btn-primary">anterior</button>
+        </form>
+
+        <!-- Input Data e Botão Ir Para -->
+        <form asp-action="Index" method="post" class="mx-2">
+            <div class="input-group">
+                <input type="date" name="dataSearch" class="text-center form-control" />
+                <button type="submit" class="btn btn-primary">Ir para</button>
+            </div>
+        </form>
+
+        <!-- Botão Próxima -->
+        <form asp-action="Navigate" method="post">
+            <input type="hidden" name="direction" value="next" />
+            <button type="submit" class="btn btn-primary">próxima</button>
+        </form>
+    </div>
 </div>
+
 
 <form asp-action="Persist" method="post">
     <p class="d-flex justify-content-end mb-2">
@@ -95,7 +111,7 @@
                         <td class="fw-bold">
                             <input type="hidden" class="form-control fw-bold" value="@(Model.First().TotalHoursDay[@i])" readonly />
                             <span class="fw-bold" id="totalDay_@i">0.0</span>
-                            <div id="errorDay_@i" class="text-danger" style="display: none;">A soma das horas trabalhadas em um dia não pode ultrapassar 24h.</div>
+                            <div id="errorDay1_@i" class="text-danger" style="display: none;">A soma das horas trabalhadas em um dia não pode ultrapassar 24h.</div>
                         </td>
                     }
                     <td></td>
@@ -182,7 +198,7 @@
         var totalDayElement = document.getElementById(`totalDay_${colIndex}`);
         totalDayElement.innerText = totalDay.toFixed(1);
 
-        var errorElement = document.getElementById(`errorDay_${colIndex}`);
+        var errorElement = document.getElementById(`errorDay1_${colIndex}`);
         if (totalDay > 24) {
             totalDayElement.classList.add("text-danger", "fw-bold");
             errorElement.style.display = "block";
@@ -190,6 +206,7 @@
             totalDayElement.classList.remove("text-danger", "fw-bold");
             errorElement.style.display = "none";
         }
+
     }
 
     function updateTotalsOnLoad() {

@@ -31,6 +31,17 @@ namespace MyTE.Controllers
             }
             var UserId = _userManager.GetUserId(User);
 
+            
+            if (dataSearch.HasValue)
+            {
+                TempData["CurrentDate"] = dataSearch.Value.ToString("yyyy-MM-dd");
+            }
+            else
+            {
+                TempData["CurrentDate"] = null;
+            }
+            
+
             var consultaWbs = from obj in _context.WBS select obj;
             var consultaRecord = from obj in _context.Record select obj;
             int year = 0;
@@ -194,6 +205,34 @@ namespace MyTE.Controllers
                 }
             }
             return myMap;
+        }
+
+        [HttpPost]
+        public IActionResult Navigate(string direction)
+        {
+            var currentDate = DateTime.Now;
+
+            if (TempData["CurrentDate"] == null)
+            {
+                TempData["CurrentDate"] = currentDate.ToString("yyyy-MM-dd");
+
+            }
+            else
+            {
+                currentDate = DateTime.Parse(TempData["CurrentDate"].ToString());
+            }
+
+            if (direction == "previous")
+            {
+                currentDate = currentDate.AddDays(-15);
+            }
+            else if (direction == "next")
+            {
+                currentDate = currentDate.AddDays(15);
+            }
+
+            TempData["CurrentDate"] = currentDate.ToString("yyyy-MM-dd");
+            return RedirectToAction("Index", new { dataSearch = currentDate });
         }
     }
 }
