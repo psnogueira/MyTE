@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "Index";
+    var currentDate = TempData["CurrentDate"] != null ? DateTime.Parse(TempData["CurrentDate"].ToString()) : DateTime.Now;
 }
 
 <div class="row">
@@ -16,7 +17,7 @@
         <!-- Input Data e Botão Ir Para -->
         <form asp-action="Index" method="post" class="mx-2">
             <div class="input-group">
-                <input type="date" name="dataSearch" class="text-center form-control" />
+                <input type="date" name="dataSearch" class="text-center form-control" value="@currentDate" />
                 <button type="submit" class="btn btn-primary">Ir para</button>
             </div>
         </form>
@@ -63,7 +64,7 @@
                                 <option value="0">-------</option>
                                 @foreach (var wbs in ViewBag.WBSList as List<SelectListItem>)
                                 {
-                                    <!option value="@wbs.Value" @(item.WBSId == int.Parse(wbs.Value) ? "selected" : "")>@wbs.Text</!option>
+                                    <!option value="@wbs.Value" @(item.WBS.WBSId.ToString() == wbs.Value ? "selected" : "")>@wbs.Text</!option>
                                 }
                             </select>
                         </td>

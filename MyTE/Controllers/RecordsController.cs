@@ -38,7 +38,15 @@ namespace MyTE.Controllers
             }
             else
             {
-                TempData["CurrentDate"] = null;
+                if (TempData["CurrentDate"] != null)
+                {
+                    dataSearch = DateTime.Parse(TempData["CurrentDate"].ToString());
+                }
+                else
+                {
+                    TempData["CurrentDate"] = null;
+                    dataSearch = DateTime.Now;
+                }
             }
             
 
@@ -120,7 +128,7 @@ namespace MyTE.Controllers
                 Text = $"{wbs.Code} - {wbs.Desc}"
             }).ToList();
 
-            return View(await Task.FromResult(list));
+            return View(list);
         }
 
         // POST: Records/Persist
