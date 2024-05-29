@@ -255,7 +255,8 @@ namespace MyTE.Controllers
             if(!string.IsNullOrEmpty(searchString))
             {
                 biweeklyRecords = biweeklyRecords
-                    .Where(r => r.UserEmail.Contains(searchString));
+                    .Where(r => r.UserEmail.Contains(searchString) ||
+                                r.EmployeeName.Contains(searchString));
             }
 
             if (startDate.HasValue && endDate.HasValue)
