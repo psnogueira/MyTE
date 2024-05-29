@@ -2,11 +2,10 @@
 
 @{
     ViewData["Title"] = "Index";
-
 }
 
 <div class="row align-items-center">
-    <h1 class="col">Registro de Horas</h1>
+    <h1 class="col fw-bold">Registro de Horas</h1>
     <form class="col-3" asp-action="Index" method="post">
         <div class="input-group">
             <input type="date" name="dataSearch" class="text-center form-control" />
@@ -31,10 +30,9 @@
                         var date = record.Data.ToString("dd/MM", culture);
 
                         <th class="@(record.Data.DayOfWeek == DayOfWeek.Saturday || record.Data.DayOfWeek == DayOfWeek.Sunday ? "table-secondary" : "")">
-                            <span class=" fw-bold">@dayOfWeek</span>
+                            <span class="fw-bold">@dayOfWeek</span>
                             <span class="text-secondary fw-normal">@date</span>
                         </th>
-                        @* <th>@record.Data.ToString("ddd dd/MM", new System.Globalization.CultureInfo("pt-BR"))</th> *@
                     }
                     <th class="col-1">Total WBS</th>
                 </tr>
@@ -45,16 +43,13 @@
                     var item = Model.ElementAt(i);
                     <tr>
                         <td class="col-2">
-                            @Html.DisplayFor(modelItem => item.WBS.Code) - @Html.DisplayFor(modelItem => item.WBS.Desc)
-                            @* <select name="listRecordDTO[@i].WBSId" class="form-control text-center" onchange="updateWBSId(this, @i)">
-                                <option value="">-------</option>
+                            <select name="listRecordDTO[@i].WBSId" class="form-control border-0 px-1 text-center" onchange="updateWBSId(this, @i)">
+                                <option value="0">-------</option>
                                 @foreach (var wbs in ViewBag.WBSList as List<SelectListItem>)
                                 {
-                                    <option value="@wbs.Value" 
-                                    oninput="@(item.WBSId == int.Parse(wbs.Value) ? "selected" : String.Empty)"
-                                    >@wbs.Text</option>
+                                    <!option value="@wbs.Value" @(item.WBSId == int.Parse(wbs.Value) ? "selected" : "")>@wbs.Text</!option>
                                 }
-                            </select> *@
+                            </select>
                         </td>
                         @for (int j = 0; j < item.records.Count(); j++)
                         {
@@ -98,14 +93,11 @@
                             <div id="errorDay_@i" class="text-danger" style="display: none;">A soma das horas trabalhadas em um dia não pode ultrapassar 24h.</div>
                         </td>
                     }
-                    <td></td>
                 </tr>
             </tbody>
         </table>
     </div>
 </form>
-
-
 
 @if (TempData["SuccessMessage"] != null)
 {
@@ -141,6 +133,26 @@
 }
 
 <script>
+    function updateWBSId(selectElement, index) {
+        var selectedWBSId = selectElement.value;
+        var hiddenInputIds = document.querySelectorAll(`[id^="recordWBSId_${index}-"]`);
+
+        hiddenInputIds.forEach(function (input) {
+            input.value = selectedWBSId;
+        });
+    }
+
+    // function updateWBSId(selectElement, i, j) {
+    //     var selectedWBSId = selectElement.value;
+    //     var hiddenInputIds = document.getElementById('recordHours_' + i + '-' + j);
+    //     if (visibleInput.value.trim() === "") {
+    //         hiddenInput.value = 0;
+    //     } else {
+    //         hiddenInput.value = visibleInput.value;
+    //     }
+    // }
+
+
     function updateHiddenInput(visibleInput, i, j) {
         var hiddenInput = document.getElementById('recordHours_' + i + '-' + j);
         if (visibleInput.value.trim() === "") {

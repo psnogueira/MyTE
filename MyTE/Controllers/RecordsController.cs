@@ -73,8 +73,6 @@ namespace MyTE.Controllers
                 List<Record> records = new List<Record>();
                 for (int i = dayInit; i <= dayMax; i++)
                 {
-
-
                     var consultaRecordFinal = consultaRecord.Where(s => s.UserId == UserId && s.Data == new DateTime(year, month, i) && s.WBSId == wbs.WBSId);
 
                     Record? result = consultaRecordFinal.FirstOrDefault();
@@ -102,6 +100,15 @@ namespace MyTE.Controllers
                 dto.TotalHoursDay = totalHoursDay;
                 list.Add(dto);
             }
+
+            var wbsList = await _context.WBS.ToListAsync();
+
+            ViewBag.WBSList = wbsList.Select(wbs => new SelectListItem
+            {
+                Value = wbs.WBSId.ToString(),
+                Text = $"{wbs.Code} - {wbs.Desc}"
+            }).ToList();
+
             return View(await Task.FromResult(list));
         }
 
@@ -121,7 +128,6 @@ namespace MyTE.Controllers
                 }
                 if (ValidateRecords(ConvertForMap(records)))
                 {
-
                     var recordsExclude = await _context.Record.Where(
                             r => r.UserId == records[0].UserId
                             && r.Data >= records[0].Data && r.Data <= records[records.Count() - 1].Data
@@ -134,7 +140,6 @@ namespace MyTE.Controllers
                         {
                             recordsToSave.Add(itemRecord);
                         }
-
                     }
                     TempData["SuccessMessage"] = "Registro de horas salvo com sucesso!";
                     _context.AddRange(recordsToSave);
@@ -146,7 +151,6 @@ namespace MyTE.Controllers
                     return RedirectToAction(nameof(Index));
                 }
             }
-            
             return RedirectToAction(nameof(Index));
         }
 
@@ -167,7 +171,7 @@ namespace MyTE.Controllers
                 }
                 if (item.Value > 24)
                 {
-                    TempData["ErrorMessageText"] = "A data " + item.Key + " possui uma quantidade superior ao máximo de horas de um dia (24 horas).";
+                    TempData["ErrorMessage"] = "A data " + item.Key + " possui uma quantidade superior ao máximo de horas de um dia (24 horas).";
                     TempData["ErrorMessageText2"] = "Quantidade de horas registradas: " + item.Value;
                     return false;
                 }
