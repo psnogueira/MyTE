@@ -1,31 +1,28 @@
 ﻿@model IEnumerable<MyTE.DTO.RecordDTO>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Registro de horas";
     var currentDate = TempData["CurrentDate"] != null ? DateTime.Parse(TempData["CurrentDate"].ToString()) : DateTime.Now;
 }
 
 <div class="row">
     <h1 class="col">Registro de Horas</h1>
     <div class="col d-flex justify-content-end" aria-label="Navegação de Data">
-        <!-- Botão Anterior -->
         <form asp-action="Navigate" method="post">
             <input type="hidden" name="direction" value="previous" />
-            <button type="submit" class="btn btn-primary">anterior</button>
+            <button type="submit" class="btn btn-primary"><i class="bi bi-chevron-left"></i></button>
         </form>
 
-        <!-- Input Data e Botão Ir Para -->
         <form asp-action="Index" method="post" class="mx-2">
             <div class="input-group">
-                <input type="date" name="dataSearch" class="text-center form-control" value="@currentDate" />
+                <input type="date" name="dataSearch" class="text-center form-control" value="@currentDate"/>
                 <button type="submit" class="btn btn-primary">Ir para</button>
             </div>
         </form>
 
-        <!-- Botão Próxima -->
         <form asp-action="Navigate" method="post">
             <input type="hidden" name="direction" value="next" />
-            <button type="submit" class="btn btn-primary">próxima</button>
+            <button type="submit" class="btn btn-primary"><i class="bi bi-chevron-right"></i></button>
         </form>
     </div>
 </div>
@@ -238,4 +235,5 @@
     document.addEventListener("DOMContentLoaded", function () {
         updateTotalsOnLoad();
     });
+
 </script>

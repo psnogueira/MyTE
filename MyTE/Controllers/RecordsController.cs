@@ -25,31 +25,79 @@ namespace MyTE.Controllers
         // GET: Records
         public async Task<IActionResult> Index(DateTime? dataSearch)
         {
-            if(dataSearch < StartDateRestriction)
+            if (dataSearch < StartDateRestriction)
             {
                 TempData["ErrorMessage"] = "A data de pesquisa deve ser maior que 01/01/2024";
             }
-            var UserId = _userManager.GetUserId(User);
 
-            
-            if (dataSearch.HasValue)
+            var userId = _userManager.GetUserId(User);
+            dataSearch = InitializeDataSearch(dataSearch);
+
+            var list = await GetRecordsListAsync(dataSearch.Value, userId);
+
+            var wbsList = await _context.WBS.ToListAsync();
+
+            ViewBag.WBSList = GetWBSListItems(wbsList);
+
+            return View(list);
+        }
+
+        // POST: Records/Persist
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Persist(List<RecordDTO> listRecordDTO)
+        {
+            if (ModelState.IsValid)
             {
-                TempData["CurrentDate"] = dataSearch.Value.ToString("yyyy-MM-dd");
-            }
-            else
-            {
-                if (TempData["CurrentDate"] != null)
+                var records = listRecordDTO.SelectMany(item => item.records).ToList();
+
+                if (ValidateRecords(ConvertForMap(records)))
                 {
-                    dataSearch = DateTime.Parse(TempData["CurrentDate"].ToString());
+                    await SaveRecordsAsync(records);
+                    TempData["SuccessMessage"] = "Registro de horas salvo com sucesso!";
                 }
                 else
                 {
-                    TempData["CurrentDate"] = null;
-                    dataSearch = DateTime.Now;
+                    TempData["ErrorMessage"] = "Falha na validação dos registros.";
+                    return RedirectToAction(nameof(Index));
                 }
             }
-            
+            return RedirectToAction(nameof(Index));
+        }
 
+        [HttpPost]
+        public IActionResult Navigate(string direction)
+        {
+            var currentDate = GetOrSetCurrentDate();
+
+            if (direction == "previous")
+            {
+                currentDate = currentDate.AddDays(-15);
+            }
+            else if (direction == "next")
+            {
+                currentDate = currentDate.AddDays(15);
+            }
+
+            TempData["CurrentDate"] = currentDate.ToString("yyyy-MM-dd");
+            return RedirectToAction("Index", new { dataSearch = currentDate });
+        }
+
+        #region Private Methods
+
+        private DateTime InitializeDataSearch(DateTime? dataSearch)
+        {
+            if (!dataSearch.HasValue)
+            {
+                dataSearch = TempData["CurrentDate"] != null ? DateTime.Parse(TempData["CurrentDate"].ToString()) : DateTime.Now;
+            }
+
+            return dataSearch.Value;
+        }
+
+        private async Task<List<RecordDTO>> GetRecordsListAsync(DateTime? dataSearch, string userId)
+        {
+            var list = new List<RecordDTO>();
             var consultaWbs = from obj in _context.WBS select obj;
             var consultaRecord = from obj in _context.Record select obj;
             int year = 0;
@@ -82,7 +130,6 @@ namespace MyTE.Controllers
                 dayMax = DateTime.DaysInMonth(year, month);
             }
 
-            List<RecordDTO> list = new List<RecordDTO>();
             double[] totalHoursDay = new double[16];
 
             foreach (var wbs in consultaWbs.ToList())
@@ -92,7 +139,7 @@ namespace MyTE.Controllers
                 List<Record> records = new List<Record>();
                 for (int i = dayInit; i <= dayMax; i++)
                 {
-                    var consultaRecordFinal = consultaRecord.Where(s => s.UserId == UserId && s.Data == new DateTime(year, month, i) && s.WBSId == wbs.WBSId);
+                    var consultaRecordFinal = consultaRecord.Where(s => s.UserId == userId && s.Data == new DateTime(year, month, i) && s.WBSId == wbs.WBSId);
 
                     Record? result = consultaRecordFinal.FirstOrDefault();
 
@@ -106,7 +153,7 @@ namespace MyTE.Controllers
                     {
                         Record record = new Record();
                         record.Data = new DateTime(year, month, i);
-                        record.UserId = UserId;
+                        record.UserId = userId;
                         record.WBSId = wbs.WBSId;
                         records.Add(record);
                     }
@@ -120,57 +167,63 @@ namespace MyTE.Controllers
                 list.Add(dto);
             }
 
-            var wbsList = await _context.WBS.ToListAsync();
+            return list;
+        }
 
-            ViewBag.WBSList = wbsList.Select(wbs => new SelectListItem
+        public List<SelectListItem> GetWBSListItems(List<WBS> wbsList)
+        {
+            return wbsList.Select(wbs => new SelectListItem
             {
                 Value = wbs.WBSId.ToString(),
                 Text = $"{wbs.Code} - {wbs.Desc}"
             }).ToList();
-
-            return View(list);
         }
 
-        // POST: Records/Persist
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Persist(List<RecordDTO> listRecordDTO)
+        private async Task SaveRecordsAsync(List<Record> records)
         {
-            if (ModelState.IsValid)
+            var userId = records.FirstOrDefault()?.UserId;
+            var startDate = records.Min(r => r.Data);
+            var endDate = records.Max(r => r.Data);
+
+            var existingRecords = await _context.Record.Where(r => r.UserId == userId && r.Data >= startDate && r.Data <= endDate).ToListAsync();
+
+            var recordsToSave = new List<Record>();
+
+            var recordsToDelete = new List<Record>();
+
+            foreach (var record in records) 
             {
-                List<Record> records = new List<Record>();
-                foreach (var item in listRecordDTO)
+                var existingRecord = existingRecords.FirstOrDefault(r => r.Data == record.Data && r.WBSId == record.WBSId);
+
+                if (existingRecord != null)
                 {
-                    records.AddRange(item.records);
-                }
-                if (ValidateRecords(ConvertForMap(records)))
-                {
-                    var recordsExclude = await _context.Record.Where(
-                            r => r.UserId == records[0].UserId
-                            && r.Data >= records[0].Data && r.Data <= records[records.Count() - 1].Data
-                        ).ToListAsync();
-                    _context.Record.RemoveRange(recordsExclude);
-                    var recordsToSave = new List<Record>();
-                    foreach (var itemRecord in records)
+                    if (record.Hours > 0)
                     {
-                        if (itemRecord.Hours > 0)
-                        {
-                            recordsToSave.Add(itemRecord);
-                        }
+                        existingRecord.Hours = record.Hours;
+                        recordsToSave.Add(existingRecord);
                     }
-                    TempData["SuccessMessage"] = "Registro de horas salvo com sucesso!";
-                    _context.AddRange(recordsToSave);
-                    await _context.SaveChangesAsync();
+                    else
+                    {
+                        recordsToDelete.Add(existingRecord);
+                    }
                 }
-                else
+                else if (record.Hours > 0)
                 {
-                    TempData["ErrorMessage"] = "Falha na validação dos registros.";
-                    return RedirectToAction(nameof(Index));
+                    recordsToSave.Add(record);
                 }
             }
-            return RedirectToAction(nameof(Index));
+
+            if (recordsToSave.Any())
+            {
+                _context.Record.UpdateRange(recordsToSave);
+            }
+
+            if (recordsToDelete.Any())
+            {
+                _context.Record.RemoveRange(recordsToDelete);
+            }
+
+            await _context.SaveChangesAsync();
         }
 
         private bool ValidateRecords(Dictionary<DateTime, double> myMap)
@@ -219,32 +272,18 @@ namespace MyTE.Controllers
             return myMap;
         }
 
-        [HttpPost]
-        public IActionResult Navigate(string direction)
+        private DateTime GetOrSetCurrentDate()
         {
             var currentDate = DateTime.Now;
 
-            if (TempData["CurrentDate"] == null)
-            {
-                TempData["CurrentDate"] = currentDate.ToString("yyyy-MM-dd");
-
-            }
-            else
+            if (TempData["CurrentDate"] != null)
             {
                 currentDate = DateTime.Parse(TempData["CurrentDate"].ToString());
             }
 
-            if (direction == "previous")
-            {
-                currentDate = currentDate.AddDays(-15);
-            }
-            else if (direction == "next")
-            {
-                currentDate = currentDate.AddDays(15);
-            }
-
-            TempData["CurrentDate"] = currentDate.ToString("yyyy-MM-dd");
-            return RedirectToAction("Index", new { dataSearch = currentDate });
+            return currentDate;
         }
+
+        #endregion
     }
 }
