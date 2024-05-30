@@ -58,16 +58,16 @@
 <nav aria-label="Page navigation example" class="container mt-4">
     <ul class="pagination">
         <li class="page-item @(Model.ReportsList.HasPreviousPage ? "" : "disabled")">
-            <a class="page-link" asp-action="Index" asp-route-pageNumber="@(Model.ReportsList.PageIndex - 1)" asp-route-searchString="@Model.CurrentFilter">Anterior</a>
+            <a class="page-link" asp-action="AdminView" asp-route-pageNumber="@(Model.ReportsList.PageIndex - 1)" asp-route-searchString="@Model.CurrentFilter">Anterior</a>
         </li>
         @for (int i = 1; i <= Model.ReportsList.TotalPages; i++)
         {
             <li class="page-item @(i == Model.ReportsList.PageIndex ? "active" : "")">
-                <a class="page-link" asp-action="Index" asp-route-pageNumber="@i" asp-route-searchString="@Model.CurrentFilter">@i</a>
+                <a class="page-link" asp-action="AdminView" asp-route-pageNumber="@i" asp-route-searchString="@Model.CurrentFilter">@i</a>
             </li>
         }
         <li class="page-item @(Model.ReportsList.HasNextPage ? "" : "disabled")">
-            <a class="page-link" asp-action="Index" asp-route-pageNumber="@(Model.ReportsList.PageIndex + 1)" asp-route-searchString="@Model.CurrentFilter">Próxima</a>
+            <a class="page-link" asp-action="AdminView" asp-route-pageNumber="@(Model.ReportsList.PageIndex + 1)" asp-route-searchString="@Model.CurrentFilter">Próxima</a>
         </li>
     </ul>
 </nav>
