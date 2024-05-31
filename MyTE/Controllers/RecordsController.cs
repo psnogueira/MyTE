@@ -31,9 +31,17 @@ namespace MyTE.Controllers
             }
 
             var userId = _userManager.GetUserId(User);
-            dataSearch = InitializeDataSearch(dataSearch);
 
-            var list = await GetRecordsListAsync(dataSearch.Value, userId);
+            if (dataSearch.HasValue)
+            {
+                TempData["CurrentDate"] = dataSearch.Value.ToString("yyyy-MM-dd");
+            }
+            else
+            {
+                TempData["CurrentDate"] = null;
+            }
+
+            var list = await GetRecordsListAsync(dataSearch, userId);
 
             var wbsList = await _context.WBS.ToListAsync();
 
@@ -68,15 +76,40 @@ namespace MyTE.Controllers
         [HttpPost]
         public IActionResult Navigate(string direction)
         {
-            var currentDate = GetOrSetCurrentDate();
+            var currentDate = DateTime.Now;
+
+            if (TempData["CurrentDate"] == null)
+            {
+                TempData["CurrentDate"] = currentDate.ToString("yyyy-MM-dd");
+            }
+            else
+            {
+                currentDate = DateTime.Parse(TempData["CurrentDate"].ToString());
+            }
 
             if (direction == "previous")
             {
-                currentDate = currentDate.AddDays(-15);
+                if (currentDate.Day <= 15)
+                {
+                    currentDate = currentDate.AddMonths(-1);
+                    currentDate = new DateTime(currentDate.Year, currentDate.Month, 16);
+                }
+                else
+                {
+                    currentDate = new DateTime(currentDate.Year, currentDate.Month, 1);
+                }
             }
             else if (direction == "next")
             {
-                currentDate = currentDate.AddDays(15);
+                if (currentDate.Day >= 16)
+                {
+                    currentDate = currentDate.AddMonths(1);
+                    currentDate = new DateTime(currentDate.Year, currentDate.Month, 1);
+                }
+                else
+                {
+                    currentDate = new DateTime(currentDate.Year, currentDate.Month, 16);
+                }
             }
 
             TempData["CurrentDate"] = currentDate.ToString("yyyy-MM-dd");
@@ -84,16 +117,6 @@ namespace MyTE.Controllers
         }
 
         #region Private Methods
-
-        private DateTime InitializeDataSearch(DateTime? dataSearch)
-        {
-            if (!dataSearch.HasValue)
-            {
-                dataSearch = TempData["CurrentDate"] != null ? DateTime.Parse(TempData["CurrentDate"].ToString()) : DateTime.Now;
-            }
-
-            return dataSearch.Value;
-        }
 
         private async Task<List<RecordDTO>> GetRecordsListAsync(DateTime? dataSearch, string userId)
         {
@@ -191,7 +214,7 @@ namespace MyTE.Controllers
 
             var recordsToDelete = new List<Record>();
 
-            foreach (var record in records) 
+            foreach (var record in records)
             {
                 var existingRecord = existingRecords.FirstOrDefault(r => r.Data == record.Data && r.WBSId == record.WBSId);
 
@@ -243,7 +266,7 @@ namespace MyTE.Controllers
                 }
                 if (item.Value > 24)
                 {
-                    TempData["ErrorMessage"] = "A data " + item.Key + " possui uma quantidade superior ao máximo de horas de um dia (24 horas).";
+                    TempData["ErrorMessageText"] = "A data " + item.Key.Date.ToString("dd/MM") + " possui uma quantidade superior ao máximo de horas de um dia (24 horas).";
                     TempData["ErrorMessageText2"] = "Quantidade de horas registradas: " + item.Value;
                     return false;
                 }
@@ -270,18 +293,6 @@ namespace MyTE.Controllers
                 }
             }
             return myMap;
-        }
-
-        private DateTime GetOrSetCurrentDate()
-        {
-            var currentDate = DateTime.Now;
-
-            if (TempData["CurrentDate"] != null)
-            {
-                currentDate = DateTime.Parse(TempData["CurrentDate"].ToString());
-            }
-
-            return currentDate;
         }
 
         #endregion
