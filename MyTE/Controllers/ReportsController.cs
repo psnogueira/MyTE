@@ -52,6 +52,7 @@ namespace MyTE.Controllers
                                       .Select(w => new
                                       {
                                           w.WBSId,
+                                          w.Code,
                                           w.Desc
                                       })
                                       .ToListAsync();
@@ -59,9 +60,12 @@ namespace MyTE.Controllers
             // Dicionário para armazenar as descrições das WBS.
             var wbsDescriptionsDictionary = wbsDescriptions.ToDictionary(item => item.WBSId, item => item.Desc);
 
+            var wbsCodeDictionary = wbsDescriptions.ToDictionary(item => item.WBSId, item => item.Code);
+
             // ViewBag para exibir os dados na View.
             ViewBag.HorasPorWBS = horasPorWBSDicionario;
             ViewBag.DescricoesWBS = wbsDescriptionsDictionary;
+            ViewBag.CodigosWBS = wbsCodeDictionary;
 
             return View();
         }

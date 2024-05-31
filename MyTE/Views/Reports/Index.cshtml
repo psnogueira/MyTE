@@ -15,6 +15,7 @@
     <thead>
         <tr>
             <th>Id WBS</th>
+            <th>Código</th>
             <th>Descrição</th>
             <th>Total de Horas</th>
             <th></th>
@@ -29,9 +30,11 @@
                 primeiraLinha = false;
 
                 var wbsDesc = ViewBag.DescricoesWBS[item.Key] as string ?? "Sem descrição";
+                var wbsCode = ViewBag.CodigosWBS[item.Key] as string ?? "Sem código";
 
                 <tr class="@classeLinha">
                     <td>@item.Key</td>
+                    <td>@wbsCode</td>
                     <td>@wbsDesc</td>
                     <td>@item.Value</td>
                     <td></td>
