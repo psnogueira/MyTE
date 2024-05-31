@@ -8,13 +8,16 @@
 <div class="container mt-3">
     <h1 class="fw-bold display-2 text-white mb-3">@ViewData["Title"]</h1>
     <div class="d-flex align-items-center justify-content-between my-3">
-        <form asp-action="AdminView" method="get">
-            <div class="form-actions input-group w-40rem">
+        <form asp-action="AdminView" method="get" class="w-100">
+            <div class="form-actions input-group row w-75">
 
-                <input type="text" class="form-control w-25" name="SearchString" value="@ViewData["CurrentFilter"]" placeholder="Buscar por nome ou email" id="autoComplete" data-table="BiweeklyRecords" data-column1="EmployeeName" data-column2="UserEmail" />
-                <input class="btn btn-outline-primary" type="submit" value="Procurar" />
+                <input type="text" class="form-control col-sm-7" name="SearchString" value="@ViewData["CurrentFilter"]" placeholder="Buscar por nome ou email" id="autoComplete" data-table="BiweeklyRecords" data-column1="EmployeeName" data-column2="UserEmail" />
+                <input type="date" class="form-control col-sm-1" name="StartDate" value="@ViewData["CurrentStartDate"]" placeholder="Data Inicial" />
+                <input type="date" class="form-control col-sm-1" name="EndDate" value="@ViewData["CurrentEndDate"]" placeholder="Data Inicial" />
+                
+                <input class="btn btn-outline-primary col-sm-1" type="submit" value="Procurar" />
 
-                <a class="btn btn-outline-primary align-content-center" asp-action="AdminView">Lista completa</a>
+                <a class="btn btn-outline-primary align-content-center col-sm-2" asp-action="AdminView">Lista completa</a>
             </div>
         </form>
     </div>

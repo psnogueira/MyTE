@@ -20,5 +20,8 @@ namespace MyTE.Models.ViewModel
         public BiweeklyRecord BiweeklyRecord { get; set; }
         public ApplicationUser User { get; set; }
         public string CurrentFilter { get; set; }
+
+        public DateTime? CurrentStartDate { get; set; }
+        public DateTime? CurrentEndDate { get; set;}
     }
 }

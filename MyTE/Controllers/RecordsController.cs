@@ -240,10 +240,12 @@ namespace MyTE.Controllers
 
 
         [Authorize(Policy = "RequerPerfilAdmin")]
-        public async Task<IActionResult> AdminView(string searchString, int? pageNumber)
+        public async Task<IActionResult> AdminView(string searchString, DateTime? startDate, DateTime? endDate,int? pageNumber)
         {
             var pageSize = 5;
             ViewData["CurrentFilter"] = searchString;
+            ViewData["CurrentStartDate"] = startDate?.ToString("yyyy-MM-dd");
+            ViewData["CurrentEndDate"] = endDate?.ToString("yyyy-MM-dd");
 
             var biweeklyRecords = _context.BiweeklyRecords
                                     .Include(b => b.Records)                                    
@@ -255,6 +257,20 @@ namespace MyTE.Controllers
                 biweeklyRecords = biweeklyRecords
                     .Where(r => r.UserEmail.Contains(searchString));
             }
+
+            if (startDate.HasValue && endDate.HasValue)
+            {
+                biweeklyRecords = biweeklyRecords
+                    .Where(d => (d.StartDate <= endDate.Value && d.EndDate >= startDate.Value));
+            }
+            else if (startDate.HasValue)
+                biweeklyRecords = biweeklyRecords
+                                    .Where(d => d.StartDate >= startDate.Value);
+            else if (endDate.HasValue)
+            {
+                biweeklyRecords = biweeklyRecords.Where(d => d.EndDate <= endDate.Value);
+            }
+
 
             var viewModel = new AdminViewModel
             {
