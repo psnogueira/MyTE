@@ -8,23 +8,23 @@
     <h1 class="col">Registro de Horas</h1>
     <div class="col d-flex justify-content-end" aria-label="Navegação de Data">
         <!-- Botão Anterior -->
-        <form asp-action="Navigate" method="post">
+        <form asp-action="Navigate" method="post" class="">
             <input type="hidden" name="direction" value="previous" />
-            <button type="submit" class="btn btn-primary">anterior</button>
+            <button type="submit" class="btn btn-primary"><i class="bi bi-arrow-left"></i></button>
         </form>
 
         <!-- Input Data e Botão Ir Para -->
         <form asp-action="Index" method="post" class="mx-2">
             <div class="input-group">
                 <input type="date" name="dataSearch" class="text-center form-control" />
-                <button type="submit" class="btn btn-primary">Ir para</button>
+                <button type="submit" class="btn btn-primary"><i class="bi bi-search"></i></button>
             </div>
         </form>
 
         <!-- Botão Próxima -->
-        <form asp-action="Navigate" method="post">
+        <form asp-action="Navigate" method="post" class="">
             <input type="hidden" name="direction" value="next" />
-            <button type="submit" class="btn btn-primary">próxima</button>
+            <button type="submit" class="btn btn-primary"><i class="bi bi-arrow-right"></i></button>
         </form>
     </div>
 </div>
@@ -46,8 +46,8 @@
                         var date = record.Data.ToString("dd/MM", culture);
 
                         <th class="@(record.Data.DayOfWeek == DayOfWeek.Saturday || record.Data.DayOfWeek == DayOfWeek.Sunday ? "table-secondary" : "")">
-                            <span class="fw-bold">@dayOfWeek</span>
-                            <span class="text-secondary fw-normal">@date</span>
+                            <span class="fw-normal text-secondary">@dayOfWeek</span>
+                            <small class=" fw-bold">@date</small>
                         </th>
                     }
                     <th class="col-1">Total WBS</th>
@@ -63,9 +63,12 @@
                                 <option value="0">-------</option>
                                 @foreach (var wbs in ViewBag.WBSList as List<SelectListItem>)
                                 {
-                                    <!option value="@wbs.Value" @(item.WBSId == int.Parse(wbs.Value) ? "selected" : "")>@wbs.Text</!option>
+                                    <!option value="@wbs.Value" @(item.WBS.WBSId.ToString() == wbs.Value ? "selected" : "")>@wbs.Text</!option>
                                 }
                             </select>
+                            @* <select asp-for="@item.WBSId" asp-items="ViewBag.WBSList" class="form-control">
+                                <option value="0">-------</option>
+                            </select> *@
                         </td>
                         @for (int j = 0; j < item.records.Count(); j++)
                         {
@@ -88,7 +91,7 @@
 
                                 <input type="hidden" id="recordWBSId_@i-@j"
                                        name="listRecordDTO[@i].records[@j].WBSId"
-                                       value="@record.WBSId" class="form-control" />
+                                       value="@item.WBS.WBSId" class="form-control" />
 
                                 <input type="hidden" name="listRecordDTO[@i].records[@j].Data"
                                        value="@record.Data" class="form-control" />
@@ -157,16 +160,6 @@
             input.value = selectedWBSId;
         });
     }
-
-    // function updateWBSId(selectElement, i, j) {
-    //     var selectedWBSId = selectElement.value;
-    //     var hiddenInputIds = document.getElementById('recordHours_' + i + '-' + j);
-    //     if (visibleInput.value.trim() === "") {
-    //         hiddenInput.value = 0;
-    //     } else {
-    //         hiddenInput.value = visibleInput.value;
-    //     }
-    // }
 
 
     function updateHiddenInput(visibleInput, i, j) {

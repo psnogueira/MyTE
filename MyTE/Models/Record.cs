@@ -22,7 +22,7 @@ namespace MyTE.Models
         public DateTime Data { get; set; }
 
         [Required(ErrorMessage = "A quantidade de horas é obrigatória.")]
-        [Range(0, 24, ErrorMessage = "A quantidade de horas deve estar entre 0 e 24.")]
+        //[Range(0, 24, ErrorMessage = "A quantidade de horas deve estar entre 0 e 24.")]
         public double Hours { get; set; }
 
         public Record()

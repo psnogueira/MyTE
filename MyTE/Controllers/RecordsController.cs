@@ -77,38 +77,77 @@ namespace MyTE.Controllers
             List<RecordDTO> list = new List<RecordDTO>();
             double[] totalHoursDay = new double[16];
 
-            foreach (var wbs in consultaWbs.ToList())
+            // Carrega os registros salvos do banco de dados
+            var savedRecords = await _context.Record
+                .Where(r => r.UserId == UserId && r.Data.Year == year && r.Data.Month == month && r.Data.Day >= dayInit && r.Data.Day <= dayMax)
+                .ToListAsync();
+
+            // Agrupa os registros por WBSId
+            var recordsGroupedByWBS = savedRecords.GroupBy(r => r.WBSId);
+
+            // Itera sobre os grupos de registros por WBSId
+            foreach (var group in recordsGroupedByWBS)
             {
                 int posicaoInicial = 0;
                 double totalHoursWBS = 0d;
                 List<Record> records = new List<Record>();
                 for (int i = dayInit; i <= dayMax; i++)
                 {
-                    var consultaRecordFinal = consultaRecord.Where(s => s.UserId == UserId && s.Data == new DateTime(year, month, i) && s.WBSId == wbs.WBSId);
-
-                    Record? result = consultaRecordFinal.FirstOrDefault();
-
-                    if (result != null && result.RecordId > 0)
+                    var record = group.FirstOrDefault(r => r.Data.Day == i);
+                    if (record != null)
                     {
-                        totalHoursWBS += result.Hours;
-                        records.Add(result);
-                        totalHoursDay[posicaoInicial] = totalHoursDay[posicaoInicial] + result.Hours;
+                        totalHoursWBS += record.Hours;
+                        records.Add(record);
+                        totalHoursDay[posicaoInicial] = totalHoursDay[posicaoInicial] + record.Hours;
                     }
                     else
                     {
-                        Record record = new Record();
-                        record.Data = new DateTime(year, month, i);
-                        record.UserId = UserId;
-                        record.WBSId = wbs.WBSId;
+                        record = new Record
+                        {
+                            Data = new DateTime(year, month, i),
+                            UserId = UserId,
+                            WBSId = group.Key // Usa o WBSId do grupo
+                        };
                         records.Add(record);
                     }
                     posicaoInicial++;
                 }
-                RecordDTO dto = new RecordDTO();
-                dto.WBS = wbs;
-                dto.records = records;
-                dto.TotalHours = totalHoursWBS;
-                dto.TotalHoursDay = totalHoursDay;
+
+                var wbs = await _context.WBS.FindAsync(group.Key);
+                RecordDTO dto = new RecordDTO
+                {
+                    WBS = wbs ?? new WBS { WBSId = 0, Code = "", Desc = "" },
+                    records = records,
+                    TotalHours = totalHoursWBS,
+                    TotalHoursDay = totalHoursDay
+                };
+                list.Add(dto);
+            }
+
+            // Adiciona linhas adicionais se houver menos de 4 linhas
+            while (list.Count < 4)
+            {
+                int posicaoInicial = 0;
+                double totalHoursWBS = 0d;
+                List<Record> records = new List<Record>();
+                for (int i = dayInit; i <= dayMax; i++)
+                {
+                    var record = new Record
+                    {
+                        Data = new DateTime(year, month, i),
+                        UserId = UserId,
+                        WBSId = 0 // Inicialmente sem WBS associada
+                    };
+                    records.Add(record);
+                    posicaoInicial++;
+                }
+                RecordDTO dto = new RecordDTO
+                {
+                    WBS = new WBS { WBSId = 0, Code = "", Desc = "" },
+                    records = records,
+                    TotalHours = totalHoursWBS,
+                    TotalHoursDay = totalHoursDay
+                };
                 list.Add(dto);
             }
 
@@ -135,7 +174,11 @@ namespace MyTE.Controllers
                 List<Record> records = new List<Record>();
                 foreach (var item in listRecordDTO)
                 {
-                    records.AddRange(item.records);
+                    foreach (var record in item.records)
+                    {
+                        // Atribua a WBSId selecionada a cada registro
+                        records.Add(record);
+                    }
                 }
                 if (ValidateRecords(ConvertForMap(records)))
                 {
