@@ -4,8 +4,8 @@
     ViewData["Title"] = "Index";
 }
 
-<div class="row">
-    <h1 class="col">Registro de Horas</h1>
+<div class="row align-items-center">
+    <h1 class="col fw-bold display-4">Registro de Horas</h1>
     <div class="col d-flex justify-content-end" aria-label="Navegação de Data">
         <!-- Botão Anterior -->
         <form asp-action="Navigate" method="post" class="">
@@ -29,12 +29,11 @@
     </div>
 </div>
 
-
 <form asp-action="Persist" method="post">
     <p class="d-flex justify-content-end mb-2">
         <input type="submit" value="Salvar" class="btn btn-primary" />
     </p>
-    <div class="table-responsive border rounded-3 mt-0">
+    <div class="table-responsive bg-white border rounded-3 mt-0">
         <table class="table align-middle text-center table-bordered mb-0">
             <thead>
                 <tr class="table-secondary align-middle">
@@ -66,9 +65,6 @@
                                     <!option value="@wbs.Value" @(item.WBS.WBSId.ToString() == wbs.Value ? "selected" : "")>@wbs.Text</!option>
                                 }
                             </select>
-                            @* <select asp-for="@item.WBSId" asp-items="ViewBag.WBSList" class="form-control">
-                                <option value="0">-------</option>
-                            </select> *@
                         </td>
                         @for (int j = 0; j < item.records.Count(); j++)
                         {

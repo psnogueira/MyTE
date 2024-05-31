@@ -237,8 +237,8 @@ namespace MyTE.Controllers
                 }
                 if (item.Value > 24)
                 {
-                    TempData["ErrorMessageText"] = "A data " + item.Key + " possui uma quantidade superior ao máximo de horas de um dia (24 horas).";
-                    TempData["ErrorMessageText2"] = "Quantidade de horas registradas: " + item.Value;
+                    TempData["ErrorMessageText"] = "A data " + item.Key.Date.ToString("dd/MM") + " possui uma quantidade superior ao máximo";
+                    TempData["ErrorMessageText2"] = "de horas de um dia (24 horas). Quantidade de horas registradas: " + item.Value;
                     return false;
                 }
             }
