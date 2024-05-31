@@ -9,7 +9,10 @@ using MyTE.DTO;
 using MyTE.Models;
 using MyTE.Models.ViewModel;
 using MyTE.Pagination;
+using Newtonsoft.Json;
 using System.Drawing.Printing;
+using System.Globalization;
+using System.Text;
 
 namespace MyTE.Controllers
 {
@@ -272,12 +275,14 @@ namespace MyTE.Controllers
                 biweeklyRecords = biweeklyRecords.Where(d => d.EndDate <= endDate.Value);
             }
 
+            var totalHours = await biweeklyRecords.SumAsync(b => b.TotalHours);
 
             var viewModel = new AdminViewModel
             {
                 ReportsList = await PaginatedList<BiweeklyRecord>
                 .CreateAsync(biweeklyRecords.AsNoTracking(), pageNumber ?? 1, pageSize),
                 CurrentFilter = searchString,
+                TotalHours = totalHours,
                 BiweeklyRecord = new BiweeklyRecord(),
             };
 

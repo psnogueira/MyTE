@@ -21,6 +21,7 @@ namespace MyTE.Models.ViewModel
         public ApplicationUser User { get; set; }
         public string CurrentFilter { get; set; }
 
+        public double TotalHours { get; set; }
         public DateTime? CurrentStartDate { get; set; }
         public DateTime? CurrentEndDate { get; set;}
     }
