@@ -180,6 +180,18 @@ namespace MyTE.Controllers
                         records.Add(record);
                     }
                 }
+
+                // Validação adicional para garantir que WBSId 0 só tenha horas iguais a 0
+                foreach (var record in records)
+                {
+                    if (record.WBSId == 0 && record.Hours != 0)
+                    {
+                        TempData["ErrorMessage"] = "Falha na validação dos registros.";
+                        TempData["ErrorMessageText"] = "Não é possível salvar horas na WBS vazia.";
+                        return RedirectToAction(nameof(Index));
+                    }
+                }
+
                 if (ValidateRecords(ConvertForMap(records)))
                 {
                     var recordsExclude = await _context.Record.Where(
@@ -225,7 +237,7 @@ namespace MyTE.Controllers
                 }
                 if (item.Value > 24)
                 {
-                    TempData["ErrorMessage"] = "A data " + item.Key + " possui uma quantidade superior ao máximo de horas de um dia (24 horas).";
+                    TempData["ErrorMessageText"] = "A data " + item.Key + " possui uma quantidade superior ao máximo de horas de um dia (24 horas).";
                     TempData["ErrorMessageText2"] = "Quantidade de horas registradas: " + item.Value;
                     return false;
                 }
