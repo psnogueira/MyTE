@@ -4,34 +4,33 @@
     ViewData["Title"] = "Registro de horas";
 }
 
-<div class="row">
-    <h1 class="col">Registro de Horas</h1>
+<div class="row align-items-center">
+    <h1 class="col fw-bold display-4">Registro de Horas</h1>
     <div class="col d-flex justify-content-end" aria-label="Navegação de Data">
-        <form asp-action="Navigate" method="post">
+        <form asp-action="Navigate" method="post" class="">
             <input type="hidden" name="direction" value="previous" />
-            <button type="submit" class="btn btn-primary"><i class="bi bi-chevron-left"></i></button>
+            <button type="submit" class="btn btn-primary"><i class="bi bi-arrow-left"></i></button>
         </form>
 
         <form asp-action="Index" method="post" class="mx-2">
             <div class="input-group">
-                <input type="date" name="dataSearch" class="text-center form-control"/>
-                <button type="submit" class="btn btn-primary">Ir para</button>
+                <input type="date" name="dataSearch" class="text-center form-control" />
+                <button type="submit" class="btn btn-primary"><i class="bi bi-search"></i></button>
             </div>
         </form>
 
-        <form asp-action="Navigate" method="post">
+        <form asp-action="Navigate" method="post" class="">
             <input type="hidden" name="direction" value="next" />
-            <button type="submit" class="btn btn-primary"><i class="bi bi-chevron-right"></i></button>
+            <button type="submit" class="btn btn-primary"><i class="bi bi-arrow-right"></i></button>
         </form>
     </div>
 </div>
-
 
 <form asp-action="Persist" method="post">
     <p class="d-flex justify-content-end mb-2">
         <input type="submit" value="Salvar" class="btn btn-primary" />
     </p>
-    <div class="table-responsive border rounded-3 mt-0">
+    <div class="table-responsive bg-white border rounded-3 mt-0">
         <table class="table align-middle text-center table-bordered mb-0">
             <thead>
                 <tr class="table-secondary align-middle">
@@ -43,8 +42,8 @@
                         var date = record.Data.ToString("dd/MM", culture);
 
                         <th class="@(record.Data.DayOfWeek == DayOfWeek.Saturday || record.Data.DayOfWeek == DayOfWeek.Sunday ? "table-secondary" : "")">
-                            <span class="fw-bold">@dayOfWeek</span>
-                            <span class="text-secondary fw-normal">@date</span>
+                            <span class="fw-normal text-secondary">@dayOfWeek</span>
+                            <small class=" fw-bold">@date</small>
                         </th>
                     }
                     <th class="col-1">Total WBS</th>
@@ -85,7 +84,7 @@
 
                                 <input type="hidden" id="recordWBSId_@i-@j"
                                        name="listRecordDTO[@i].records[@j].WBSId"
-                                       value="@record.WBSId" class="form-control" />
+                                       value="@item.WBS.WBSId" class="form-control" />
 
                                 <input type="hidden" name="listRecordDTO[@i].records[@j].Data"
                                        value="@record.Data" class="form-control" />
@@ -154,16 +153,6 @@
             input.value = selectedWBSId;
         });
     }
-
-    // function updateWBSId(selectElement, i, j) {
-    //     var selectedWBSId = selectElement.value;
-    //     var hiddenInputIds = document.getElementById('recordHours_' + i + '-' + j);
-    //     if (visibleInput.value.trim() === "") {
-    //         hiddenInput.value = 0;
-    //     } else {
-    //         hiddenInput.value = visibleInput.value;
-    //     }
-    // }
 
 
     function updateHiddenInput(visibleInput, i, j) {

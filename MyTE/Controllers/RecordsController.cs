@@ -155,38 +155,77 @@ namespace MyTE.Controllers
 
             double[] totalHoursDay = new double[16];
 
-            foreach (var wbs in consultaWbs.ToList())
+            // Carrega os registros salvos do banco de dados
+            var savedRecords = await _context.Record
+                .Where(r => r.UserId == UserId && r.Data.Year == year && r.Data.Month == month && r.Data.Day >= dayInit && r.Data.Day <= dayMax)
+                .ToListAsync();
+
+            // Agrupa os registros por WBSId
+            var recordsGroupedByWBS = savedRecords.GroupBy(r => r.WBSId);
+
+            // Itera sobre os grupos de registros por WBSId
+            foreach (var group in recordsGroupedByWBS)
             {
                 int posicaoInicial = 0;
                 double totalHoursWBS = 0d;
                 List<Record> records = new List<Record>();
                 for (int i = dayInit; i <= dayMax; i++)
                 {
-                    var consultaRecordFinal = consultaRecord.Where(s => s.UserId == userId && s.Data == new DateTime(year, month, i) && s.WBSId == wbs.WBSId);
-
-                    Record? result = consultaRecordFinal.FirstOrDefault();
-
-                    if (result != null && result.RecordId > 0)
+                    var record = group.FirstOrDefault(r => r.Data.Day == i);
+                    if (record != null)
                     {
-                        totalHoursWBS += result.Hours;
-                        records.Add(result);
-                        totalHoursDay[posicaoInicial] = totalHoursDay[posicaoInicial] + result.Hours;
+                        totalHoursWBS += record.Hours;
+                        records.Add(record);
+                        totalHoursDay[posicaoInicial] = totalHoursDay[posicaoInicial] + record.Hours;
                     }
                     else
                     {
-                        Record record = new Record();
-                        record.Data = new DateTime(year, month, i);
-                        record.UserId = userId;
-                        record.WBSId = wbs.WBSId;
+                        record = new Record
+                        {
+                            Data = new DateTime(year, month, i),
+                            UserId = UserId,
+                            WBSId = group.Key // Usa o WBSId do grupo
+                        };
                         records.Add(record);
                     }
                     posicaoInicial++;
                 }
-                RecordDTO dto = new RecordDTO();
-                dto.WBS = wbs;
-                dto.records = records;
-                dto.TotalHours = totalHoursWBS;
-                dto.TotalHoursDay = totalHoursDay;
+
+                var wbs = await _context.WBS.FindAsync(group.Key);
+                RecordDTO dto = new RecordDTO
+                {
+                    WBS = wbs ?? new WBS { WBSId = 0, Code = "", Desc = "" },
+                    records = records,
+                    TotalHours = totalHoursWBS,
+                    TotalHoursDay = totalHoursDay
+                };
+                list.Add(dto);
+            }
+
+            // Adiciona linhas adicionais se houver menos de 4 linhas
+            while (list.Count < 4)
+            {
+                int posicaoInicial = 0;
+                double totalHoursWBS = 0d;
+                List<Record> records = new List<Record>();
+                for (int i = dayInit; i <= dayMax; i++)
+                {
+                    var record = new Record
+                    {
+                        Data = new DateTime(year, month, i),
+                        UserId = UserId,
+                        WBSId = 0 // Inicialmente sem WBS associada
+                    };
+                    records.Add(record);
+                    posicaoInicial++;
+                }
+                RecordDTO dto = new RecordDTO
+                {
+                    WBS = new WBS { WBSId = 0, Code = "", Desc = "" },
+                    records = records,
+                    TotalHours = totalHoursWBS,
+                    TotalHoursDay = totalHoursDay
+                };
                 list.Add(dto);
             }
 
@@ -216,9 +255,28 @@ namespace MyTE.Controllers
 
             foreach (var record in records)
             {
-                var existingRecord = existingRecords.FirstOrDefault(r => r.Data == record.Data && r.WBSId == record.WBSId);
+                List<Record> records = new List<Record>();
+                foreach (var item in listRecordDTO)
+                {
+                    foreach (var record in item.records)
+                    {
+                        // Atribua a WBSId selecionada a cada registro
+                        records.Add(record);
+                    }
+                }
 
-                if (existingRecord != null)
+                // Validação adicional para garantir que WBSId 0 só tenha horas iguais a 0
+                foreach (var record in records)
+                {
+                    if (record.WBSId == 0 && record.Hours != 0)
+                    {
+                        TempData["ErrorMessageText"] = "Falha na validação dos registros.";
+                        TempData["ErrorMessageText2"] = "Não é possível salvar horas na WBS vazia.";
+                        return RedirectToAction(nameof(Index));
+                    }
+                }
+
+                if (ValidateRecords(ConvertForMap(records)))
                 {
                     if (record.Hours > 0)
                     {
@@ -266,8 +324,8 @@ namespace MyTE.Controllers
                 }
                 if (item.Value > 24)
                 {
-                    TempData["ErrorMessageText"] = "A data " + item.Key.Date.ToString("dd/MM") + " possui uma quantidade superior ao máximo de horas de um dia (24 horas).";
-                    TempData["ErrorMessageText2"] = "Quantidade de horas registradas: " + item.Value;
+                    TempData["ErrorMessageText"] = "A data " + item.Key.Date.ToString("dd/MM") + " possui uma quantidade superior ao máximo";
+                    TempData["ErrorMessageText2"] = "de horas de um dia (24 horas). Quantidade de horas registradas: " + item.Value;
                     return false;
                 }
             }
