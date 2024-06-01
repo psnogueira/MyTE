@@ -47,6 +47,7 @@ namespace MyTE.Data
             var adminPassword = config["AdminCredentials:Password"];
 
             var admin = await userManager.FindByEmailAsync(adminEmail);
+            var adminRole = await roleManager.FindByNameAsync(roleAdmin);
 
             if (admin == null)
             {
@@ -56,14 +57,16 @@ namespace MyTE.Data
                 // Cadastra o usuário Admin
                 admin = new ApplicationUser
                 {
+                    NormalizedUserName = adminEmail.ToUpper(),
                     UserName = adminEmail,
                     Email = adminEmail,
                     EmailConfirmed = true,
                     FirstName = "admin",
                     LastName = "admin",
-                    DepartmentId = departmentId,
+                    HiringDate = DateTime.Parse("2024-01-01"),
                     PID = "admin",
-                    HiringDate = DateTime.Parse("2024-01-01")
+                    DepartmentId = departmentId,
+                    RoleId = adminRole.Id
                 };
                 var result = await userManager.CreateAsync(admin, adminPassword);
 

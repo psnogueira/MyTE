@@ -39,12 +39,12 @@
 
 <div class="container mt-3">
     <h1 class="fw-bold display-2 text-white mb-3">@ViewData["Title"]</h1>
-    <div class="row my-3">
-        <form class="col-5" asp-action="Index" method="get">
-            <div class="form-actions input-group">
-                <input type="text" class="form-control" id="departmentName" name="SearchString" value="@ViewData["CurrentFilter"]" placeholder="Buscar por nome" />
-                <input class="btn btn-outline-primary" type="submit" value="Procurar" />
-                <a class="btn btn-outline-primary align-content-center" asp-action="Index">Lista completa</a>
+    <div class="d-flex align-items-center justify-content-between my-3">
+        <form asp-action="Index" method="get">
+            <div class="form-actions input-group w-20rem">
+                <input type="text" class="form-control" name="SearchString" value="@ViewData["CurrentFilter"]" placeholder="Buscar por nome" id="autoComplete" data-table="Department" data-column1="Name" data-column2="" />
+                <input class="btn btn-outline-secondary" type="submit" value="Procurar" />
+                <a class="btn btn-outline-secondary align-content-center" asp-action="Index">Lista completa</a>
             </div>
         </form>
         <div class="col d-flex justify-content-end">
@@ -206,31 +206,7 @@
 </div>
 *@
 @section Scripts {
-    <script>
-        $(document).ready(function () {
-            // O ID deve ser igual ao colocado no input do search
-            $("#departmentName").autocomplete({
-                source: function (request, response) {
-                    var tableName = "Department"; // Nome da Tabela
-                    var columnName1 = "Name"; // Nome da primeira coluna usada no Auto-complete
-                    var columnName2 = ""; // Nome da segunda coluna usada no Auto-complete
-                    var url = 'api/autocomplete/' + tableName + '/search';
-                    var data = { term: request.term, columnName1: columnName1 };
-
-                    if (columnName2) {
-                        data.columnName2 = columnName2;
-                    }
-
-                    $.ajax({
-                        url: url,
-                        data: data,
-                        success: function (data) {
-                            response(data);
-                        }
-                    });
-                }
-            });
-        });
-    </script>
-
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 } 

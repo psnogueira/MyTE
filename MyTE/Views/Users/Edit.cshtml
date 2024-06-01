@@ -1,7 +1,4 @@
 ﻿@model EditUserViewModel
-@{
-
-}
 
 <div class="d-flex flex-wrap justify-content-between">
     <div class="col-md-5 h-100 mx-auto">
@@ -10,6 +7,7 @@
         </a>
         <h1 class="text-primary display-5 fw-bold mb-3">Editar Usuário</h1>
         <form asp-action="Edit" asp-for="Id">
+            <input type="hidden" asp-for="Id" />
             <div class="row">
                 <div class="col form-floating mb-3">
                     <input asp-for="FirstName" class="form-control" placeholder="." />
@@ -56,7 +54,6 @@
         <img class="img-fluid" src="~/img/Art.jpg" alt="Arte decorativa" />
     </div>
 </div>
-
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
 }

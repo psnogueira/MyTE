@@ -1,7 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using MyTE.Data;
 using System.Data;
 
@@ -12,34 +10,10 @@ namespace MyTE.Controllers
     public class AutoCompleteController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
-        private readonly RoleManager<IdentityRole> _manager;
 
-        public AutoCompleteController(ApplicationDbContext context, RoleManager<IdentityRole> roleManager)
+        public AutoCompleteController(ApplicationDbContext context)
         {
             _context = context;
-            _manager = roleManager;
-        }
-
-        [Produces("application/json")]
-        [HttpGet("identitySearch")]
-        public IActionResult AutoComplete()
-        {
-            try
-            {
-                string term = HttpContext.Request.Query["term"].ToString();
-
-                var roleName = _manager.Roles
-                    .Where(r => r.Name.Contains(term) || r.Id.Contains(term))
-                    .Select(r => r.Name)
-                    .ToList();
-
-                return Ok(roleName);
-
-            }
-            catch (Exception)
-            {
-                return BadRequest();
-            }
         }
 
         [Produces("application/json")]
@@ -53,8 +27,12 @@ namespace MyTE.Controllers
                 // Valida as tabelas e colunas que podem ser consultadas através do auto-complete
                 var allowedTables = new Dictionary<string, string[]>
                 {
-                    { "WBS", new[] { "Code", "Desc" } },
-                    { "Department", new[] { "Name", "" } }
+                    { "WBS", new[] { "Desc", "Code" } },
+                    { "Department", new[] { "Name", "" } },
+                    { "Roles", new[] { "Name", "" } },
+                    { "Users", new[] { "FirstName", "Email" } },
+                    { "BiweeklyRecords", new[] { "UserEmail", "" } }
+
                 };
 
                 if (!allowedTables.ContainsKey(tableName) ||

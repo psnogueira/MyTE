@@ -1,0 +1,79 @@
+﻿@model MyTE.Models.ViewModel.AdminViewModel
+
+@{
+    ViewData["Title"] = "Relatórios";
+    Layout = "~/Views/Shared/_LayoutCRUD.cshtml";
+}
+
+<div class="container mt-3">
+    <h1 class="fw-bold display-2 text-white mb-3">@ViewData["Title"]</h1>
+    <div class="d-flex align-items-center justify-content-between my-3">
+        <form asp-action="AdminView" method="get" class="w-100">
+            <div class="form-actions input-group row w-75">
+
+                <input type="text" class="form-control col-sm-7" name="SearchString" value="@ViewData["CurrentFilter"]" placeholder="Buscar por nome ou email" id="autoComplete" data-table="BiweeklyRecords" data-column1="EmployeeName" data-column2="UserEmail" />
+                <input type="date" class="form-control col-sm-1" name="StartDate" value="@ViewData["CurrentStartDate"]" placeholder="Data Inicial" />
+                <input type="date" class="form-control col-sm-1" name="EndDate" value="@ViewData["CurrentEndDate"]" placeholder="Data Inicial" />
+                
+                <input class="btn btn-outline-primary col-sm-1" type="submit" value="Procurar" />
+
+                <a class="btn btn-outline-primary align-content-center col-sm-2" asp-action="AdminView">Lista completa</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<img class="position-absolute object-fit-cover w-100 h-20rem top-0 z-n1" src="~/img/ArtH3.jpg" alt="Arte ilustrativa" />
+
+<div class="bg-white container rounded table-responsive">
+    <table class="table text-center align-middle">
+        <thead>
+            <tr>
+                <th>Usuário</th>
+                <th>Nome</th>
+                <th>Período</th>
+                <th>Total de Horas</th>
+                <th>Detalhes</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var record in Model.ReportsList)
+            {
+                <tr>
+                    <td>@record.UserEmail</td>
+                    <td class="text-capitalize">@record.EmployeeName</td>
+                    <td>@record.StartDate.ToString("dd/MM/yyyy") - @record.EndDate.ToString("dd/MM/yyyy")</td>
+                    <td>@record.TotalHours</td>
+                    <td>
+                        <a asp-action="ViewDetails" asp-route-id="@record.BiweeklyRecordId" class="btn btn-primary">
+                            Detalhes
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<nav aria-label="Page navigation example" class="container mt-4">
+    <ul class="pagination">
+        <li class="page-item @(Model.ReportsList.HasPreviousPage ? "" : "disabled")">
+            <a class="page-link" asp-action="Index" asp-route-pageNumber="@(Model.ReportsList.PageIndex - 1)" asp-route-searchString="@Model.CurrentFilter">Anterior</a>
+        </li>
+        @for (int i = 1; i <= Model.ReportsList.TotalPages; i++)
+        {
+            <li class="page-item @(i == Model.ReportsList.PageIndex ? "active" : "")">
+                <a class="page-link" asp-action="Index" asp-route-pageNumber="@i" asp-route-searchString="@Model.CurrentFilter">@i</a>
+            </li>
+        }
+        <li class="page-item @(Model.ReportsList.HasNextPage ? "" : "disabled")">
+            <a class="page-link" asp-action="Index" asp-route-pageNumber="@(Model.ReportsList.PageIndex + 1)" asp-route-searchString="@Model.CurrentFilter">Próxima</a>
+        </li>
+    </ul>
+</nav>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

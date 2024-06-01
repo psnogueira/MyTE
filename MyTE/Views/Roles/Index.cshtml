@@ -43,7 +43,7 @@
     <div class="row my-3">
         <form class="col-5" asp-action="Index" method="get">
             <div class="form-actions input-group">
-                <input type="text" class="form-control col-3" id="roleName" name="SearchString" value="@ViewData["CurrentFilter"]" placeholder="Buscar por nome" />
+                <input type="text" class="form-control col-3" name="SearchString" value="@ViewData["CurrentFilter"]" placeholder="Burcar por nome" id="autoComplete" data-table="Roles" data-column1="Name" data-column2="" />
                 <input class="btn btn-outline-primary" type="submit" value="Procurar" />
                 <a class="btn btn-outline-primary align-content-center" asp-action="Index">Lista completa</a>
             </div>
@@ -157,12 +157,8 @@
 </div>
 
 @section Scripts {
-    <script>
-        $(document).ready(function () {
-            $("#roleName").autocomplete({
-                source: 'api/autocomplete/identitySearch',
-            })
-        })
-    </script>
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 
 }
