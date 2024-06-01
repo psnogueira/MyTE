@@ -77,9 +77,7 @@ namespace MyTE.Controllers
             {
                 return NotFound();
             }
-            TempData["SuccessMessage2"] = "Role editada com sucesso!";
             return View(role);
-
         }
 
         [HttpPost]
@@ -110,6 +108,7 @@ namespace MyTE.Controllers
                         throw;
                     }
                 }
+                TempData["SuccessMessage2"] = "Role editada com sucesso!";
                 return RedirectToAction(nameof(Index));
             }
             return View(role);

@@ -1,24 +1,36 @@
 ﻿@model IEnumerable<MyTE.DTO.RecordDTO>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Registro de horas";
 }
 
 <div class="row align-items-center">
-    <h1 class="col">Registro de Horas</h1>
-    <form class="col-3" asp-action="Index" method="post">
-        <div class="input-group">
-            <input type="date" name="dataSearch" class="text-center form-control" />
-            <button type="submit" class="btn btn-primary">Ir para</button>
-        </div>
-    </form>
+    <h1 class="col fw-bold display-4">Registro de Horas</h1>
+    <div class="col d-flex justify-content-end" aria-label="Navegação de Data">
+        <form asp-action="Navigate" method="post" class="">
+            <input type="hidden" name="direction" value="previous" />
+            <button type="submit" class="btn btn-primary"><i class="bi bi-arrow-left"></i></button>
+        </form>
+
+        <form asp-action="Index" method="post" class="mx-2">
+            <div class="input-group">
+                <input type="date" name="dataSearch" class="text-center form-control" />
+                <button type="submit" class="btn btn-primary"><i class="bi bi-search"></i></button>
+            </div>
+        </form>
+
+        <form asp-action="Navigate" method="post" class="">
+            <input type="hidden" name="direction" value="next" />
+            <button type="submit" class="btn btn-primary"><i class="bi bi-arrow-right"></i></button>
+        </form>
+    </div>
 </div>
 
 <form asp-action="Persist" method="post">
     <p class="d-flex justify-content-end mb-2">
         <input type="submit" value="Salvar" class="btn btn-primary" />
     </p>
-    <div class="table-responsive border rounded-3 mt-0">
+    <div class="table-responsive bg-white border rounded-3 mt-0">
         <table class="table align-middle text-center table-bordered mb-0">
             <thead>
                 <tr class="table-secondary align-middle">
@@ -30,10 +42,9 @@
                         var date = record.Data.ToString("dd/MM", culture);
 
                         <th class="@(record.Data.DayOfWeek == DayOfWeek.Saturday || record.Data.DayOfWeek == DayOfWeek.Sunday ? "table-secondary" : "")">
-                            <span class=" fw-bold">@dayOfWeek</span>
-                            <span class="text-secondary fw-normal">@date</span>
+                            <span class="fw-normal text-secondary">@dayOfWeek</span>
+                            <small class=" fw-bold">@date</small>
                         </th>
-                        @* <th>@record.Data.ToString("ddd dd/MM", new System.Globalization.CultureInfo("pt-BR"))</th> *@
                     }
                     <th class="col-1">Total WBS</th>
                 </tr>
@@ -44,16 +55,13 @@
                     var item = Model.ElementAt(i);
                     <tr>
                         <td class="col-2">
-                            @Html.DisplayFor(modelItem => item.WBS.Code) - @Html.DisplayFor(modelItem => item.WBS.Desc)
-                            @* <select name="listRecordDTO[@i].WBSId" class="form-control text-center" onchange="updateWBSId(this, @i)">
-                                <option value="">-------</option>
+                            <select name="listRecordDTO[@i].WBSId" class="form-control border-0 px-1 text-center" onchange="updateWBSId(this, @i)">
+                                <option value="0">-------</option>
                                 @foreach (var wbs in ViewBag.WBSList as List<SelectListItem>)
                                 {
-                                    <option value="@wbs.Value" 
-                                    oninput="@(item.WBSId == int.Parse(wbs.Value) ? "selected" : String.Empty)"
-                                    >@wbs.Text</option>
+                                    <!option value="@wbs.Value" @(item.WBS.WBSId.ToString() == wbs.Value ? "selected" : "")>@wbs.Text</!option>
                                 }
-                            </select> *@
+                            </select>
                         </td>
                         @for (int j = 0; j < item.records.Count(); j++)
                         {
@@ -76,7 +84,7 @@
 
                                 <input type="hidden" id="recordWBSId_@i-@j"
                                        name="listRecordDTO[@i].records[@j].WBSId"
-                                       value="@record.WBSId" class="form-control" />
+                                       value="@item.WBS.WBSId" class="form-control" />
 
                                 <input type="hidden" name="listRecordDTO[@i].records[@j].Data"
                                        value="@record.Data" class="form-control" />
@@ -94,17 +102,14 @@
                         <td class="fw-bold">
                             <input type="hidden" class="form-control fw-bold" value="@(Model.First().TotalHoursDay[@i])" readonly />
                             <span class="fw-bold" id="totalDay_@i">0.0</span>
-                            <div id="errorDay_@i" class="text-danger" style="display: none;">A soma das horas trabalhadas em um dia não pode ultrapassar 24h.</div>
+                            <div id="errorDay1_@i" class="text-danger" style="display: none;">A soma das horas trabalhadas em um dia não pode ultrapassar 24h.</div>
                         </td>
                     }
-                    <td></td>
                 </tr>
             </tbody>
         </table>
     </div>
 </form>
-
-
 
 @if (TempData["SuccessMessage"] != null)
 {
@@ -140,6 +145,16 @@
 }
 
 <script>
+    function updateWBSId(selectElement, index) {
+        var selectedWBSId = selectElement.value;
+        var hiddenInputIds = document.querySelectorAll(`[id^="recordWBSId_${index}-"]`);
+
+        hiddenInputIds.forEach(function (input) {
+            input.value = selectedWBSId;
+        });
+    }
+
+
     function updateHiddenInput(visibleInput, i, j) {
         var hiddenInput = document.getElementById('recordHours_' + i + '-' + j);
         if (visibleInput.value.trim() === "") {
@@ -181,7 +196,7 @@
         var totalDayElement = document.getElementById(`totalDay_${colIndex}`);
         totalDayElement.innerText = totalDay.toFixed(1);
 
-        var errorElement = document.getElementById(`errorDay_${colIndex}`);
+        var errorElement = document.getElementById(`errorDay1_${colIndex}`);
         if (totalDay > 24) {
             totalDayElement.classList.add("text-danger", "fw-bold");
             errorElement.style.display = "block";
@@ -189,6 +204,7 @@
             totalDayElement.classList.remove("text-danger", "fw-bold");
             errorElement.style.display = "none";
         }
+
     }
 
     function updateTotalsOnLoad() {
@@ -207,4 +223,5 @@
     document.addEventListener("DOMContentLoaded", function () {
         updateTotalsOnLoad();
     });
+
 </script>
