@@ -29,11 +29,22 @@ namespace MyTE.Controllers
         // GET: Records
         public async Task<IActionResult> Index(DateTime? dataSearch)
         {
-            if(dataSearch < StartDateRestriction)
+            if (dataSearch < StartDateRestriction)
             {
                 TempData["ErrorMessage"] = "A data de pesquisa deve ser maior que 01/01/2024";
             }
             var UserId = _userManager.GetUserId(User);
+
+
+            if (dataSearch.HasValue)
+            {
+                TempData["CurrentDate"] = dataSearch.Value.ToString("yyyy-MM-dd");
+            }
+            else
+            {
+                TempData["CurrentDate"] = null;
+            }
+
 
             var consultaWbs = from obj in _context.WBS select obj;
             var consultaRecord = from obj in _context.Record select obj;
@@ -70,42 +81,88 @@ namespace MyTE.Controllers
             List<RecordDTO> list = new List<RecordDTO>();
             double[] totalHoursDay = new double[16];
 
-            foreach (var wbs in consultaWbs.ToList())
+            // Carrega os registros salvos do banco de dados
+            var savedRecords = await _context.Record
+                .Where(r => r.UserId == UserId && r.Data.Year == year && r.Data.Month == month && r.Data.Day >= dayInit && r.Data.Day <= dayMax)
+                .ToListAsync();
+
+            // Agrupa os registros por WBSId
+            var recordsGroupedByWBS = savedRecords.GroupBy(r => r.WBSId);
+
+            // Itera sobre os grupos de registros por WBSId
+            foreach (var group in recordsGroupedByWBS)
             {
                 int posicaoInicial = 0;
                 double totalHoursWBS = 0d;
                 List<Record> records = new List<Record>();
                 for (int i = dayInit; i <= dayMax; i++)
                 {
-
-
-                    var consultaRecordFinal = consultaRecord.Where(s => s.UserId == UserId && s.Data == new DateTime(year, month, i) && s.WBSId == wbs.WBSId);
-
-                    Record? result = consultaRecordFinal.FirstOrDefault();
-
-                    if (result != null && result.RecordId > 0)
+                    var record = group.FirstOrDefault(r => r.Data.Day == i);
+                    if (record != null)
                     {
-                        totalHoursWBS += result.Hours;
-                        records.Add(result);
-                        totalHoursDay[posicaoInicial] = totalHoursDay[posicaoInicial] + result.Hours;
+                        totalHoursWBS += record.Hours;
+                        records.Add(record);
+                        totalHoursDay[posicaoInicial] = totalHoursDay[posicaoInicial] + record.Hours;
                     }
                     else
                     {
-                        Record record = new Record();
-                        record.Data = new DateTime(year, month, i);
-                        record.UserId = UserId;
-                        record.WBSId = wbs.WBSId;
+                        record = new Record
+                        {
+                            Data = new DateTime(year, month, i),
+                            UserId = UserId,
+                            WBSId = group.Key // Usa o WBSId do grupo
+                        };
                         records.Add(record);
                     }
                     posicaoInicial++;
                 }
-                RecordDTO dto = new RecordDTO();
-                dto.WBS = wbs;
-                dto.records = records;
-                dto.TotalHours = totalHoursWBS;
-                dto.TotalHoursDay = totalHoursDay;
+
+                var wbs = await _context.WBS.FindAsync(group.Key);
+                RecordDTO dto = new RecordDTO
+                {
+                    WBS = wbs ?? new WBS { WBSId = 0, Code = "", Desc = "" },
+                    records = records,
+                    TotalHours = totalHoursWBS,
+                    TotalHoursDay = totalHoursDay
+                };
                 list.Add(dto);
             }
+
+            // Adiciona linhas adicionais se houver menos de 4 linhas
+            while (list.Count < 4)
+            {
+                int posicaoInicial = 0;
+                double totalHoursWBS = 0d;
+                List<Record> records = new List<Record>();
+                for (int i = dayInit; i <= dayMax; i++)
+                {
+                    var record = new Record
+                    {
+                        Data = new DateTime(year, month, i),
+                        UserId = UserId,
+                        WBSId = 0 // Inicialmente sem WBS associada
+                    };
+                    records.Add(record);
+                    posicaoInicial++;
+                }
+                RecordDTO dto = new RecordDTO
+                {
+                    WBS = new WBS { WBSId = 0, Code = "", Desc = "" },
+                    records = records,
+                    TotalHours = totalHoursWBS,
+                    TotalHoursDay = totalHoursDay
+                };
+                list.Add(dto);
+            }
+
+            var wbsList = await _context.WBS.ToListAsync();
+
+            ViewBag.WBSList = wbsList.Select(wbs => new SelectListItem
+            {
+                Value = wbs.WBSId.ToString(),
+                Text = $"{wbs.Code} - {wbs.Desc}"
+            }).ToList();
+
             return View(await Task.FromResult(list));
         }
 
@@ -121,8 +178,24 @@ namespace MyTE.Controllers
                 List<Record> records = new List<Record>();
                 foreach (var item in listRecordDTO)
                 {
-                    records.AddRange(item.records);
+                    foreach (var record in item.records)
+                    {
+                        // Atribua a WBSId selecionada a cada registro
+                        records.Add(record);
+                    }
                 }
+
+                // Validação adicional para garantir que WBSId 0 só tenha horas iguais a 0
+                foreach (var record in records)
+                {
+                    if (record.WBSId == 0 && record.Hours != 0)
+                    {
+                        TempData["ErrorMessage"] = "Falha na validação dos registros.";
+                        TempData["ErrorMessageText"] = "Não é possível salvar horas na WBS vazia.";
+                        return RedirectToAction(nameof(Index));
+                    }
+                }
+
                 if (ValidateRecords(ConvertForMap(records)))
                 {
                     var userId = records.First().UserId;
@@ -175,7 +248,6 @@ namespace MyTE.Controllers
                         {
                             recordsToSave.Add(itemRecord);
                         }
-
                     }
                     TempData["SuccessMessage"] = "Registro de horas salvo com sucesso!";
                     _context.AddRange(recordsToSave);
@@ -188,7 +260,6 @@ namespace MyTE.Controllers
                     return RedirectToAction(nameof(Index));
                 }
             }
-            
             return RedirectToAction(nameof(Index));
         }
 
@@ -209,8 +280,8 @@ namespace MyTE.Controllers
                 }
                 if (item.Value > 24)
                 {
-                    TempData["ErrorMessageText"] = "A data " + item.Key + " possui uma quantidade superior ao máximo de horas de um dia (24 horas).";
-                    TempData["ErrorMessageText2"] = "Quantidade de horas registradas: " + item.Value;
+                    TempData["ErrorMessageText"] = "A data " + item.Key.Date.ToString("dd/MM") + " possui uma quantidade superior ao máximo";
+                    TempData["ErrorMessageText2"] = "de horas de um dia (24 horas). Quantidade de horas registradas: " + item.Value;
                     return false;
                 }
             }
@@ -237,6 +308,51 @@ namespace MyTE.Controllers
             }
             return myMap;
         }
+
+        [HttpPost]
+        public IActionResult Navigate(string direction)
+        {
+            var currentDate = DateTime.Now;
+
+            if (TempData["CurrentDate"] == null)
+            {
+                TempData["CurrentDate"] = currentDate.ToString("yyyy-MM-dd");
+            }
+            else
+            {
+                currentDate = DateTime.Parse(TempData["CurrentDate"].ToString());
+            }
+
+            if (direction == "previous")
+            {
+                if (currentDate.Day <= 15)
+                {
+                    currentDate = currentDate.AddMonths(-1);
+                    currentDate = new DateTime(currentDate.Year, currentDate.Month, 16);
+                }
+                else
+                {
+                    currentDate = new DateTime(currentDate.Year, currentDate.Month, 1);
+                }
+            }
+            else if (direction == "next")
+            {
+                if (currentDate.Day >= 16)
+                {
+                    currentDate = currentDate.AddMonths(1);
+                    currentDate = new DateTime(currentDate.Year, currentDate.Month, 1);
+                }
+                else
+                {
+                    currentDate = new DateTime(currentDate.Year, currentDate.Month, 16);
+                }
+            }
+
+            TempData["CurrentDate"] = currentDate.ToString("yyyy-MM-dd");
+            return RedirectToAction("Index", new { dataSearch = currentDate });
+        }
+    }
+}
 
 
         [Authorize(Policy = "RequerPerfilAdmin")]
@@ -315,4 +431,3 @@ namespace MyTE.Controllers
 
 
 }
-
