@@ -51,7 +51,7 @@ namespace MyTE.Controllers
             int year = 0;
             int month = 0;
             int day = 0;
-            if (dataSearch != null && dataSearch > StartDateRestriction)
+            if (dataSearch != null && dataSearch >= StartDateRestriction)
             {
                 year = dataSearch.Value.Year;
                 month = dataSearch.Value.Month;
@@ -351,10 +351,7 @@ namespace MyTE.Controllers
             TempData["CurrentDate"] = currentDate.ToString("yyyy-MM-dd");
             return RedirectToAction("Index", new { dataSearch = currentDate });
         }
-    }
-}
-
-
+    
         [Authorize(Policy = "RequerPerfilAdmin")]
         public async Task<IActionResult> AdminView(string searchString, DateTime? startDate, DateTime? endDate,int? pageNumber)
         {
@@ -428,6 +425,4 @@ namespace MyTE.Controllers
             return View(viewModel);
         }
     }
-
-
 }
