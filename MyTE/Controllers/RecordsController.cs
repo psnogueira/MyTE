@@ -57,7 +57,26 @@ namespace MyTE.Controllers
         {
             if (ModelState.IsValid)
             {
-                var records = listRecordDTO.SelectMany(item => item.records).ToList();
+                var records = new List<Record>();
+                foreach (var recordDTO in listRecordDTO)
+                {
+                    foreach (var record in recordDTO.records)
+                    {
+                        // Atribui a WBSId selecionada a cada registro
+                        records.Add(record);
+                    }
+                }
+
+                // Validação adicional para garantir que WBSId 0 só tenha horas iguais a 0
+                foreach (var record in records)
+                {
+                    if (record.WBSId == 0 && record.Hours != 0)
+                    {
+                        TempData["ErrorMessage"] = "Falha na validação dos registros.";
+                        TempData["ErrorMessageText"] = "Não é possível salvar horas na WBS vazia.";
+                        return RedirectToAction(nameof(Index));
+                    }
+                }
 
                 if (ValidateRecords(ConvertForMap(records)))
                 {
@@ -157,7 +176,7 @@ namespace MyTE.Controllers
 
             // Carrega os registros salvos do banco de dados
             var savedRecords = await _context.Record
-                .Where(r => r.UserId == UserId && r.Data.Year == year && r.Data.Month == month && r.Data.Day >= dayInit && r.Data.Day <= dayMax)
+                .Where(r => r.UserId == userId && r.Data.Year == year && r.Data.Month == month && r.Data.Day >= dayInit && r.Data.Day <= dayMax)
                 .ToListAsync();
 
             // Agrupa os registros por WBSId
@@ -183,7 +202,7 @@ namespace MyTE.Controllers
                         record = new Record
                         {
                             Data = new DateTime(year, month, i),
-                            UserId = UserId,
+                            UserId = userId,
                             WBSId = group.Key // Usa o WBSId do grupo
                         };
                         records.Add(record);
@@ -213,7 +232,7 @@ namespace MyTE.Controllers
                     var record = new Record
                     {
                         Data = new DateTime(year, month, i),
-                        UserId = UserId,
+                        UserId = userId,
                         WBSId = 0 // Inicialmente sem WBS associada
                     };
                     records.Add(record);
@@ -243,67 +262,20 @@ namespace MyTE.Controllers
 
         private async Task SaveRecordsAsync(List<Record> records)
         {
-            var userId = records.FirstOrDefault()?.UserId;
-            var startDate = records.Min(r => r.Data);
-            var endDate = records.Max(r => r.Data);
-
-            var existingRecords = await _context.Record.Where(r => r.UserId == userId && r.Data >= startDate && r.Data <= endDate).ToListAsync();
-
+            var recordsExclude = await _context.Record.Where(
+                            r => r.UserId == records[0].UserId
+                            && r.Data >= records[0].Data && r.Data <= records[records.Count() - 1].Data
+                        ).ToListAsync();
+            _context.Record.RemoveRange(recordsExclude);
             var recordsToSave = new List<Record>();
-
-            var recordsToDelete = new List<Record>();
-
-            foreach (var record in records)
+            foreach (var itemRecord in records)
             {
-                List<Record> records = new List<Record>();
-                foreach (var item in listRecordDTO)
+                if (itemRecord.Hours > 0)
                 {
-                    foreach (var record in item.records)
-                    {
-                        // Atribua a WBSId selecionada a cada registro
-                        records.Add(record);
-                    }
-                }
-
-                // Validação adicional para garantir que WBSId 0 só tenha horas iguais a 0
-                foreach (var record in records)
-                {
-                    if (record.WBSId == 0 && record.Hours != 0)
-                    {
-                        TempData["ErrorMessageText"] = "Falha na validação dos registros.";
-                        TempData["ErrorMessageText2"] = "Não é possível salvar horas na WBS vazia.";
-                        return RedirectToAction(nameof(Index));
-                    }
-                }
-
-                if (ValidateRecords(ConvertForMap(records)))
-                {
-                    if (record.Hours > 0)
-                    {
-                        existingRecord.Hours = record.Hours;
-                        recordsToSave.Add(existingRecord);
-                    }
-                    else
-                    {
-                        recordsToDelete.Add(existingRecord);
-                    }
-                }
-                else if (record.Hours > 0)
-                {
-                    recordsToSave.Add(record);
+                    recordsToSave.Add(itemRecord);
                 }
             }
-
-            if (recordsToSave.Any())
-            {
-                _context.Record.UpdateRange(recordsToSave);
-            }
-
-            if (recordsToDelete.Any())
-            {
-                _context.Record.RemoveRange(recordsToDelete);
-            }
-
+            _context.Record.AddRange(recordsToSave);
             await _context.SaveChangesAsync();
         }
 
