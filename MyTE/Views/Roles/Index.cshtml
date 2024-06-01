@@ -2,7 +2,7 @@
 @model IEnumerable<IdentityRole>
 
 @{
-    ViewData["Title"] = "Role";
+    ViewData["Title"] = "Níveis de Acesso";
     Layout = "~/Views/Shared/_LayoutCRUD.cshtml";
 }
 
@@ -43,13 +43,13 @@
     <div class="row my-3">
         <form class="col-5" asp-action="Index" method="get">
             <div class="form-actions input-group">
-                <input type="text" class="form-control col-3" id="roleName" name="SearchString" value="@ViewData["CurrentFilter"]" placeholder="Burcar por Id ou nome" />
+                <input type="text" class="form-control col-3" id="roleName" name="SearchString" value="@ViewData["CurrentFilter"]" placeholder="Burcar nome" />
                 <input class="btn btn-outline-primary" type="submit" value="Procurar" />
                 <a class="btn btn-outline-primary align-content-center" asp-action="Index">Lista completa</a>
             </div>
         </form>
         <div class="col d-flex justify-content-end">
-            <a asp-action="Create" class="btn btn-primary text-white"><i class="bi bi-plus-lg"></i> Nova Role</a>
+            <a asp-action="Create" class="btn btn-primary text-white"><i class="bi bi-plus-lg"></i> Novo Nível de Acesso</a>
         </div>
     </div>
 </div>
@@ -60,9 +60,6 @@
     <table class="table text-center align-middle">
         <thead>
             <tr>
-                <th class="col-2">
-                    @Html.DisplayNameFor(model => model.Id)
-                </th>
                 <th class="col-4">
                     @Html.DisplayNameFor(model => model.Name)
                 </th>
@@ -74,9 +71,6 @@
             @foreach (var item in Model)
             {
                 <tr>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Id)
-                    </td>
                     <td>
                         @Html.DisplayFor(modelItem => item.Name)
                     </td>
@@ -99,7 +93,7 @@
                     <div class="modal-dialog modal-dialog-centered">
                         <div class="modal-content">
                             <div class="modal-header align-items-center">
-                                <h3 class="text-primary fw-bold ">Detalhes da Role</h3>
+                                <h3 class="text-primary fw-bold ">Detalhes do nível de acesso</h3>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
                             <div class="modal-body">

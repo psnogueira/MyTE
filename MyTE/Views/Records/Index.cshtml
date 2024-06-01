@@ -1,19 +1,17 @@
 ﻿@model IEnumerable<MyTE.DTO.RecordDTO>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Registro de horas";
 }
 
 <div class="row align-items-center">
     <h1 class="col fw-bold display-4">Registro de Horas</h1>
     <div class="col d-flex justify-content-end" aria-label="Navegação de Data">
-        <!-- Botão Anterior -->
         <form asp-action="Navigate" method="post" class="">
             <input type="hidden" name="direction" value="previous" />
             <button type="submit" class="btn btn-primary"><i class="bi bi-arrow-left"></i></button>
         </form>
 
-        <!-- Input Data e Botão Ir Para -->
         <form asp-action="Index" method="post" class="mx-2">
             <div class="input-group">
                 <input type="date" name="dataSearch" class="text-center form-control" />
@@ -21,7 +19,6 @@
             </div>
         </form>
 
-        <!-- Botão Próxima -->
         <form asp-action="Navigate" method="post" class="">
             <input type="hidden" name="direction" value="next" />
             <button type="submit" class="btn btn-primary"><i class="bi bi-arrow-right"></i></button>
@@ -226,4 +223,5 @@
     document.addEventListener("DOMContentLoaded", function () {
         updateTotalsOnLoad();
     });
+
 </script>
