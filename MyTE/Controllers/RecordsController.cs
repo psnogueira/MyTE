@@ -130,7 +130,8 @@ namespace MyTE.Controllers
                         UserId = _userManager.GetUserId(User),
                         WBSId = group.Key,
                         SubmissionDate = DateTime.Now
-                    };
+                };
+                    
                     records.Add(record);
                 }
                 posicaoInicial++;
@@ -158,7 +159,8 @@ namespace MyTE.Controllers
                     {
                         Data = new DateTime(year, month, i),
                         UserId = userId,
-                        WBSId = 0
+                        WBSId = 0,
+                        SubmissionDate= DateTime.Now
                     });
                 }
                 list.Add(new RecordDTO
