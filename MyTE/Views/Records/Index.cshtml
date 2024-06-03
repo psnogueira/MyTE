@@ -102,7 +102,7 @@
                         <td class="fw-bold">
                             <input type="hidden" class="form-control fw-bold" value="@(Model.First().TotalHoursDay[@i])" readonly />
                             <span class="fw-bold" id="totalDay_@i">0.0</span>
-                            <div id="errorDay1_@i" class="text-danger" style="display: none;">A soma das horas trabalhadas em um dia não pode ultrapassar 24h.</div>
+                            <div id="errorDay1_@i" class="invalid-tooltip" style="display: none; top:initial;">A soma das horas trabalhadas em um dia não pode ultrapassar 24h.</div>
                         </td>
                     }
                 </tr>

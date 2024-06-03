@@ -42,9 +42,9 @@
     <div class="d-flex align-items-center justify-content-between my-3">
         <form asp-action="Index" method="get">
             <div class="form-actions input-group w-40rem">
-                @* <select class="form-control" asp-for="WBSType" asp-items="Model.Type">
-                <option value="">Todos</option>
-                </select> *@
+                <select class="form-control" asp-for="DepartmentType" asp-items="Model.Type">
+                    <option value="">Todos</option>
+                </select>
                 <input type="text" class="form-control w-25" name="SearchString" value="@ViewData["CurrentFilter"]" placeholder="Buscar por código ou descrição" id="autoComplete" data-table="Users" data-column1="FirstName" data-column2="Email" />
                 <input class="btn btn-outline-primary" type="submit" value="Procurar" />
 
