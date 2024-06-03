@@ -8,10 +8,10 @@ using MyTE.DTO;
 using MyTE.Models;
 using MyTE.Models.ViewModel;
 using MyTE.Pagination;
-using Newtonsoft.Json;
-using System.Drawing.Printing;
-using System.Globalization;
-using System.Text;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace MyTE.Controllers
 {
@@ -60,60 +60,7 @@ namespace MyTE.Controllers
 
                 if (ValidateRecords(ConvertForMap(records)))
                 {
-                    var userId = records.First().UserId;
-                    var user = await _userManager.FindByIdAsync(userId);
-                    var userEmail = user.Email;
-                    var employeeName = user.FullName;
-                    var departmentId = user.DepartmentId;
-                    var startDate = records.Min(r => r.Data);
-                    var endDate = records.Max(r => r.Data);
-                    var totalHours = records.Sum(r => r.Hours);
-
-                    // Check if a biweekly record already exists for this user and period
-                    var existingRecord = await _context.BiweeklyRecords
-                        .Include(b => b.Records)
-                        .FirstOrDefaultAsync(b => b.UserEmail == userEmail && b.StartDate == startDate && b.EndDate == endDate && b.EmployeeName == employeeName && b.DepartmentId == departmentId);
-
-                    if (existingRecord != null)
-                    {
-                        // Update existing record
-                        existingRecord.TotalHours = totalHours;
-                        existingRecord.Records = records;
-
-                        _context.Update(existingRecord);
-                    }
-                    else
-                    {
-                        // Create a new record
-                        var biweeklyRecord = new BiweeklyRecord
-                        {
-                            UserEmail = userEmail,
-                            EmployeeName = employeeName,
-                            DepartmentId = departmentId,
-                            StartDate = startDate,
-                            EndDate = endDate,
-                            TotalHours = totalHours,
-                            Records = records
-                        };
-
-                        _context.BiweeklyRecords.Add(biweeklyRecord);
-                    }
-
-                    var recordsExclude = await _context.Record.Where(
-                        r => r.UserId == userId
-                        && r.Data >= startDate && r.Data <= endDate
-                    ).ToListAsync();
-
-                    _context.Record.RemoveRange(recordsExclude);
-                    var recordsToSave = new List<Record>();
-                    foreach (var itemRecord in records)
-                    {
-                        if (itemRecord.Hours > 0)
-                        {
-                            recordsToSave.Add(itemRecord);
-                        }
-
-                    }
+                    await SaveRecords(records);
                     TempData["SuccessMessage"] = "Registro de horas salvo com sucesso!";
                 }
                 else
@@ -241,6 +188,7 @@ namespace MyTE.Controllers
             var user = await _userManager.FindByIdAsync(userId);
             var userEmail = user.Email;
             var employeeName = user.FullName;
+            var departmentId = user.DepartmentId;
             var startDate = records.Min(r => r.Data);
             var endDate = records.Max(r => r.Data);
             var totalHours = records.Sum(r => r.Hours);
@@ -261,7 +209,7 @@ namespace MyTE.Controllers
             // Atualiza ou cria um novo registro quinzenal
             var existingRecord = await _context.BiweeklyRecords
                 .Include(b => b.Records)
-                .FirstOrDefaultAsync(b => b.UserEmail == userEmail && b.StartDate == startDate && b.EndDate == endDate && b.EmployeeName == employeeName);
+                .FirstOrDefaultAsync(b => b.UserEmail == userEmail && b.StartDate == startDate && b.EndDate == endDate && b.EmployeeName == employeeName && b.DepartmentId == departmentId);
 
             if (existingRecord != null)
             {
@@ -275,6 +223,7 @@ namespace MyTE.Controllers
                 {
                     UserEmail = userEmail,
                     EmployeeName = employeeName,
+                    DepartmentId = departmentId,
                     StartDate = startDate,
                     EndDate = endDate,
                     TotalHours = totalHours,
@@ -345,19 +294,19 @@ namespace MyTE.Controllers
         }
 
         [Authorize(Policy = "RequerPerfilAdmin")]
-        public async Task<IActionResult> AdminView(string searchString, DateTime? startDate, DateTime? endDate,int? pageNumber, int? departmentType)
+        public async Task<IActionResult> AdminView(string searchString, DateTime? startDate, DateTime? endDate, int? pageNumber, int? departmentType)
         {
             var pageSize = 5;
             ViewData["CurrentFilter"] = searchString;
             ViewData["CurrentStartDate"] = startDate?.ToString("yyyy-MM-dd");
             ViewData["CurrentEndDate"] = endDate?.ToString("yyyy-MM-dd");
-            ViewData["DepartmentType"] = departmentType; // Adicionar o departamento selecionado
+            ViewData["DepartmentType"] = departmentType;
 
             var biweeklyRecords = _context.BiweeklyRecords
-                                    .Include(b => b.Records)    
-                                    .Include(b => b.Department)
-                                    .OrderByDescending(r => r.StartDate)
-                                    .AsQueryable();
+                .Include(b => b.Records)
+                .Include(b => b.Department)
+                .OrderByDescending(r => r.StartDate)
+                .AsQueryable();
 
             var departments = await _context.Department.ToListAsync();
             var departmentList = departments.Select(d => new SelectListItem
@@ -366,11 +315,10 @@ namespace MyTE.Controllers
                 Text = d.Name
             }).ToList();
 
+            // Filtros de busca
             if (!string.IsNullOrEmpty(searchString))
             {
-                biweeklyRecords = biweeklyRecords
-                    .Where(r => r.UserEmail.Contains(searchString) ||
-                                r.EmployeeName.Contains(searchString));
+                biweeklyRecords = biweeklyRecords.Where(r => r.UserEmail.Contains(searchString));
             }
 
             if (startDate.HasValue && endDate.HasValue)
@@ -393,9 +341,11 @@ namespace MyTE.Controllers
 
             var totalHours = await biweeklyRecords.SumAsync(b => b.TotalHours);
 
+            // Criação do ViewModel para a View de Administração
             var viewModel = new AdminViewModel
             {
-                ReportsList = await PaginatedList<BiweeklyRecord>.CreateAsync(biweeklyRecords.AsNoTracking(), pageNumber ?? 1, pageSize),
+                ReportsList = await PaginatedList<BiweeklyRecord>
+                .CreateAsync(biweeklyRecords.AsNoTracking(), pageNumber ?? 1, pageSize),
                 CurrentFilter = searchString,
                 TotalHours = totalHours,
                 BiweeklyRecord = new BiweeklyRecord(),

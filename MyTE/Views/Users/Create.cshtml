@@ -1,6 +1,6 @@
 ﻿@model CreateUserViewModel
 @{
-
+    Layout = "~/Views/Shared/_LayoutRegister.cshtml";
 }
 
 <div class="d-flex flex-wrap justify-content-between">
@@ -63,8 +63,8 @@
             <button type="submit" class="btn btn-primary btn-lg fw-bold w-100">Cadastrar</button>
         </form>
     </div>
-    <div class="col-md-6  overflow-hidden">
-        <img class="img-fluid" src="~/img/Art.jpg" alt="Arte decorativa" />
+    <div class="col-md-6 d-none d-md-block">
+        <img class="img-fluid createImage w-100" src="~/img/Art.jpg" alt="Arte decorativa" />
     </div>
 </div>
 
