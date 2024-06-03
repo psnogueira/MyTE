@@ -95,6 +95,7 @@ namespace MyTE.Controllers
                         record.Data = new DateTime(year, month, i);
                         record.UserId = UserId;
                         record.WBSId = wbs.WBSId;
+                        record.SubmissionDate = DateTime.Now;
                         records.Add(record);
                     }
                     posicaoInicial++;
@@ -178,8 +179,7 @@ namespace MyTE.Controllers
 
                     }
                     TempData["SuccessMessage"] = "Registro de horas salvo com sucesso!";
-                    _context.AddRange(recordsToSave);
-                    _context.Record.AddRange(records);
+                    _context.Record.AddRange(recordsToSave);
                     await _context.SaveChangesAsync();
                 }
                 else

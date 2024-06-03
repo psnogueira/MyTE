@@ -25,6 +25,9 @@ namespace MyTE.Models
         [Range(0, 24, ErrorMessage = "A quantidade de horas deve estar entre 0 e 24.")]
         public double Hours { get; set; }
 
+        [DataType(DataType.Date)]
+        public DateTime SubmissionDate { get; set; }
+
         public Record()
         { }
 
