@@ -9,18 +9,21 @@
     <h1 class="fw-bold display-2 text-white mb-3">@ViewData["Title"]</h1>
     <div class="d-flex align-items-center justify-content-between my-3">
         <form asp-action="AdminView" method="get" class="w-100">
-            <div class="form-actions input-group row w-75">
-                <input type="text" class="form-control col-sm-7" name="SearchString" value="@ViewData["CurrentFilter"]" placeholder="Buscar por nome ou email" id="autoComplete" data-table="BiweeklyRecords" data-column1="EmployeeName" data-column2="UserEmail" />
-                <input type="date" class="form-control col-sm-1" name="StartDate" value="@ViewData["CurrentStartDate"]" placeholder="Data Inicial" />
-                <input type="date" class="form-control col-sm-1" name="EndDate" value="@ViewData["CurrentEndDate"]" placeholder="Data Inicial" />
-                <input class="btn btn-outline-primary col-sm-1" type="submit" value="Procurar" />
+            <div class="form-actions input-group d-flex">
+                <select class="form-control" name="departmentType" asp-for="DepartmentType" asp-items="Model.DepartmentList">
+                    <option value="0">Todos</option>
+                </select>
+                <input type="text" class="form-control flex-grow-2" name="SearchString" value="@ViewData["CurrentFilter"]" placeholder="Buscar por nome ou email" id="autoComplete" data-table="BiweeklyRecords" data-column1="EmployeeName" data-column2="UserEmail" />
+                <input type="date" class="form-control " name="StartDate" value="@ViewData["CurrentStartDate"]" placeholder="Data Inicial" />
+                <input type="date" class="form-control " name="EndDate" value="@ViewData["CurrentEndDate"]" placeholder="Data Inicial" />
+                <input class="btn btn-outline-primary " type="submit" value="Procurar" />
                 <a class="btn btn-outline-primary align-content-center col-sm-2" asp-action="AdminView">Lista completa</a>
             </div>
         </form>
     </div>
 </div>
 
-<img class="position-absolute object-fit-cover w-100 h-20rem top-0 z-n1" src="~/img/ArtH3.jpg" alt="Arte ilustrativa" />
+<img class="position-absolute object-fit-cover w-100 h-20rem top-0 z-n1" src="~/img/ArtHz.jpg" alt="Arte ilustrativa" />
 
 <div class="bg-white container rounded table-responsive">
     <form id="exportForm" method="post">
@@ -30,8 +33,9 @@
                     <th>
                         <input type="checkbox" id="selectAll" class="t form-check-input" />
                     </th>
-                    <th>Usuário</th>
                     <th>Nome</th>
+                    <th>Usuário</th>
+                    <th>Departamento</th>
                     <th>Período</th>
                     <th>Total de Horas</th>
                     <th>Detalhes</th>
@@ -44,8 +48,9 @@
                         <td>
                             <input type="checkbox" name="selectedReports" value="@record.BiweeklyRecordId" class="form-check-input" />
                         </td>
-                        <td>@record.UserEmail</td>
                         <td class="text-capitalize">@record.EmployeeName</td>
+                        <td>@record.UserEmail</td>
+                        <td>@record.Department?.Name</td>
                         <td>@record.StartDate.ToString("dd/MM/yyyy") - @record.EndDate.ToString("dd/MM/yyyy")</td>
                         <td>@record.TotalHours</td>
                         <td>
@@ -120,6 +125,14 @@
         document.getElementById("exportForm").addEventListener("submit", function (event) {
             saveSelections();
             const selectedIds = JSON.parse(localStorage.getItem('selectedReports')) || [];
+
+            // Verifica se existe pelo menos 1 item selecionado
+            if (selectedIds.length === 0) {
+                event.preventDefault();
+                alert("Por favor, selecione pelo menos um item para exportar.");
+                return;
+            }
+
             const hiddenInput = document.createElement('input');
             hiddenInput.type = 'hidden';
             hiddenInput.name = 'selectedReportIds';
@@ -187,7 +200,6 @@
                 }
             });
         });
-
 
     </script>
 }

@@ -1,4 +1,5 @@
-﻿using MyTE.Pagination;
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
+using MyTE.Pagination;
 
 namespace MyTE.Models.ViewModel
 {
@@ -24,5 +25,7 @@ namespace MyTE.Models.ViewModel
         public double TotalHours { get; set; }
         public DateTime? CurrentStartDate { get; set; }
         public DateTime? CurrentEndDate { get; set;}
+        public int? DepartmentType { get; set; } // Adicionar a propriedade DepartmentType
+        public List<SelectListItem> DepartmentList { get; set; } // Adicionar a propriedade DepartmentList
     }
 }

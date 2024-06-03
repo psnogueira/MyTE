@@ -1,4 +1,6 @@
-﻿namespace MyTE.Models
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace MyTE.Models
 {
     public class BiweeklyRecord
     {
@@ -9,5 +11,8 @@
         public DateTime EndDate { get; set; }
         public double TotalHours { get; set; }
         public List<Record> Records { get; set; }
+        public int DepartmentId { get; set; }
+        [ForeignKey("DepartmentId")]
+        public Department Department { get; set; }
     }
 }

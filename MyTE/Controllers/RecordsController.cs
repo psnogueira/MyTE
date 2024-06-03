@@ -132,6 +132,7 @@ namespace MyTE.Controllers
                     var user = await _userManager.FindByIdAsync(userId);
                     var userEmail = user.Email;
                     var employeeName = user.FullName;
+                    var departmentId = user.DepartmentId;
                     var startDate = records.Min(r => r.Data);
                     var endDate = records.Max(r => r.Data);
                     var totalHours = records.Sum(r => r.Hours);
@@ -139,7 +140,7 @@ namespace MyTE.Controllers
                     // Check if a biweekly record already exists for this user and period
                     var existingRecord = await _context.BiweeklyRecords
                         .Include(b => b.Records)
-                        .FirstOrDefaultAsync(b => b.UserEmail == userEmail && b.StartDate == startDate && b.EndDate == endDate && b.EmployeeName == employeeName);
+                        .FirstOrDefaultAsync(b => b.UserEmail == userEmail && b.StartDate == startDate && b.EndDate == endDate && b.EmployeeName == employeeName && b.DepartmentId == departmentId);
 
                     if (existingRecord != null)
                     {
@@ -156,6 +157,7 @@ namespace MyTE.Controllers
                         {
                             UserEmail = userEmail,
                             EmployeeName = employeeName,
+                            DepartmentId = departmentId,
                             StartDate = startDate,
                             EndDate = endDate,
                             TotalHours = totalHours,
@@ -243,19 +245,28 @@ namespace MyTE.Controllers
 
 
         [Authorize(Policy = "RequerPerfilAdmin")]
-        public async Task<IActionResult> AdminView(string searchString, DateTime? startDate, DateTime? endDate,int? pageNumber)
+        public async Task<IActionResult> AdminView(string searchString, DateTime? startDate, DateTime? endDate,int? pageNumber, int? departmentType)
         {
             var pageSize = 5;
             ViewData["CurrentFilter"] = searchString;
             ViewData["CurrentStartDate"] = startDate?.ToString("yyyy-MM-dd");
             ViewData["CurrentEndDate"] = endDate?.ToString("yyyy-MM-dd");
+            ViewData["DepartmentType"] = departmentType; // Adicionar o departamento selecionado
 
             var biweeklyRecords = _context.BiweeklyRecords
-                                    .Include(b => b.Records)                                    
+                                    .Include(b => b.Records)    
+                                    .Include(b => b.Department)
                                     .OrderByDescending(r => r.StartDate)
                                     .AsQueryable();
 
-            if(!string.IsNullOrEmpty(searchString))
+            var departments = await _context.Department.ToListAsync();
+            var departmentList = departments.Select(d => new SelectListItem
+            {
+                Value = d.DepartmentId.ToString(),
+                Text = d.Name
+            }).ToList();
+
+            if (!string.IsNullOrEmpty(searchString))
             {
                 biweeklyRecords = biweeklyRecords
                     .Where(r => r.UserEmail.Contains(searchString) ||
@@ -275,6 +286,11 @@ namespace MyTE.Controllers
                 biweeklyRecords = biweeklyRecords.Where(d => d.EndDate <= endDate.Value);
             }
 
+            if (departmentType.HasValue && departmentType != 0)
+            {
+                biweeklyRecords = biweeklyRecords.Where(d => d.DepartmentId == departmentType);
+            }
+
             var totalHours = await biweeklyRecords.SumAsync(b => b.TotalHours);
 
             var viewModel = new AdminViewModel
@@ -284,6 +300,8 @@ namespace MyTE.Controllers
                 CurrentFilter = searchString,
                 TotalHours = totalHours,
                 BiweeklyRecord = new BiweeklyRecord(),
+                DepartmentType = departmentType, // Adicionar departamento selecionado ao ViewModel
+                DepartmentList = departmentList // Adicionar a lista de departamentos ao ViewModel
             };
 
 
