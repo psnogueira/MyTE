@@ -14,7 +14,7 @@
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow">
             <div class="container-fluid">
-                <a asp-area="" asp-controller="Home" asp-action="Index" class="logo-sm navbar-brand"><img src="~/img/logo.png" alt="Logo" /> MyTE</a>
+                <a asp-area="" asp-controller="Records" asp-action="Index" class="logo-sm navbar-brand"><img src="~/img/logo.png" alt="Logo" /> MyTE</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -22,22 +22,22 @@
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Records" asp-action="Index">Registro de Horas</a>
+                            <a class="nav-link text-dark @(ViewContext.RouteData.Values["Controller"].ToString() == "Index" ? "active" : "")" asp-area="" asp-controller="Records" asp-action="Index">Registro de Horas</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Roles" asp-action="Index">Níveis de Acesso</a>
+                            <a class="nav-link text-dark @(ViewContext.RouteData.Values["Controller"].ToString() == "Roles" ? "active" : "")" asp-area="" asp-controller="Roles" asp-action="Index">Níveis de Acesso</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Users" asp-action="Index">Usuários</a>
+                            <a class="nav-link text-dark @(ViewContext.RouteData.Values["Controller"].ToString() == "Users" ? "active" : "")" asp-area="" asp-controller="Users" asp-action="Index">Usuários</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="WBS" asp-action="Index">WBS</a>
+                            <a class="nav-link text-dark @(ViewContext.RouteData.Values["Controller"].ToString() == "WBS" ? "active" : "")" asp-area="" asp-controller="WBS" asp-action="Index">WBS</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Departments" asp-action="Index">Departamentos</a>
+                            <a class="nav-link text-dark @(ViewContext.RouteData.Values["Controller"].ToString() == "Departments" ? "active" : "")" asp-area="" asp-controller="Departments" asp-action="Index">Departamentos</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Records" asp-action="AdminView">Relatórios</a>
+                            <a class="nav-link text-dark @(ViewContext.RouteData.Values["Action"].ToString() == "AdminView" ? "active" : "")" asp-area="" asp-controller="Records" asp-action="AdminView">Relatórios</a>
                         </li>
                     </ul>
                     <partial name="_LoginPartial" />
