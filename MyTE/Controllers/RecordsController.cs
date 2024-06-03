@@ -117,6 +117,7 @@ namespace MyTE.Controllers
                 var record = group.FirstOrDefault(r => r.Data.Day == i);
                 if (record != null)
                 {
+                    record.SubmissionDate = DateTime.Now;
                     totalHoursWBS += record.Hours;
                     records.Add(record);
                     totalHoursDay[posicaoInicial] += record.Hours;
@@ -127,7 +128,8 @@ namespace MyTE.Controllers
                     {
                         Data = new DateTime(year, month, i),
                         UserId = _userManager.GetUserId(User),
-                        WBSId = group.Key
+                        WBSId = group.Key,
+                        SubmissionDate = DateTime.Now
                     };
                     records.Add(record);
                 }
