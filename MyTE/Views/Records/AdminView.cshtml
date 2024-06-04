@@ -7,20 +7,34 @@
 
 <div class="container mt-3">
     <h1 class="fw-bold display-2 text-white mb-3">@ViewData["Title"]</h1>
-    <div class="d-flex align-items-center justify-content-between my-3">
-        <form asp-action="AdminView" method="get" class="w-100">
-            <div class="form-actions input-group d-flex">
-                <select class="form-control" name="departmentType" asp-for="DepartmentType" asp-items="Model.DepartmentList">
+    <form asp-action="AdminView" method="get">
+        <div class="row align-items-center gx-0 gy-1 my-3">
+            <div class="col-md-auto">
+                <select class="form-control rounded-start-2 rounded-end-0" name="departmentType" asp-for="DepartmentType" asp-items="Model.DepartmentList">
                     <option value="0">Todos</option>
                 </select>
-                <input type="text" class="form-control flex-grow-2" name="SearchString" value="@ViewData["CurrentFilter"]" placeholder="Buscar por nome ou email" id="autoComplete" data-table="BiweeklyRecords" data-column1="EmployeeName" data-column2="UserEmail" />
-                <input type="date" class="form-control " name="StartDate" value="@ViewData["CurrentStartDate"]" placeholder="Data Inicial" />
-                <input type="date" class="form-control " name="EndDate" value="@ViewData["CurrentEndDate"]" placeholder="Data Inicial" />
-                <input class="btn btn-outline-primary " type="submit" value="Procurar" />
-                <a class="btn btn-outline-primary align-content-center col-sm-2" asp-action="AdminView">Lista completa</a>
             </div>
-        </form>
-    </div>
+            <div class="col-md">
+                <input type="text" class="form-control rounded-0" name="SearchString" value="@ViewData["CurrentFilter"]" placeholder="Buscar por nome ou email" id="autoComplete" data-table="BiweeklyRecords" data-column1="EmployeeName" data-column2="UserEmail" />
+            </div>
+            <div class="col-md-auto">
+                <input type="date" class="form-control rounded-0" name="StartDate" value="@ViewData["CurrentStartDate"]" placeholder="Data Inicial" />
+            </div>
+            <div class="col-md-auto">
+                <input type="date" class="form-control rounded-0" name="EndDate" value="@ViewData["CurrentEndDate"]" placeholder="Data Inicial" />
+            </div>
+            <div class="col-md-auto">
+                <input class="btn btn-outline-primary rounded-0" type="submit" value="Procurar" />
+            </div>
+            <div class="col-md-auto">
+                <a class="btn btn-outline-primary rounded-start-0 rounded-end-2" asp-action="AdminView">Lista completa</a>
+            </div>
+        </div>
+    </form>
+
+
+
+
 </div>
 
 <img class="position-absolute object-fit-cover w-100 h-20rem top-0 z-n1" src="~/img/ArtHz.jpg" alt="Arte ilustrativa" />

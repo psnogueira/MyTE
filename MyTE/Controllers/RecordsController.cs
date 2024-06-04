@@ -60,60 +60,7 @@ namespace MyTE.Controllers
 
                 if (ValidateRecords(ConvertForMap(records)))
                 {
-                    var userId = records.First().UserId;
-                    var user = await _userManager.FindByIdAsync(userId);
-                    var userEmail = user.Email;
-                    var employeeName = user.FullName;
-                    var departmentId = user.DepartmentId;
-                    var startDate = records.Min(r => r.Data);
-                    var endDate = records.Max(r => r.Data);
-                    var totalHours = records.Sum(r => r.Hours);
-
-                    // Check if a biweekly record already exists for this user and period
-                    var existingRecord = await _context.BiweeklyRecords
-                        .Include(b => b.Records)
-                        .FirstOrDefaultAsync(b => b.UserEmail == userEmail && b.StartDate == startDate && b.EndDate == endDate && b.EmployeeName == employeeName && b.DepartmentId == departmentId);
-
-                    if (existingRecord != null)
-                    {
-                        // Update existing record
-                        existingRecord.TotalHours = totalHours;
-                        existingRecord.Records = records;
-
-                        _context.Update(existingRecord);
-                    }
-                    else
-                    {
-                        // Create a new record
-                        var biweeklyRecord = new BiweeklyRecord
-                        {
-                            UserEmail = userEmail,
-                            EmployeeName = employeeName,
-                            DepartmentId = departmentId,
-                            StartDate = startDate,
-                            EndDate = endDate,
-                            TotalHours = totalHours,
-                            Records = records
-                        };
-
-                        _context.BiweeklyRecords.Add(biweeklyRecord);
-                    }
-
-                    var recordsExclude = await _context.Record.Where(
-                        r => r.UserId == userId
-                        && r.Data >= startDate && r.Data <= endDate
-                    ).ToListAsync();
-
-                    _context.Record.RemoveRange(recordsExclude);
-                    var recordsToSave = new List<Record>();
-                    foreach (var itemRecord in records)
-                    {
-                        if (itemRecord.Hours > 0)
-                        {
-                            recordsToSave.Add(itemRecord);
-                        }
-
-                    }
+                    await SaveRecords(records);
                     TempData["SuccessMessage"] = "Registro de horas salvo com sucesso!";
                 }
                 else
@@ -242,6 +189,7 @@ namespace MyTE.Controllers
             var userId = records.First().UserId;
             var user = await _userManager.FindByIdAsync(userId);
             var userEmail = user.Email;
+            var departmentId = user.DepartmentId;
             var employeeName = user.FullName;
             var startDate = records.Min(r => r.Data);
             var endDate = records.Max(r => r.Data);
@@ -263,7 +211,11 @@ namespace MyTE.Controllers
             // Atualiza ou cria um novo registro quinzenal
             var existingRecord = await _context.BiweeklyRecords
                 .Include(b => b.Records)
-                .FirstOrDefaultAsync(b => b.UserEmail == userEmail && b.StartDate == startDate && b.EndDate == endDate && b.EmployeeName == employeeName);
+                .FirstOrDefaultAsync(b => b.UserEmail == userEmail 
+                && b.StartDate == startDate 
+                && b.EndDate == endDate 
+                && b.EmployeeName == employeeName 
+                && b.DepartmentId == departmentId);
 
             if (existingRecord != null)
             {
@@ -277,6 +229,7 @@ namespace MyTE.Controllers
                 {
                     UserEmail = userEmail,
                     EmployeeName = employeeName,
+                    DepartmentId = departmentId,
                     StartDate = startDate,
                     EndDate = endDate,
                     TotalHours = totalHours,
