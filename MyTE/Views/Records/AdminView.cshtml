@@ -7,67 +7,98 @@
 
 <div class="container mt-3">
     <h1 class="fw-bold display-2 text-white mb-3">@ViewData["Title"]</h1>
-    <div class="d-flex align-items-center justify-content-between my-3">
-        <form asp-action="AdminView" method="get" class="w-100">
-            <div class="form-actions input-group w-50rem">
-
-                <input type="text" class="form-control w-15" name="SearchString" value="@ViewData["CurrentFilter"]" placeholder="Buscar por nome ou email" id="autoComplete" data-table="BiweeklyRecords" data-column1="EmployeeName" data-column2="UserEmail" />
-                <input type="date" class="form-control" name="StartDate" value="@ViewData["CurrentStartDate"]" placeholder="Data Inicial" />
-                <input type="date" class="form-control " name="EndDate" value="@ViewData["CurrentEndDate"]" placeholder="Data Inicial" />
-                
-                <input class="btn btn-outline-primary " type="submit" value="Procurar" />
-
-                <a class="btn btn-outline-primary align-content-center " asp-action="AdminView">Lista completa</a>
+    <form asp-action="AdminView" method="get">
+        <div class="row align-items-center gx-0 gy-1 my-3">
+            <div class="col-md-auto">
+                <select class="form-control rounded-start-2 rounded-end-0" name="departmentType" asp-for="DepartmentType" asp-items="Model.DepartmentList">
+                    <option value="0">Todos</option>
+                </select>
             </div>
-        </form>
-    </div>
+            <div class="col-md">
+                <input type="text" class="form-control rounded-0" name="SearchString" value="@ViewData["CurrentFilter"]" placeholder="Buscar por nome ou email" id="autoComplete" data-table="BiweeklyRecords" data-column1="EmployeeName" data-column2="UserEmail" />
+            </div>
+            <div class="col-md-auto">
+                <input type="date" class="form-control rounded-0" name="StartDate" value="@ViewData["CurrentStartDate"]" placeholder="Data Inicial" />
+            </div>
+            <div class="col-md-auto">
+                <input type="date" class="form-control rounded-0" name="EndDate" value="@ViewData["CurrentEndDate"]" placeholder="Data Inicial" />
+            </div>
+            <div class="col-md-auto">
+                <input class="btn btn-outline-primary rounded-0" type="submit" value="Procurar" />
+            </div>
+            <div class="col-md-auto">
+                <a class="btn btn-outline-primary rounded-start-0 rounded-end-2" asp-action="AdminView">Lista completa</a>
+            </div>
+        </div>
+    </form>
+
+
+
+
 </div>
 
 <img class="position-absolute object-fit-cover w-100 h-20rem top-0 z-n1" src="~/img/ArtHz.jpg" alt="Arte ilustrativa" />
 
 <div class="bg-white container rounded table-responsive">
-    <table class="table text-center align-middle">
-        <thead>
-            <tr>
-                <th>Usuário</th>
-                <th>Nome</th>
-                <th>Período</th>
-                <th>Total de Horas</th>
-                <th>Detalhes</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var record in Model.ReportsList)
-            {
+    <form id="exportForm" method="post">
+        <table class="table text-center align-middle">
+            <thead>
                 <tr>
-                    <td>@record.UserEmail</td>
-                    <td class="text-capitalize">@record.EmployeeName</td>
-                    <td>@record.StartDate.ToString("dd/MM/yyyy") - @record.EndDate.ToString("dd/MM/yyyy")</td>
-                    <td>@record.TotalHours</td>
-                    <td>
-                        <a asp-action="ViewDetails" asp-route-id="@record.BiweeklyRecordId" class="btn btn-primary">
-                            Detalhes
-                        </a>
-                    </td>
+                    <th>
+                        <input type="checkbox" id="selectAll" class="t form-check-input" />
+                    </th>
+                    <th>Nome</th>
+                    <th>Usuário</th>
+                    <th>Departamento</th>
+                    <th>Período</th>
+                    <th>Total de Horas</th>
+                    <th>Detalhes</th>
                 </tr>
-            }
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                @foreach (var record in Model.ReportsList)
+                {
+                    <tr>
+                        <td>
+                            <input type="checkbox" name="selectedReports" value="@record.BiweeklyRecordId" class="form-check-input" />
+                        </td>
+                        <td class="text-capitalize">@record.EmployeeName</td>
+                        <td>@record.UserEmail</td>
+                        <td>@record.Department?.Name</td>
+                        <td>@record.StartDate.ToString("dd/MM/yyyy") - @record.EndDate.ToString("dd/MM/yyyy")</td>
+                        <td>@record.TotalHours</td>
+                        <td>
+                            <a asp-action="ViewDetails" asp-route-id="@record.BiweeklyRecordId" class="btn btn-primary">
+                                Detalhes
+                            </a>
+                        </td>
+                    </tr>
+                }
+                <tr>
+                    <td><button type="submit" class="btn btn-primary">Exportar para CSV</button></td>
+                    <td colspan="3"><strong>Total de Horas</strong></td>
+                    <td><strong>@Model.TotalHours</strong></td>
+                    <td></td>
+                </tr>
+            </tbody>
+        </table>
+
+    </form>
 </div>
 
 <nav aria-label="Page navigation example" class="container mt-4">
     <ul class="pagination">
         <li class="page-item @(Model.ReportsList.HasPreviousPage ? "" : "disabled")">
-            <a class="page-link" asp-action="Index" asp-route-pageNumber="@(Model.ReportsList.PageIndex - 1)" asp-route-searchString="@Model.CurrentFilter">Anterior</a>
+            <a class="page-link" asp-action="AdminView" asp-route-pageNumber="@(Model.ReportsList.PageIndex - 1)" asp-route-searchString="@Model.CurrentFilter">Anterior</a>
         </li>
         @for (int i = 1; i <= Model.ReportsList.TotalPages; i++)
         {
             <li class="page-item @(i == Model.ReportsList.PageIndex ? "active" : "")">
-                <a class="page-link" asp-action="Index" asp-route-pageNumber="@i" asp-route-searchString="@Model.CurrentFilter">@i</a>
+                <a class="page-link" asp-action="AdminView" asp-route-pageNumber="@i" asp-route-searchString="@Model.CurrentFilter">@i</a>
             </li>
         }
         <li class="page-item @(Model.ReportsList.HasNextPage ? "" : "disabled")">
-            <a class="page-link" asp-action="Index" asp-route-pageNumber="@(Model.ReportsList.PageIndex + 1)" asp-route-searchString="@Model.CurrentFilter">Próxima</a>
+            <a class="page-link" asp-action="AdminView" asp-route-pageNumber="@(Model.ReportsList.PageIndex + 1)" asp-route-searchString="@Model.CurrentFilter">Próxima</a>
         </li>
     </ul>
 </nav>
@@ -76,4 +107,114 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+    <script>
+        // Função para salvar seleções no local storage
+        function saveSelections() {
+            const checkboxes = document.querySelectorAll('.form-check-input');
+            const selectedIds = JSON.parse(localStorage.getItem('selectedReports')) || [];
+            checkboxes.forEach(checkbox => {
+                const id = checkbox.value;
+                if (checkbox.checked && !selectedIds.includes(id)) {
+                    selectedIds.push(id);
+                } else if (!checkbox.checked && selectedIds.includes(id)) {
+                    const index = selectedIds.indexOf(id);
+                    selectedIds.splice(index, 1);
+                }
+            });
+            localStorage.setItem('selectedReports', JSON.stringify(selectedIds));
+        }
+
+        // Função para restaurar seleções do local storage
+        function restoreSelections() {
+            const selectedIds = JSON.parse(localStorage.getItem('selectedReports')) || [];
+            const checkboxes = document.querySelectorAll('.form-check-input');
+            checkboxes.forEach(checkbox => {
+                if (selectedIds.includes(checkbox.value)) {
+                    checkbox.checked = true;
+                }
+            });
+        }
+
+        // Evento para salvar seleções antes do envio do formulário
+        document.getElementById("exportForm").addEventListener("submit", function (event) {
+            saveSelections();
+            const selectedIds = JSON.parse(localStorage.getItem('selectedReports')) || [];
+
+            // Verifica se existe pelo menos 1 item selecionado
+            if (selectedIds.length === 0) {
+                event.preventDefault();
+                alert("Por favor, selecione pelo menos um item para exportar.");
+                return;
+            }
+
+            const hiddenInput = document.createElement('input');
+            hiddenInput.type = 'hidden';
+            hiddenInput.name = 'selectedReportIds';
+            hiddenInput.value = JSON.stringify(selectedIds);
+            this.appendChild(hiddenInput);
+        });
+
+        // Evento para selecionar/desmarcar todos os checkboxes
+        document.getElementById("selectAll").addEventListener("click", function () {
+            const checkboxes = document.querySelectorAll('input[name="selectedReports"]');
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = this.checked;
+            });
+            saveSelections();
+        });
+
+        // Salvar seleções ao marcar/desmarcar individualmente
+        document.querySelectorAll('.form-check-input').forEach(checkbox => {
+            checkbox.addEventListener('change', saveSelections);
+        });
+
+        // Limpar seleções ao sair da admin view
+        window.addEventListener('unload', function (event) {
+            // Verificar se a nova URL não está na admin view
+            if (!event.currentTarget.location.href.includes("/Admin")) {
+                localStorage.removeItem('selectedReports');
+            }
+        });
+
+        // Limpar seleções ao exportar com sucesso
+        document.getElementById("exportForm").addEventListener("submit", function (event) {
+            saveSelections();
+            const selectedIds = JSON.parse(localStorage.getItem('selectedReports')) || [];
+            const hiddenInput = document.createElement('input');
+            hiddenInput.type = 'hidden';
+            hiddenInput.name = 'selectedReportIds';
+            hiddenInput.value = JSON.stringify(selectedIds);
+            this.appendChild(hiddenInput);
+            // Limpar seleções após a exportação bem-sucedida
+            localStorage.removeItem('selectedReports');
+        });
+
+        // As seleções permancem mesmo ao mudar da página 1 para a página 2, por exemplo
+        window.addEventListener('load', function () {
+            restoreSelections();
+        });
+
+        let leavingAdminView = false;
+
+        // Limpar seleções ao sair da admin view, a menos que estejamos indo para outra página da admin view
+        window.addEventListener('unload', function (event) {
+            if (!leavingAdminView) {
+                localStorage.removeItem('selectedReports');
+            }
+        });
+
+        // Evento para detectar quando o usuário está navegando para fora da admin view
+        document.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', function (event) {
+                const href = this.getAttribute('href');
+                if (href && href.includes('/Admin')) {
+                    leavingAdminView = true;
+                } else {
+                    leavingAdminView = false;
+                }
+            });
+        });
+
+    </script>
 }
+
