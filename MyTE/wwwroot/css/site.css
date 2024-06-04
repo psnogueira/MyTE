@@ -30,3 +30,22 @@ btn-orange {
     color: #334EAC !important;
     font-weight: bold;
 }
+
+.linha {
+    height: 50px;
+    border: .5px solid #EDF1F6;
+}
+
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    background-color: #8C8C8F;
+}

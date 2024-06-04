@@ -39,9 +39,9 @@
 
 <div class="container mt-3">
     <h1 class="fw-bold display-2 text-white mb-3">@ViewData["Title"]</h1>
-    <div class="d-flex align-items-center justify-content-between my-3">
-        <form asp-action="Index" method="get">
-            <div class="form-actions input-group w-40rem">
+    <div class="row justify-content-between my-3">
+        <form class="col-7" asp-action="Index" method="get">
+            <div class="form-actions input-group w-100">
                 <select class="form-control" asp-for="DepartmentType" asp-items="Model.Type">
                     <option value="">Todos</option>
                 </select>
