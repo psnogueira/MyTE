@@ -183,7 +183,8 @@ namespace MyTE.Controllers
                         UserId = _userManager.GetUserId(User),
                         WBSId = group.Key,
                         SubmissionDate = DateTime.Now
-                    };
+                };
+                    
                     records.Add(record);
                 }
                 posicaoInicial++;
@@ -211,7 +212,8 @@ namespace MyTE.Controllers
                     {
                         Data = new DateTime(year, month, i),
                         UserId = userId,
-                        WBSId = 0
+                        WBSId = 0,
+                        SubmissionDate= DateTime.Now
                     });
                 }
                 list.Add(new RecordDTO
@@ -293,7 +295,8 @@ namespace MyTE.Controllers
             {
                 if (item.Value > 0 && item.Value < 8)
                 {
-                    TempData["ErrorMessageText"] = $"A data {item.Key:dd/MM} possui uma quantidade inferior ao mínimo permitido (8 horas). Quantidade de horas registradas: {item.Value}";
+                    TempData["ErrorMessageText"] = $"A data {item.Key:dd/MM} possui uma quantidade inferior ao mínimo";
+                    TempData["ErrorMessageText2"] = $"permitido (8 horas). Quantidade de horas registradas: {item.Value}";
                     return false;
                 }
                 if (item.Value > 0 && (item.Key.DayOfWeek == DayOfWeek.Sunday || item.Key.DayOfWeek == DayOfWeek.Saturday))
@@ -303,7 +306,8 @@ namespace MyTE.Controllers
                 }
                 if (item.Value > 24)
                 {
-                    TempData["ErrorMessageText"] = $"A data {item.Key:dd/MM} possui uma quantidade superior ao máximo de horas de um dia (24 horas). Quantidade de horas registradas: {item.Value}";
+                    TempData["ErrorMessageText"] = $"A data {item.Key:dd/MM} possui uma quantidade superior ao máximo de";
+                    TempData["ErrorMessageText2"] = $"horas de um dia (24 horas). Quantidade de horas registradas: {item.Value}";
                     return false;
                 }
             }

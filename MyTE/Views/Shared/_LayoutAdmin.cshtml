@@ -1,5 +1,10 @@
-﻿<!DOCTYPE html>
-<html lang="pt-br" class="overflow-hidden">
+﻿@{
+    var isRegistroDeHoras = ViewData["Title"] != null && ViewData["Title"].ToString() == "Registro de horas";
+    var cssClass = isRegistroDeHoras ? "bg-violet" : "";
+}
+
+<!DOCTYPE html>
+<html lang="pt-br" class="">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -10,7 +15,7 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/MyTE.styles.css" asp-append-version="true" />
 </head>
-<body class="bg-violet">
+<body class="@cssClass">
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container-fluid">
@@ -54,7 +59,7 @@
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
+    <footer class="border-top footer bg-white text-muted z-n1">
         <div class="container">
             &copy; 2024 - MyTE - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>
