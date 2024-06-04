@@ -30,3 +30,7 @@ btn-orange {
     color: #334EAC !important;
     font-weight: bold;
 }
+
+.createImage {
+    height: calc(100vh - 57px); /* Ajuste 56px para a altura real do seu menu */
+}

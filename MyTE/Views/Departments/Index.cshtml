@@ -43,8 +43,8 @@
         <form asp-action="Index" method="get">
             <div class="form-actions input-group w-20rem">
                 <input type="text" class="form-control" name="SearchString" value="@ViewData["CurrentFilter"]" placeholder="Buscar por nome" id="autoComplete" data-table="Department" data-column1="Name" data-column2="" />
-                <input class="btn btn-outline-secondary" type="submit" value="Procurar" />
-                <a class="btn btn-outline-secondary align-content-center" asp-action="Index">Lista completa</a>
+                <input class="btn btn-outline-primary" type="submit" value="Procurar" />
+                <a class="btn btn-outline-primary align-content-center" asp-action="Index">Lista completa</a>
             </div>
         </form>
         <div class="col d-flex justify-content-end">
