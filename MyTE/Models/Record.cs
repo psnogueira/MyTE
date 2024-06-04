@@ -24,6 +24,9 @@ namespace MyTE.Models
         [Required(ErrorMessage = "A quantidade de horas é obrigatória.")]
         public double Hours { get; set; }
 
+        [DataType(DataType.Date)]
+        public DateTime SubmissionDate { get; set; }
+
         public Record()
         { }
 
