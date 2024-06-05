@@ -58,164 +58,169 @@
 
 <img class="position-absolute object-fit-cover w-100 h-20rem top-0 z-n1" src="~/img/ArtHz.jpg" alt="Arte ilustrativa" />
 
-<div class="bg-white container rounded table-responsive">
-    <table class="table text-center align-middle">
-        <thead>
-            <tr>
-                <th>@Html.DisplayNameFor(model => model.User.Email)</th>
-                <th>@Html.DisplayNameFor(model => model.User.FullName)</th>
-                <th>@Html.DisplayNameFor(model => model.User.HiringDate)</th>
-                <th>@Html.DisplayNameFor(model => model.User.PID)</th>
-                <th>@Html.DisplayNameFor(model => model.User.DepartmentId)</th>
-                <th>@Html.DisplayNameFor(model => model.User.RoleId)</th>
-                <th>Ações</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var user in Model.UsersList)
-            {
+<div class="container">
+    <div class="bg-white container rounded table-responsive">
+        <table class="table text-center align-middle">
+            <thead>
                 <tr>
-                    <td>@user.Email</td>
-                    <td >@user.FullName</td>
-                    <td>@user.HiringDate.ToShortDateString()</td>
-                    <td>@user.PID</td>
-                    <td>@user.Department?.Name</td>
-                    <td>
-                        @if (Model.UserRoles.ContainsKey(user.Id))
-                        {
-                            @foreach (var role in Model.UserRoles[user.Id])
-                            {
-                                <span>@role</span>
-                            }
-                        }
-                    </td>
-                    <td>
-                        <a class="text-primary fs-5" asp-action="Edit" asp-route-id="@user.Id"><i class="bi bi-pen"></i></a>
-                        <a type="button" class="text-primary fs-5 mx-2" data-bs-toggle="modal" data-bs-target="#detail-@user.Id" data-task-id="@user.Id">
-                            <i class="bi bi-info-circle"></i>
-                        </a>
-                        <a type="button" class="text-primary fs-5" data-bs-toggle="modal" data-bs-target="#delete-@user.Id" data-task-id="@user.Id">
-                            <i class="bi bi-trash3"></i>
-                        </a>
-                    </td>
+                    <th>@Html.DisplayNameFor(model => model.User.Email)</th>
+                    <th>@Html.DisplayNameFor(model => model.User.FullName)</th>
+                    <th>@Html.DisplayNameFor(model => model.User.HiringDate)</th>
+                    <th>@Html.DisplayNameFor(model => model.User.PID)</th>
+                    <th>@Html.DisplayNameFor(model => model.User.DepartmentId)</th>
+                    <th>@Html.DisplayNameFor(model => model.User.RoleId)</th>
+                    <th>Ações</th>
                 </tr>
+            </thead>
+            <tbody>
+                @foreach (var user in Model.UsersList)
+                {
+                    <tr>
+                        <td>@user.Email</td>
+                        <td>@user.FullName</td>
+                        <td>@user.HiringDate.ToShortDateString()</td>
+                        <td>@user.PID</td>
+                        <td>@user.Department?.Name</td>
+                        <td>
+                            @if (Model.UserRoles.ContainsKey(user.Id))
+                            {
+                                @foreach (var role in Model.UserRoles[user.Id])
+                                {
+                                    <span>@role</span>
+                                }
+                            }
+                        </td>
 
-                @* Detail Modal *@
-                <div class="modal fade" id="detail-@user.Id" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                    <div class="modal-dialog modal-dialog-centered">
-                        <div class="modal-content">
-                            <div class="modal-header d-flex flex-column border-none  align-items-start">
-                                <span class="d-flex w-100 flex-row">
-                                    <h1 class="text-primary fw-bold ">Detalhes do Usuário</h1>
+                        <td>
+                            <a class="text-primary fs-5" asp-action="Edit" asp-route-id="@user.Id"><i class="bi bi-pen"></i></a>
+
+                            <a type="button" class="text-primary fs-5 mx-2" data-bs-toggle="modal" data-bs-target="#detail-@user.Id" data-task-id="@user.Id">
+                                <i class="bi bi-info-circle"></i>
+                            </a>
+
+                            <a type="button" class="text-primary fs-5" data-bs-toggle="modal" data-bs-target="#delete-@user.Id" data-task-id="@user.Id">
+                                <i class="bi bi-trash3"></i>
+                            </a>
+                        </td>
+                    </tr>
+
+                    @* Detail Modal *@
+                    <div class="modal fade" id="detail-@user.Id" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content">
+                                <div class="modal-header d-flex flex-column border-none  align-items-start">
+                                    <span class="d-flex w-100 flex-row">
+                                        <h1 class="text-primary fw-bold ">Detalhes do Usuário</h1>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </span>
+                                </div>
+                                <div class="modal-body">
+                                    <dl class="row">
+                                        <dt class="col-sm-4">
+                                            @Html.DisplayNameFor(model => model.User.Id)
+                                        </dt>
+                                        <dd class="col-sm-8">
+                                            @Html.DisplayFor(modelItem => user.Id)
+                                        </dd>
+                                        <dt class="col-sm-4">
+                                            @Html.DisplayNameFor(model => model.User.FirstName)
+                                        </dt>
+                                        <dd class="col-sm-8">
+                                            @Html.DisplayFor(modelItem => user.FirstName)
+                                        </dd>
+                                        <dt class="col-sm-4">
+                                            @Html.DisplayNameFor(model => model.User.LastName)
+                                        </dt>
+                                        <dd class="col-sm-8">
+                                            @Html.DisplayFor(modelItem => user.LastName)
+                                        </dd>
+                                        <dt class="col-sm-4">
+                                            @Html.DisplayNameFor(model => model.User.HiringDate)
+                                        </dt>
+                                        <dd class="col-sm-8">
+                                            @Html.DisplayFor(modelItem => user.HiringDate)
+                                        </dd>
+                                        <dt class="col-sm-4">
+                                            @Html.DisplayNameFor(model => model.User.PID)
+                                        </dt>
+                                        <dd class="col-sm-8">
+                                            @Html.DisplayFor(modelItem => user.PID)
+                                        </dd>
+                                        <dt class="col-sm-4">
+                                            @Html.DisplayNameFor(model => model.User.DepartmentId)
+                                        </dt>
+                                        <dd class="col-sm-8">
+                                            @Html.DisplayFor(modelItem => user.Department.Name)
+                                        </dd>
+                                    </dl>
+                                </div>
+                                <div class="modal-footer">
+                                    <a type="button" class="btn btn-lg btn-primary w-100 fw-bold" asp-action="Edit" asp-route-id="@user.Id"> Editar</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    @* Delete Modal *@
+                    <div class="modal fade" id="delete-@user.Id" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content">
+                                <div class="modal-header align-items-center">
+                                    <h1 class="text-primary fw-bold ">Deletar Usuário</h1>
                                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                </span>
-                            </div>
-                            <div class="modal-body">
-                                <dl class="row">
-                                    <dt class="col-sm-4">
-                                        @Html.DisplayNameFor(model => model.User.Id)
-                                    </dt>
-                                    <dd class="col-sm-8">
-                                        @Html.DisplayFor(modelItem => user.Id)
-                                    </dd>
-                                    <dt class="col-sm-4">
-                                        @Html.DisplayNameFor(model => model.User.FirstName)
-                                    </dt>
-                                    <dd class="col-sm-8">
-                                        @Html.DisplayFor(modelItem => user.FirstName)
-                                    </dd>
-                                    <dt class="col-sm-4">
-                                        @Html.DisplayNameFor(model => model.User.LastName)
-                                    </dt>
-                                    <dd class="col-sm-8">
-                                        @Html.DisplayFor(modelItem => user.LastName)
-                                    </dd>
-                                    <dt class="col-sm-4">
-                                        @Html.DisplayNameFor(model => model.User.HiringDate)
-                                    </dt>
-                                    <dd class="col-sm-8">
-                                        @Html.DisplayFor(modelItem => user.HiringDate)
-                                    </dd>
-                                    <dt class="col-sm-4">
-                                        @Html.DisplayNameFor(model => model.User.PID)
-                                    </dt>
-                                    <dd class="col-sm-8">
-                                        @Html.DisplayFor(modelItem => user.PID)
-                                    </dd>
-                                    <dt class="col-sm-4">
-                                        @Html.DisplayNameFor(model => model.User.DepartmentId)
-                                    </dt>
-                                    <dd class="col-sm-8">
-                                        @Html.DisplayFor(modelItem => user.Department.Name)
-                                    </dd>
-                                </dl>
-                            </div>
-                            <div class="modal-footer">
-                                <a type="button" class="btn btn-lg btn-primary w-100 fw-bold" asp-action="Edit" asp-route-id="@user.Id"> Editar</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                @* Delete Modal *@
-                <div class="modal fade" id="delete-@user.Id" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                    <div class="modal-dialog modal-dialog-centered">
-                        <div class="modal-content">
-                            <div class="modal-header align-items-center">
-                                <h1 class="text-primary fw-bold ">Deletar Usuário</h1>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body">
-                                <h4>Tem certeza de que deseja deletar?</h4>
-                                <p class="lh-1 mb-4 text-danger">*Esta operação não poderá ser desfeita*</p>
-                                <dl class="row">
-                                    <dt class="col-sm-4">
-                                        @Html.DisplayNameFor(model => model.User.Id)
-                                    </dt>
-                                    <dd class="col-sm-8">
-                                        @Html.DisplayFor(modelItem => user.Id)
-                                    </dd>
-                                    <dt class="col-sm-4">
-                                        @Html.DisplayNameFor(model => model.User.FirstName)
-                                    </dt>
-                                    <dd class="col-sm-8">
-                                        @Html.DisplayFor(modelItem => user.FirstName)
-                                    </dd>
-                                    <dt class="col-sm-4">
-                                        @Html.DisplayNameFor(model => model.User.LastName)
-                                    </dt>
-                                    <dd class="col-sm-8">
-                                        @Html.DisplayFor(modelItem => user.LastName)
-                                    </dd>
-                                    <dt class="col-sm-4">
-                                        @Html.DisplayNameFor(model => model.User.HiringDate)
-                                    </dt>
-                                    <dd class="col-sm-8">
-                                        @Html.DisplayFor(modelItem => user.HiringDate)
-                                    </dd>
-                                    <dt class="col-sm-4">
-                                        @Html.DisplayNameFor(model => model.User.PID)
-                                    </dt>
-                                    <dd class="col-sm-8">
-                                        @Html.DisplayFor(modelItem => user.PID)
-                                    </dd>
-                                    <dt class="col-sm-4">
-                                        @Html.DisplayNameFor(model => model.User.DepartmentId)
-                                    </dt>
-                                    <dd class="col-sm-8">
-                                        @Html.DisplayFor(modelItem => user.Department.Name)
-                                    </dd>
-                                </dl>
-                            </div>
-                            <div class="modal-footer">
-                                <a type="button" class="btn btn-lg btn-danger w-100 fw-bold" asp-action="Delete" asp-route-id="@user.Id"><i class="bi bi-trash3"></i> Deletar</a>
+                                </div>
+                                <div class="modal-body">
+                                    <h4>Tem certeza de que deseja deletar?</h4>
+                                    <p class="lh-1 mb-4 text-danger">*Esta operação não poderá ser desfeita*</p>
+                                    <dl class="row">
+                                        <dt class="col-sm-4">
+                                            @Html.DisplayNameFor(model => model.User.Id)
+                                        </dt>
+                                        <dd class="col-sm-8">
+                                            @Html.DisplayFor(modelItem => user.Id)
+                                        </dd>
+                                        <dt class="col-sm-4">
+                                            @Html.DisplayNameFor(model => model.User.FirstName)
+                                        </dt>
+                                        <dd class="col-sm-8">
+                                            @Html.DisplayFor(modelItem => user.FirstName)
+                                        </dd>
+                                        <dt class="col-sm-4">
+                                            @Html.DisplayNameFor(model => model.User.LastName)
+                                        </dt>
+                                        <dd class="col-sm-8">
+                                            @Html.DisplayFor(modelItem => user.LastName)
+                                        </dd>
+                                        <dt class="col-sm-4">
+                                            @Html.DisplayNameFor(model => model.User.HiringDate)
+                                        </dt>
+                                        <dd class="col-sm-8">
+                                            @Html.DisplayFor(modelItem => user.HiringDate)
+                                        </dd>
+                                        <dt class="col-sm-4">
+                                            @Html.DisplayNameFor(model => model.User.PID)
+                                        </dt>
+                                        <dd class="col-sm-8">
+                                            @Html.DisplayFor(modelItem => user.PID)
+                                        </dd>
+                                        <dt class="col-sm-4">
+                                            @Html.DisplayNameFor(model => model.User.DepartmentId)
+                                        </dt>
+                                        <dd class="col-sm-8">
+                                            @Html.DisplayFor(modelItem => user.Department.Name)
+                                        </dd>
+                                    </dl>
+                                </div>
+                                <div class="modal-footer">
+                                    <a type="button" class="btn btn-lg btn-danger w-100 fw-bold" asp-action="Delete" asp-route-id="@user.Id"><i class="bi bi-trash3"></i> Deletar</a>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            }
-        </tbody>
-    </table>
+                }
+            </tbody>
+        </table>
+    </div>
 </div>
 
 <nav aria-label="Page navigation example" class="container mt-4">

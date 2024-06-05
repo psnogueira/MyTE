@@ -36,27 +36,29 @@
 
 <img class="position-absolute object-fit-cover w-100 h-20rem top-0 z-n1" src="~/img/ArtHz.jpg" alt="Arte ilustrativa" />
 
-<div class="scroll bg-white container rounded table-responsive h-20rem overflow-y-scroll">
-    <table class="table text-center align-middle">
-        <thead>
-            <tr>
-                <th>Data</th>
-                <th>Horas</th>
-                <th>WBS</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var detail in Model.RecordDetails)
-            {
-                if (detail.Record.Hours > 0)
+<div class="container">
+    <div class="scroll bg-white container rounded table-responsive max-h-20rem overflow-y-scroll">
+        <table class="table text-center align-middle">
+            <thead>
+                <tr>
+                    <th>Data</th>
+                    <th>Horas</th>
+                    <th>WBS</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var detail in Model.RecordDetails)
                 {
-                    <tr>
-                        <td>@detail.Record.Data.ToString("dd/MM/yyyy")</td>
-                        <td>@detail.Record.Hours</td>
-                        <td>@detail.WBS?.Code - @detail.WBS?.Desc</td>
-                    </tr>
+                    if (detail.Record.Hours > 0)
+                    {
+                        <tr>
+                            <td>@detail.Record.Data.ToString("dd/MM/yyyy")</td>
+                            <td>@detail.Record.Hours</td>
+                            <td>@detail.WBS?.Code - @detail.WBS?.Desc</td>
+                        </tr>
+                    }
                 }
-            }
-        </tbody>
-    </table>
+            </tbody>
+        </table>
+    </div>
 </div>

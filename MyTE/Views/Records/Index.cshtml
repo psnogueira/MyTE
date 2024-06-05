@@ -2,11 +2,45 @@
 
 @{
     ViewData["Title"] = "Registro de horas";
+    Layout = "~/Views/Shared/_LayoutCRUD.cshtml";
 }
 
-<div class="row align-items-center">
-    <h1 class="col fw-bold display-4">Registro de Horas</h1>
-    <div class="col d-flex justify-content-end" aria-label="Navegação de Data">
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="sucesso">
+        <div class="alert alert-success d-flex align-items-center shadow alert-dismissible fade show position-fixed bottom-0 end-0 p-3 m-3 z-3 rounded" role="alert">
+            <i class="bi bi-check-lg fs-1 me-3"></i>
+            <div>
+                <div class="alert-heading align-items-center">
+                    <strong class="me-4 pe-1">@TempData["SuccessMessage"]</strong>
+                    <small type="button" class="btn-close align-items-center" data-bs-dismiss="alert" aria-label="Close"></small>
+                </div>
+                Você pode encontrá-lo na tabela.
+            </div>
+        </div>
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="erro">
+        <div class="alert alert-danger d-flex align-items-center shadow alert-dismissible fade show position-fixed bottom-0 end-0 p-3 m-3 z-3 rounded" role="alert">
+            <i class="bi bi-exclamation-triangle-fill fs-1 me-3"></i>
+            <div>
+                <div class="alert-heading align-items-center">
+                    <strong class="me-4 pe-1">@TempData["ErrorMessage"]</strong>
+                    <small type="button" class="btn-close align-items-center" data-bs-dismiss="alert" aria-label="Close"></small>
+                </div>
+                @TempData["ErrorMessageText"] <br />
+                @TempData["ErrorMessageText2"]
+            </div>
+        </div>
+    </div>
+}
+
+<div class="container mt-4">
+    <h1 class="fw-bold display-3 mb-3 text-white">Registro de Horas</h1>
+    <div class="d-flex justify-content-start position-absolute" aria-label="Navegação de Data">
         <form asp-action="Navigate" method="post" class="">
             <input type="hidden" name="direction" value="previous" />
             <button type="submit" class="btn btn-primary"><i class="bi bi-arrow-left"></i></button>
@@ -26,11 +60,13 @@
     </div>
 </div>
 
-<form asp-action="Persist" method="post">
+<img class="position-absolute object-fit-cover w-100 h-20rem top-0 z-n1" src="~/img/ArtHz2.jpg" alt="Arte ilustrativa" />
+
+<form class="container" asp-action="Persist" method="post">
     <p class="d-flex justify-content-end mb-2">
         <input type="submit" value="Salvar" class="btn btn-primary" />
     </p>
-    <div class="table-responsive bg-white border rounded-3 mt-0">
+    <div class="table-responsive bg-white border rounded-3 mt-3">
         <table class="table align-middle text-center table-bordered mb-0">
             <thead>
                 <tr class="table-secondary align-middle">
@@ -112,39 +148,6 @@
         </table>
     </div>
 </form>
-
-@if (TempData["SuccessMessage"] != null)
-{
-    <div class="sucesso">
-        <div class="alert alert-success d-flex align-items-center shadow alert-dismissible fade show position-fixed bottom-0 end-0 p-3 m-3 z-3 rounded" role="alert">
-            <i class="bi bi-check-lg fs-1 me-3"></i>
-            <div>
-                <div class="alert-heading align-items-center">
-                    <strong class="me-4 pe-1">@TempData["SuccessMessage"]</strong>
-                    <small type="button" class="btn-close align-items-center" data-bs-dismiss="alert" aria-label="Close"></small>
-                </div>
-                Você pode encontrá-lo na tabela.
-            </div>
-        </div>
-    </div>
-}
-
-@if (TempData["ErrorMessage"] != null)
-{
-    <div class="erro">
-        <div class="alert alert-danger d-flex align-items-center shadow alert-dismissible fade show position-fixed bottom-0 end-0 p-3 m-3 z-3 rounded" role="alert">
-            <i class="bi bi-exclamation-triangle-fill fs-1 me-3"></i>
-            <div>
-                <div class="alert-heading align-items-center">
-                    <strong class="me-4 pe-1">@TempData["ErrorMessage"]</strong>
-                    <small type="button" class="btn-close align-items-center" data-bs-dismiss="alert" aria-label="Close"></small>
-                </div>
-                @TempData["ErrorMessageText"] <br />
-                @TempData["ErrorMessageText2"]
-            </div>
-        </div>
-    </div>
-}
 
 <script>
     function updateWBSId(selectElement, index) {
