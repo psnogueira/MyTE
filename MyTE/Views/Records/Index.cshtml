@@ -147,7 +147,12 @@
             </tbody>
         </table>
     </div>
+    @if (TempData["LastSubmissionDate"] != null)
+    {
+        <span class="fw-light d-flex justify-content-end mb-2 text-secondary">@TempData["LastSubmissionDate"]</span>
+    }
 </form>
+
 
 <script>
     function updateWBSId(selectElement, index) {

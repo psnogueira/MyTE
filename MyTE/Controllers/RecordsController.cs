@@ -104,6 +104,17 @@ namespace MyTE.Controllers
                 .Where(r => r.UserId == userId && r.Data.Year == year && r.Data.Month == month && r.Data.Day >= dayInit && r.Data.Day <= dayMax)
                 .ToListAsync();
 
+            if (savedRecords.Any())
+            {
+                var latestSubmissionDate = savedRecords.Max(r => r.SubmissionDate);
+                TempData["LastSubmissionDate"] = $"Salvo pela última vez em {latestSubmissionDate:dd/MM/yyyy HH:mm:ss}";
+            }
+            else
+            {
+                TempData["LastSubmissionDate"] = "";
+            }
+
+
             var recordsGroupedByWBS = savedRecords.GroupBy(r => r.WBSId);
             List<RecordDTO> list = new List<RecordDTO>();
             double[] totalHoursDay = new double[16];
