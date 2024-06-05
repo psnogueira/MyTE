@@ -184,6 +184,31 @@ public class UsersController : Controller
                 var result = await _userManager.UpdateAsync(user);
                 if (result.Succeeded)
                 {
+                    var currentRole = await _userManager.GetRolesAsync(user);
+                        var removeRole = await _userManager.RemoveFromRolesAsync(user, currentRole);
+                   if(!removeRole.Succeeded)
+                    {
+                        foreach(var error in removeRole.Errors)
+                        {
+                            ModelState.AddModelError(string.Empty, error.Description);
+                        }
+                        return View(model);
+                    }
+
+                    var role = await _roleManager.FindByIdAsync(model.RoleId);
+                    if (role != null)
+                    {
+                        var addRole = await _userManager.AddToRoleAsync(user, role.Name);
+                        if (!addRole.Succeeded)
+                        {
+                            foreach (var error in removeRole.Errors)
+                            {
+                                ModelState.AddModelError(string.Empty, error.Description);
+                            }
+                            return View(model);
+                        }
+                    }
+
                     TempData["SuccessMessage2"] = "Usuário editado com sucesso!";
                     return RedirectToAction(nameof(Index));
                 }
