@@ -11923,11 +11923,15 @@ textarea.form-control-lg {
 }
 
 .w-30rem {
-  width: 35rem;
+  max-width: 35rem;
 }
 
 .w-50rem {
   width: 50rem;
+}
+
+.w-52rem {
+  width: 55.5rem;
 }
 
 .w-20rem {
@@ -11940,6 +11944,10 @@ textarea.form-control-lg {
 
 .w-15 {
   width: 15% !important;
+}
+
+.w-5 {
+  width: 5% !important;
 }
 
 .h-20rem {

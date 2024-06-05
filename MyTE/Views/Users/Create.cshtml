@@ -33,14 +33,15 @@
                     <label asp-for="HiringDate" class="ms-3 ps-2 control-label text-secondary"></label>
                     <span asp-validation-for="HiringDate" class="text-danger"></span>
                 </div>
+                <div class="col form-floating mb-3">
+                    <select asp-for="DepartmentId" class="form-control" asp-items="ViewBag.Departments">
+                        <option selected disabled value="">-------</option>
+                    </select>
+                    <label asp-for="DepartmentId" class="control-label text-secondary"></label>
+                    <span asp-validation-for="DepartmentId" class="text-danger"></span>
+                </div>
             </div>
-            <div class="form-floating mb-3">
-                <select asp-for="DepartmentId" class="form-control" asp-items="ViewBag.Departments">
-                    <option selected disabled value="">-------</option>
-                </select>
-                <label asp-for="DepartmentId" class="control-label text-secondary"></label>
-                <span asp-validation-for="DepartmentId" class="text-danger"></span>
-            </div>
+            
             <div class="form-floating mb-3">
                 <select asp-for="RoleId" class="form-control" asp-items="ViewBag.Roles">
                     <option selected disabled value="">-------</option>
