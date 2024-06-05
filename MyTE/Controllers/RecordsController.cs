@@ -59,6 +59,17 @@ namespace MyTE.Controllers
             {
                 var records = listRecordDTO.SelectMany(dto => dto.records).ToList();
 
+                // Validação adicional para garantir que WBSId 0 só tenha horas iguais a 0
+                foreach (var record in records)
+                {
+                    if (record.WBSId == 0 && record.Hours != 0)
+                    {
+                        TempData["ErrorMessage"] = "Falha na validação dos registros.";
+                        TempData["ErrorMessageText"] = "Não é possível salvar horas na WBS vazia.";
+                        return RedirectToAction(nameof(Index));
+                    }
+                }
+
                 if (ValidateRecords(ConvertForMap(records)))
                 {
                     await SaveRecords(records);
