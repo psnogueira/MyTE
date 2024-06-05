@@ -135,6 +135,10 @@ namespace MyTE.Controllers
             double totalHoursWBS = 0d;
             List<Record> records = new List<Record>();
 
+            // Muda lógica do totalHoursDay
+            int totalDaysInPeriod = dayMax - dayInit + 1;
+            totalHoursDay = new double[totalDaysInPeriod];
+
             for (int i = dayInit; i <= dayMax; i++)
             {
                 var record = group.FirstOrDefault(r => r.Data.Day == i);
@@ -173,6 +177,7 @@ namespace MyTE.Controllers
         // Método auxiliar para adicionar linhas adicionais se houver menos de 4 linhas
         private void AddAdditionalRows(List<RecordDTO> list, string userId, int year, int month, int dayInit, int dayMax)
         {
+            int totalDaysInPeriod = dayMax - dayInit + 1;
             while (list.Count < 4)
             {
                 List<Record> records = new List<Record>();
@@ -190,7 +195,7 @@ namespace MyTE.Controllers
                 {
                     WBS = new WBS { WBSId = 0, Code = "", Desc = "" },
                     records = records,
-                    TotalHoursDay = new double[16]
+                    TotalHoursDay = new double[totalDaysInPeriod]
                 });
             }
         }
