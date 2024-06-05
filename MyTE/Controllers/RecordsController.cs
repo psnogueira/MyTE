@@ -34,6 +34,7 @@ namespace MyTE.Controllers
             if (dataSearch < StartDateRestriction)
             {
                 TempData["ErrorMessage"] = "A data de pesquisa deve ser maior que 01/01/2024";
+                return RedirectToAction(nameof(Index));
             }
             var userId = _userManager.GetUserId(User);
 
