@@ -47,7 +47,6 @@
                 </select>
                 <input type="text" class="form-control w-25" name="SearchString" value="@ViewData["CurrentFilter"]" placeholder="Buscar por código ou descrição" id="autoComplete" data-table="Users" data-column1="FirstName" data-column2="Email" />
                 <input class="btn btn-outline-primary" type="submit" value="Procurar" />
-
                 <a class="btn btn-outline-primary align-content-center" asp-action="Index">Lista completa</a>
             </div>
         </form>
@@ -227,20 +226,19 @@
 <nav aria-label="Page navigation example" class="container mt-4">
     <ul class="pagination">
         <li class="page-item @(Model.UsersList.HasPreviousPage ? "" : "disabled")">
-            <a class="page-link" asp-action="Index" asp-route-pageNumber="@(Model.UsersList.PageIndex - 1)" asp-route-searchString="@Model.CurrentFilter">Anterior</a>
+            <a class="page-link" asp-action="Index" asp-route-pageNumber="@(Model.UsersList.PageIndex - 1)" asp-route-searchString="@Model.CurrentFilter" asp-route-departmentType="@ViewData["DepartmentType"]">Anterior</a>
         </li>
         @for (int i = 1; i <= Model.UsersList.TotalPages; i++)
         {
             <li class="page-item @(i == Model.UsersList.PageIndex ? "active" : "")">
-                <a class="page-link" asp-action="Index" asp-route-pageNumber="@i" asp-route-searchString="@Model.CurrentFilter">@i</a>
+                <a class="page-link" asp-action="Index" asp-route-pageNumber="@i" asp-route-searchString="@Model.CurrentFilter" asp-route-departmentType="@ViewData["DepartmentType"]">@i</a>
             </li>
         }
         <li class="page-item @(Model.UsersList.HasNextPage ? "" : "disabled")">
-            <a class="page-link" asp-action="Index" asp-route-pageNumber="@(Model.UsersList.PageIndex + 1)" asp-route-searchString="@Model.CurrentFilter">Próxima</a>
+            <a class="page-link" asp-action="Index" asp-route-pageNumber="@(Model.UsersList.PageIndex + 1)" asp-route-searchString="@Model.CurrentFilter" asp-route-departmentType="@ViewData["DepartmentType"]">Próxima</a>
         </li>
     </ul>
 </nav>
-
 
 @section Scripts {
     @{

@@ -26,14 +26,13 @@ namespace MyTE.Controllers
 
                 // Valida as tabelas e colunas que podem ser consultadas através do auto-complete
                 var allowedTables = new Dictionary<string, string[]>
-                {
-                    { "WBS", new[] { "Desc", "Code" } },
-                    { "Department", new[] { "Name", "" } },
-                    { "Roles", new[] { "Name", "" } },
-                    { "Users", new[] { "FirstName", "Email" } },
-                    { "BiweeklyRecords", new[] { "UserEmail", "" } }
-
-                };
+                    {
+                        { "WBS", new[] { "Desc", "Code" } },
+                        { "Department", new[] { "Name", "" } },
+                        { "Roles", new[] { "Name", "" } },
+                        { "Users", new[] { "FirstName", "Email" } },
+                        { "BiweeklyRecords", new[] { "UserEmail", "EmployeeName" } }  // Adicionei "EmployeeName" aqui
+                    };
 
                 if (!allowedTables.ContainsKey(tableName) ||
                     !allowedTables[tableName].Contains(columnName1) ||
