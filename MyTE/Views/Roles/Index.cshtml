@@ -57,106 +57,107 @@
 
 <img class="position-absolute object-fit-cover w-100 h-20rem top-0 z-n1" src="~/img/ArtHz.jpg" alt="Arte ilustrativa" />
 
-<div class="bg-white  container rounded table-responsive">
-    <table class="table text-center align-middle">
-        <thead>
-            <tr>
-                <th class="col-4">
-                    @Html.DisplayNameFor(model => model.Name)
-                </th>
-
-                <th class="col-2">Ações</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model)
-            {
+<div class="container">
+    <div class="bg-white container rounded table-responsive">
+        <table class="table text-center align-middle">
+            <thead>
                 <tr>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Name)
-                    </td>
-                    <td>
-                        <a class="text-primary fs-5" asp-action="Edit" asp-route-id="@item.Id"><i class="bi bi-pen"></i></a>
-                        @* <a class="text-primary fs-5" asp-action="Details" asp-route-id="@item.Id"><i class="bi bi-info-circle"></i></a> *@
-                        <a type="button" class="text-primary fs-5 mx-2" data-bs-toggle="modal" data-bs-target="#detail-@item.Id" data-task-id="@item.Id">
-                            <i class="bi bi-info-circle"></i>
-                        </a>
+                    <th class="col-4">
+                        @Html.DisplayNameFor(model => model.Name)
+                    </th>
 
-                        <a type="button" class="text-primary fs-5" data-bs-toggle="modal" data-bs-target="#delete-@item.Id" data-task-id="@item.Id">
-                            <i class="bi bi-trash3"></i>
-                        </a>
-                    </td>
-
+                    <th class="col-2">Ações</th>
                 </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Name)
+                        </td>
+                        <td>
+                            <a class="text-primary fs-5" asp-action="Edit" asp-route-id="@item.Id"><i class="bi bi-pen"></i></a>
+                            @* <a class="text-primary fs-5" asp-action="Details" asp-route-id="@item.Id"><i class="bi bi-info-circle"></i></a> *@
+                            <a type="button" class="text-primary fs-5 mx-2" data-bs-toggle="modal" data-bs-target="#detail-@item.Id" data-task-id="@item.Id">
+                                <i class="bi bi-info-circle"></i>
+                            </a>
 
-                @* Detail Modal *@
-                <div class="modal fade" id="detail-@item.Id" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                    <div class="modal-dialog modal-dialog-centered">
-                        <div class="modal-content">
-                            <div class="modal-header align-items-center">
-                                <h3 class="text-primary fw-bold ">Detalhes do nível de acesso</h3>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body">
-                                <dl class="row">
-                                    <dt class="col-sm-2">
-                                        @Html.DisplayNameFor(model => model.Id)
-                                    </dt>
-                                    <dd class="col-sm-10">
-                                        @Html.DisplayFor(modelItem => item.Id)
-                                    </dd>
-                                    <dt class="col-sm-2">
-                                        @Html.DisplayNameFor(model => model.Name)
-                                    </dt>
-                                    <dd class="col-sm-10">
-                                        @Html.DisplayFor(modelItem => item.Name)
-                                    </dd>
-                                </dl>
-                            </div>
-                            <div class="modal-footer">
-                                <a type="button" class="btn btn-lg btn-primary w-100 fw-bold" asp-action="Edit" asp-route-id="@item.Id"> Editar</a>
+                            <a type="button" class="text-primary fs-5" data-bs-toggle="modal" data-bs-target="#delete-@item.Id" data-task-id="@item.Id">
+                                <i class="bi bi-trash3"></i>
+                            </a>
+                        </td>
+
+                    </tr>
+
+                    @* Detail Modal *@
+                    <div class="modal fade" id="detail-@item.Id" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content">
+                                <div class="modal-header align-items-center">
+                                    <h3 class="text-primary fw-bold ">Detalhes do nível de acesso</h3>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <dl class="row">
+                                        <dt class="col-sm-2">
+                                            @Html.DisplayNameFor(model => model.Id)
+                                        </dt>
+                                        <dd class="col-sm-10">
+                                            @Html.DisplayFor(modelItem => item.Id)
+                                        </dd>
+                                        <dt class="col-sm-2">
+                                            @Html.DisplayNameFor(model => model.Name)
+                                        </dt>
+                                        <dd class="col-sm-10">
+                                            @Html.DisplayFor(modelItem => item.Name)
+                                        </dd>
+                                    </dl>
+                                </div>
+                                <div class="modal-footer">
+                                    <a type="button" class="btn btn-lg btn-primary w-100 fw-bold" asp-action="Edit" asp-route-id="@item.Id"> Editar</a>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                @* Delete Modal *@
-                <div class="modal fade" id="delete-@item.Id" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                    <div class="modal-dialog modal-dialog-centered">
-                        <div class="modal-content">
-                            <div class="modal-header align-items-center">
-                                <h3 class="text-primary fw-bold ">Deletar Role</h3>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body">
-                                <h4>Tem certeza de que deseja deletar?</h4>
-                                <p class="text-danger lh-1 mb-4">*Esta operação não poderá ser desfeita*</p>
-                                <dl class="row">
-                                    <dt class="col-sm-2">
-                                        @Html.DisplayNameFor(model => model.Id)
-                                    </dt>
-                                    <dd class="col-sm-10">
-                                        @Html.DisplayFor(modelItem => item.Id)
-                                    </dd>
-                                    <dt class="col-sm-2">
-                                        @Html.DisplayNameFor(model => model.Name)
-                                    </dt>
-                                    <dd class="col-sm-10">
-                                        @Html.DisplayFor(modelItem => item.Name)
-                                    </dd>
-                                </dl>
-                            </div>
-                            <div class="modal-footer">
-                                <a type="button" class="btn btn-lg btn-danger w-100 fw-bold" asp-action="Delete" asp-route-id="@item.Id">Deletar</a>
+                    @* Delete Modal *@
+                    <div class="modal fade" id="delete-@item.Id" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content">
+                                <div class="modal-header align-items-center">
+                                    <h3 class="text-primary fw-bold ">Deletar Role</h3>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <h4>Tem certeza de que deseja deletar?</h4>
+                                    <p class="text-danger lh-1 mb-4">*Esta operação não poderá ser desfeita*</p>
+                                    <dl class="row">
+                                        <dt class="col-sm-2">
+                                            @Html.DisplayNameFor(model => model.Id)
+                                        </dt>
+                                        <dd class="col-sm-10">
+                                            @Html.DisplayFor(modelItem => item.Id)
+                                        </dd>
+                                        <dt class="col-sm-2">
+                                            @Html.DisplayNameFor(model => model.Name)
+                                        </dt>
+                                        <dd class="col-sm-10">
+                                            @Html.DisplayFor(modelItem => item.Name)
+                                        </dd>
+                                    </dl>
+                                </div>
+                                <div class="modal-footer">
+                                    <a type="button" class="btn btn-lg btn-danger w-100 fw-bold" asp-action="Delete" asp-route-id="@item.Id">Deletar</a>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            }
-        </tbody>
-    </table>
+                }
+            </tbody>
+        </table>
+    </div>
 </div>
-
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");

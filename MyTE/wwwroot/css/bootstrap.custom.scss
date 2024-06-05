@@ -4,11 +4,6 @@
     --violet-300: #7096D1;
     --violet-100: #D0E3FF;
     --violet-50: #EDF1F6;
-    --primary-1000: var(--violet-1000);
-    --primary-500: var(--violet-500);
-    --primary-300: var(--violet-300);
-    --primary-100: var(--violet-100);
-    --primary-50: var(--violet-50);
 }*/
 
 $primary: #334EAC;
@@ -59,6 +54,10 @@ $secondary: #7096D1;
 
 .h-20rem{
     height: 20rem;
+}
+
+.max-h-20rem{
+    max-height: 20rem;
 }
 
 .h-25rem{
