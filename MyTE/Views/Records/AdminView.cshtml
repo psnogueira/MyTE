@@ -8,7 +8,7 @@
 <div class="container my-3">
     <h1 class="fw-bold display-2 text-white mb-3">@ViewData["Title"]</h1>
     <div class="row position-absolute">
-        <div class="container d-lg-none">
+        <div class="container d-xl-none">
             <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar" aria-label="Toggle navigation">
                 <i class="bi bi-filter"></i> Filtrar
             </button>
@@ -46,7 +46,7 @@
                 </div>
             </div>
         </div>
-        <form class="col d-lg-flex d-none" asp-action="AdminView" method="get">
+        <form class="col d-xl-flex d-none" asp-action="AdminView" method="get">
             <div class="form-actions input-group w-100">
                 <select class="form-control" name="departmentType" asp-for="DepartmentType" asp-items="Model.DepartmentList">
                     <option value="0">Todos</option>
@@ -61,7 +61,7 @@
     </div>
 </div>
 
-<img class="position-absolute object-fit-cover w-100 h-20rem top-0 z-n1" src="~/img/ArtHz2.jpg" alt="Arte ilustrativa" />
+<img class="position-absolute object-fit-cover w-100 h-20rem top-0 z-n1" src="~/img/ArtHz3.jpg" alt="Arte ilustrativa" />
 
 <div class="container">
     <form id="exportForm" method="post">
@@ -79,7 +79,7 @@
                         <th>Usuário</th>
                         <th>Departamento</th>
                         <th>Período</th>
-                        <th class="col-1">Total de Horas</th>
+                        <th>Total de Horas</th>
                         <th></th>
                     </tr>
                 </thead>
@@ -102,19 +102,20 @@
                             </td>
                         </tr>
                     }
-                    <tr>
+                    @* <tr>
                         <td></td>
                         <td colspan="3"><strong>Total de Horas</strong></td>
-                        <td><strong>@Model.TotalHours</strong></td>
+                        <td><strong></strong></td>
                         <td></td>
-                    </tr>
+                    </tr> *@
                 </tbody>
             </table>
         </div>
     </form>
 </div>
 
-<nav aria-label="Page navigation example" class="container mt-4">
+<div class="container d-flex align-items-center justify-content-between">
+<nav aria-label="Page navigation example" class="mt-4">
     <ul class="pagination">
         <li class="page-item @(Model.ReportsList.HasPreviousPage ? "" : "disabled")">
             <a class="page-link" asp-action="AdminView" asp-route-pageNumber="@(Model.ReportsList.PageIndex - 1)" asp-route-searchString="@Model.CurrentFilter">Anterior</a>
@@ -130,6 +131,11 @@
         </li>
     </ul>
 </nav>
+
+    <div class="d-flex justify-content-end  p-2 rounded">
+    <span class="text-secondary"><strong>Total de horas registradas: </strong> @Model.TotalHours</span>
+    </div>
+</div>
 
 @section Scripts {
     @{

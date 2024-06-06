@@ -11,6 +11,11 @@ $secondary: #7096D1;
 
 @import "../lib/bootstrap/scss/bootstrap";
 
+.meio{
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+}
+
 .fs-10px{
     font-size: 10px;
 }

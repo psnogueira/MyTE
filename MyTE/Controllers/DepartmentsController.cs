@@ -34,8 +34,10 @@ namespace MyTE.Controllers
 
             if (!string.IsNullOrEmpty(searchString))
             {
+                int searchId;
+                bool isNumericSearch = int.TryParse(searchString, out searchId);
 
-                department = department.Where(s => s.Name.Contains(searchString));
+                department = department.Where(s => s.Name.Contains(searchString) || (isNumericSearch && s.DepartmentId == searchId));
             }
 
             var viewModel = new DepartmentViewModel

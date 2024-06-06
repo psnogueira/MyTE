@@ -42,7 +42,7 @@
     <div class="row my-3">
         <form class="col-5" asp-action="Index" method="get">
             <div class="form-actions input-group">
-                <input type="text" class="form-control" name="SearchString" value="@ViewData["CurrentFilter"]" placeholder="Buscar por nome" id="autoComplete" data-table="Department" data-column1="Name" data-column2="" />
+                <input type="text" class="form-control" name="SearchString" value="@ViewData["CurrentFilter"]" placeholder="Buscar por nome ou ID" id="autoComplete" data-table="Department" data-column1="DepartmentId" data-column2="Name" />
                 <input class="btn btn-outline-primary" type="submit" value="Procurar" />
                 <a class="btn btn-outline-primary align-content-center" asp-action="Index">Lista completa</a>
             </div>
@@ -61,6 +61,9 @@
             <thead>
                 <tr>
                     <th>
+                        @Html.DisplayNameFor(model => model.Department.DepartmentId)
+                    </th>
+                    <th>
                         @Html.DisplayNameFor(model => model.Department.Name)
                     </th>
                     <th class="col-4">Ações</th>
@@ -70,6 +73,9 @@
                 @foreach (var item in Model.DepartmentList)
                 {
                     <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.DepartmentId)
+                        </td>
                         <td>
                             @Html.DisplayFor(modelItem => item.Name)
                         </td>
@@ -120,9 +126,6 @@
                             </div>
                         </div>
                     </div>
-
-
-
 
                     @* Delete Modal *@
                     <div class="modal fade" id="delete-@item.DepartmentId" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">

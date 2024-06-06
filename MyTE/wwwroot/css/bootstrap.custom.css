@@ -11901,6 +11901,11 @@ textarea.form-control-lg {
     display: none !important;
   }
 }
+.meio {
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+}
+
 .fs-10px {
   font-size: 10px;
 }

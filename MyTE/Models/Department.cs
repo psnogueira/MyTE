@@ -5,7 +5,7 @@ namespace MyTE.Models
     public class Department
     {
         [Key]
-        [Display(Name = "Id")]
+        [Display(Name = "ID")]
         public int DepartmentId { get; set; }
 
         [Display(Name = "Nome")]
