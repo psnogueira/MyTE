@@ -1,29 +1,39 @@
 ﻿@model MyTE.Models.ViewModel.DepartmentViewModel
 
 @{
-    ViewData["Title"] = "Departamento";
+    ViewData["Title"] = "Departamentos";
     Layout = "~/Views/Shared/_LayoutCRUD.cshtml";
 }
 
 @if (TempData["SuccessMessage"] != null)
 {
-    <div class="alert alert-secondary shadow alert-dismissible fade show position-fixed bottom-0 end-0 p-3 m-3 rounded" role="alert">
-        <div class="alert-heading align-items-center">
-            <strong class="me-4 pe-1">@TempData["SuccessMessage"]</strong>
-            <small type="button" class="btn-close align-items-center" data-bs-dismiss="alert" aria-label="Close"></small>
+    <div class="sucesso">
+        <div class="alert alert-success d-flex align-items-center shadow alert-dismissible fade show position-fixed bottom-0 end-0 p-3 m-3 rounded" role="alert">
+            <i class="bi bi-check-lg fs-1 me-3"></i>
+            <div>
+                <div class="alert-heading align-items-center">
+                    <strong class="me-4 pe-1">@TempData["SuccessMessage"]</strong>
+                    <small type="button" class="btn-close align-items-center" data-bs-dismiss="alert" aria-label="Close"></small>
+                </div>
+                Você pode encontrá-lo na tabela.
+            </div>
         </div>
-        Você pode encontrá-lo na lista.
     </div>
 }
 
 @if (TempData["SuccessMessage2"] != null)
 {
-    <div class="alert alert-secondary shadow alert-dismissible fade show position-fixed bottom-0 end-0 p-3 m-3 rounded" role="alert">
-        <div class="alert-heading align-items-center">
-            <strong class="me-4 pe-1">@TempData["SuccessMessage"]</strong>
-            <small type="button" class="btn-close align-items-center" data-bs-dismiss="alert" aria-label="Close"></small>
+    <div class="sucesso">
+        <div class="alert alert-success d-flex align-items-center shadow alert-dismissible fade show position-fixed bottom-0 end-0 p-3 m-3 rounded" role="alert">
+            <i class="bi bi-check-lg fs-1 me-3"></i>
+            <div>
+                <div class="alert-heading align-items-center">
+                    <strong class="me-4 pe-1">@TempData["SuccessMessage2"]</strong>
+                    <small type="button" class="btn-close align-items-center" data-bs-dismiss="alert" aria-label="Close"></small>
+                </div>
+                Você pode encontrá-lo na tabela.
+            </div>
         </div>
-        Você pode encontrá-lo na lista.
     </div>
 }
 
@@ -34,18 +44,21 @@
         <form asp-action="Index" method="get">
             <div class="form-actions input-group w-20rem">
                 <input type="text" class="form-control" name="SearchString" value="@ViewData["CurrentFilter"]" placeholder="Buscar por nome" id="autoComplete" data-table="Department" data-column1="Name" data-column2="" />
-                <input class="btn btn-outline-secondary" type="submit" value="Procurar" />
-                <a class="btn btn-outline-secondary align-content-center" asp-action="Index">Lista completa</a>
+                <input class="btn btn-outline-primary" type="submit" value="Procurar" />
+                <a class="btn btn-outline-primary align-content-center" asp-action="Index">Lista completa</a>
             </div>
         </form>
-        <a asp-action="Create" class="btn btn-primary"><i class="bi bi-plus-lg"></i> Novo departamento</a>
+        <div class="col d-flex justify-content-end">
+            <a asp-action="Create" class="btn btn-primary"><i class="bi bi-plus-lg"></i> Novo departamento</a>
+        </div>
+
         @* <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#create">
-            <i class="bi bi-plus-lg"></i> Novo departamento
+        <i class="bi bi-plus-lg"></i> Novo departamento
         </button> *@
     </div>
 </div>
 
-<img class="position-absolute object-fit-cover w-100 h-20rem top-0 z-n1" src="~/img/ArtH3.jpg" alt="Arte ilustrativa" />
+<img class="position-absolute object-fit-cover w-100 h-20rem top-0 z-n1" src="~/img/ArtHz.jpg" alt="Arte ilustrativa" />
 
 <div class="bg-white container rounded table-responsive">
     <table class="table text-center align-middle">
@@ -65,22 +78,19 @@
                         @Html.DisplayFor(modelItem => item.Name)
                     </td>
                     <td>
-                        <a class="text-primary fs-5" asp-action="Edit" asp-route-id="@item.DepartmentId"><i class="bi bi-pen"></i></a> 
+                        <a class="text-primary fs-5" asp-action="Edit" asp-route-id="@item.DepartmentId"><i class="bi bi-pen"></i></a>
 
                         @* <a class="text-primary fs-5 mx-2" asp-action="Details" asp-route-id="@item.DepartmentId"><i class="bi bi-info-circle"></i></a> *@
                         <a type="button" class="text-primary fs-5 mx-2" data-bs-toggle="modal" data-bs-target="#detail-@item.DepartmentId" data-task-id="@item.DepartmentId">
                             <i class="bi bi-info-circle"></i>
                         </a>
 
-                       @*  <a class="text-primary fs-5" asp-action="Delete" asp-route-id="@item.DepartmentId"><i class="bi bi-trash3"></i></a> *@
+                        @*  <a class="text-primary fs-5" asp-action="Delete" asp-route-id="@item.DepartmentId"><i class="bi bi-trash3"></i></a> *@
                         <a type="button" class="text-primary fs-5" data-bs-toggle="modal" data-bs-target="#delete-@item.DepartmentId" data-task-id="@item.DepartmentId">
                             <i class="bi bi-trash3"></i>
                         </a>
                     </td>
                 </tr>
-
-                @* Edit Modal *@
-
 
                 @* Detail Modal *@
                 <div class="modal fade" id="detail-@item.DepartmentId" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">

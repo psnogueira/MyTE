@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -12,13 +12,9 @@ using MyTE.Models;
 using MyTE.Models.ViewModel;
 using MyTE.Pagination;
 
-using CsvHelper;
-using CsvHelper.Configuration;
-using MyTE.Models.Map;
-using System.Text;
-
 namespace MyTE.Controllers
 {
+    [Authorize(Policy = "RequerPerfilAdmin")]
     public class DepartmentsController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -181,6 +177,5 @@ namespace MyTE.Controllers
         {
             return _context.Department.Any(e => e.DepartmentId == id);
         }
-
     }
 }

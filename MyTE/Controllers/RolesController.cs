@@ -5,7 +5,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace MyTE.Controllers
 {
-    //[Authorize(Roles = "admin")]
     [Authorize(Policy = "RequerPerfilAdmin")]
     public class RolesController : Controller
     {
@@ -38,10 +37,18 @@ namespace MyTE.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Create([Bind("Id", "Name")] IdentityRole role)
         {
-            // Verificar se o Nível de Acesso já existe
-            if (!_manager.RoleExistsAsync(role.Name).GetAwaiter().GetResult())
+            // Verifica a validade do nome da Role.
+            if (string.IsNullOrEmpty(role.Name))
+            {
+                // TempData["ErrorMessage"] = "Nome da Role não pode ser vazio!";
+                return View(role);
+            }
+
+            // Verifica se a Role já existe.
+            if (ModelState.IsValid && !_manager.RoleExistsAsync(role.Name).GetAwaiter().GetResult())
             {
                 _manager.CreateAsync(new IdentityRole(role.Name)).GetAwaiter().GetResult();
+                TempData["SuccessMessage"] = "Role criada com sucesso!";
             }
 
             return RedirectToAction("Index");
@@ -63,7 +70,7 @@ namespace MyTE.Controllers
 
             return View(role);
         }
-
+        
         [HttpGet]
         public async Task<IActionResult> Edit(string id)
         {
@@ -77,9 +84,7 @@ namespace MyTE.Controllers
             {
                 return NotFound();
             }
-
             return View(role);
-
         }
 
         [HttpPost]
@@ -110,6 +115,7 @@ namespace MyTE.Controllers
                         throw;
                     }
                 }
+                TempData["SuccessMessage2"] = "Role editada com sucesso!";
                 return RedirectToAction(nameof(Index));
             }
             return View(role);

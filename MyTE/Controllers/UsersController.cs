@@ -26,13 +26,18 @@ public class UsersController : Controller
 
     public async Task<IActionResult> Index(string searchString, int? pageNumber, int? departmentType)
     {
-        int pagesize = 5;
+        int pageSize = 5;
         ViewData["CurrentFilter"] = searchString;
+        ViewData["DepartmentType"] = departmentType; // Adicionar o departamento selecionado
 
         var usersQuery = _context.Users
             .Include(d => d.Department)
             .AsQueryable();
-    
+
+        var departments = _context.Department.ToList();
+
+        // Criação do SelectList com as opções de departamento
+        var departmentList = new SelectList(departments, "DepartmentId", "Name");
 
         if (!string.IsNullOrEmpty(searchString))
         {
@@ -47,7 +52,8 @@ public class UsersController : Controller
 
         var users = await PaginatedList<ApplicationUser>
             .CreateAsync(usersQuery
-            .AsNoTracking(), pageNumber ?? 1, pagesize);
+            .AsNoTracking(), pageNumber ?? 1, pageSize);
+
         var userRoles = new Dictionary<string, IList<string>>();
 
         foreach (var user in users)
@@ -59,13 +65,15 @@ public class UsersController : Controller
         var viewModel = new UserViewModel
         {
             UsersList = users,
-            User = new ApplicationUser(),
+            Type = departmentList,
+            DepartmentType = departmentType != null ? departments.FirstOrDefault(d => d.DepartmentId == departmentType) : null,
             CurrentFilter = searchString,
             UserRoles = userRoles,
         };
 
         return View(viewModel);
     }
+
 
     public IActionResult Create()
     {
