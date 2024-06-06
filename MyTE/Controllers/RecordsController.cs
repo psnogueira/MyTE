@@ -6,8 +6,10 @@ using Microsoft.EntityFrameworkCore;
 using MyTE.Data;
 using MyTE.DTO;
 using MyTE.Models;
+using MyTE.Models.Enum;
 using MyTE.Models.ViewModel;
 using MyTE.Pagination;
+using MyTE.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,10 +24,13 @@ namespace MyTE.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
         private static readonly DateTime StartDateRestriction = new DateTime(2024, 1, 1);
 
-        public RecordsController(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
+        private readonly CSVService _csvService;
+
+        public RecordsController(ApplicationDbContext context, UserManager<ApplicationUser> userManager, CSVService csvService)
         {
             _context = context;
             _userManager = userManager;
+            _csvService = csvService;
         }
 
         // GET: Records
@@ -174,6 +179,10 @@ namespace MyTE.Controllers
         private async Task<List<SelectListItem>> GetWBSList()
         {
             var wbsList = await _context.WBS.ToListAsync();
+
+            // Ordena a lista de WBS por código em ordem alfabética
+            wbsList.Sort((wbs1, wbs2) => wbs1.Code.CompareTo(wbs2.Code));
+
             return wbsList.Select(wbs => new SelectListItem
             {
                 Value = wbs.WBSId.ToString(),
@@ -327,7 +336,7 @@ namespace MyTE.Controllers
         [Authorize(Policy = "RequerPerfilAdmin")]
         public async Task<IActionResult> AdminView(string searchString, DateTime? startDate, DateTime? endDate, int? pageNumber, int? departmentType)
         {
-            var pageSize = 5;
+            var pageSize = 10;
             ViewData["CurrentFilter"] = searchString;
             ViewData["CurrentStartDate"] = startDate?.ToString("yyyy-MM-dd");
             ViewData["CurrentEndDate"] = endDate?.ToString("yyyy-MM-dd");
@@ -414,6 +423,269 @@ namespace MyTE.Controllers
             };
 
             return View(viewModel);
+        }
+
+        [Authorize(Policy = "RequerPerfilAdmin")]
+        public async Task<IActionResult> AdminViewWBS(string searchString, int? pageNumber, WBSType? wbsType)
+        {
+            int pageSize = 10;
+            ViewData["CurrentFilter"] = searchString;
+            var wbs = from s in _context.WBS
+                      select s;
+
+            IQueryable<WBSType> wbsQuery = from m in _context.WBS
+                                           orderby m.Type
+                                           select m.Type;
+
+            // Filtros de busca
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                wbs = wbs.Where(s => s.Code.Contains(searchString)
+                                       || s.Desc.Contains(searchString));
+            }
+
+            if (wbsType.HasValue)
+            {
+                wbs = wbs.Where(x => x.Type == wbsType.Value);
+            }
+
+            var viewModel = new WBSViewModel
+            {
+                WBSList = await PaginatedList<WBS>.CreateAsync(wbs.AsNoTracking(), pageNumber ?? 1, pageSize),
+                Type = new SelectList(await wbsQuery.Distinct().ToListAsync()),
+                WBS = new WBS(),
+                CurrentFilter = searchString
+            };
+
+            // Consulta LINQ para calcular a soma das horas da tabela Record para cada WBS.
+            var horasPorWBS = await _context.Record
+                                      .GroupBy(r => r.WBSId)
+                                      .Select(g => new
+                                      {
+                                          WBSId = g.Key,
+                                          TotalHoras = g.Sum(r => r.Hours)
+                                      })
+                                      .ToListAsync();
+
+            // Juntar as WBS presentes na tabela Record com as WBS restantes da tabela WBS.
+            var wbsIds = await _context.WBS.Select(w => w.WBSId).ToListAsync();
+            var wbsIdsFromRecords = horasPorWBS.Select(h => h.WBSId).ToList();
+            var wbsIdsToInclude = wbsIds.Except(wbsIdsFromRecords).ToList();
+            var wbsToInclude = wbsIdsToInclude.Select(w => new
+            {
+                WBSId = w,
+                TotalHoras = 0.0
+            }).ToList();
+
+            // Juntar horasPorWBS com wbsToInclude.
+            horasPorWBS.AddRange(wbsToInclude);
+
+            // Filtrar horasPorWBS para exibir apenas as WBS que também estão na ViewnModel.
+            horasPorWBS = horasPorWBS.Where(h => viewModel.WBSList.Any(w => w.WBSId == h.WBSId)).ToList();
+
+            // Ordena a lista de horas por WBS em ordem decrescente.
+            var horasPorWBSList = horasPorWBS.OrderByDescending(h => h.TotalHoras).ToList();
+
+            // Dicionário para armazenar os resultados.
+            var horasPorWBSDicionario = horasPorWBSList.ToDictionary(item => item.WBSId, item => item.TotalHoras);
+
+            // Consulta LINQ para obter as descrições das WBS.
+            var wbsDescriptions = await _context.WBS
+                                      .Select(w => new
+                                      {
+                                          w.WBSId,
+                                          w.Code,
+                                          w.Type,
+                                          w.Desc
+                                      })
+                                      .ToListAsync();
+
+            // Dicionário para armazenar as descrições das WBS.
+            var wbsDescriptionsDictionary = wbsDescriptions.ToDictionary(item => item.WBSId, item => item.Desc);
+            var wbsCodeDictionary = wbsDescriptions.ToDictionary(item => item.WBSId, item => item.Code);
+            var wbsTypeDictionary = wbsDescriptions.ToDictionary(item => item.WBSId, item => Enum.GetName(typeof(WBSType), item.Type));
+
+            // ViewBag para exibir os dados na View.
+            ViewBag.HorasPorWBS = horasPorWBSDicionario;
+            ViewBag.DescricoesWBS = wbsDescriptionsDictionary;
+            ViewBag.CodigosWBS = wbsCodeDictionary;
+            ViewBag.TiposWBS = wbsTypeDictionary;
+
+            return View(viewModel);
+        }
+
+        [Authorize(Policy = "RequerPerfilAdmin")]
+        public async Task<IActionResult> ViewDetailsWBS(int id)
+        {
+            // WBS selecionada.
+            var wbs = await _context.WBS.FindAsync(id);
+
+            // Lista de todas as quinzenas que possuem registros para a WBS selecionada.
+            var biweeklyRecords = await _context.BiweeklyRecords
+                .Include(b => b.Records)
+                .Where(b => b.Records.Any(r => r.WBSId == id))
+                .ToListAsync();
+
+            var isEmpty = true;
+
+            if (wbs != null && biweeklyRecords.Count > 0)
+            {
+                // Lista de todas as quinzenas diferentes em biweeklyRecords.
+                var biweeklyRecordsDistinct = biweeklyRecords.Select(b => new
+                {
+                    b.StartDate,
+                    b.EndDate
+                }).Distinct().ToList();
+
+                // Array contendo a data mais antiga e a data mais recente.
+                var dateRange = new DateTime[] { biweeklyRecordsDistinct.Min(b => b.StartDate), biweeklyRecordsDistinct.Max(b => b.EndDate) };
+
+                // Lista de todos os registros de horas em biweeklyRecords.
+                var records = biweeklyRecords.SelectMany(b => b.Records).Where(r => r.WBSId == id).ToList();
+
+                // Dicionário para armazenar as quinzenas e a soma das horas de cada uma.
+                var horasPorQuinzena = biweeklyRecordsDistinct.ToDictionary(b => b, b => records.Where(r => r.Data >= b.StartDate && r.Data <= b.EndDate).Sum(r => r.Hours));
+
+
+                // Soma de todas as horas da WBS.
+                var totalHoras = records.Sum(r => r.Hours);
+
+                // Variável para indicar que a WBS não está vazia.
+                isEmpty = false;
+
+                // ViewBag para exibir os dados na View.
+                ViewBag.WBS = wbs;
+                ViewBag.Periodo = dateRange;
+                ViewBag.HorasPorQuinzena = horasPorQuinzena;
+                ViewBag.TotalHoras = totalHoras;
+            }
+            else
+            {
+                // ViewBag para exibir os dados na View.
+                ViewBag.WBS = wbs;
+                ViewBag.Periodo = null;
+                ViewBag.HorasPorQuinzena = null;
+                ViewBag.TotalHoras = null;
+            }
+
+            ViewBag.IsEmpty = isEmpty;
+
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ExportWBS()
+        {
+            // Consulta LINQ para obter a soma das horas da tabela Record para cada WBS.
+            var horasPorWBS = await _context.Record
+                                      .GroupBy(r => r.WBSId)
+                                      .Select(g => new
+                                      {
+                                          WBSId = g.Key,
+                                          TotalHoras = g.Sum(r => r.Hours)
+                                      })
+                                      .ToListAsync();
+
+            // Juntar as WBS presentes na tabela Record com as WBS restantes da tabela WBS.
+            var wbsIds = await _context.WBS.Select(w => w.WBSId).ToListAsync();
+            var wbsIdsFromRecords = horasPorWBS.Select(h => h.WBSId).ToList();
+            var wbsIdsToInclude = wbsIds.Except(wbsIdsFromRecords).ToList();
+            var wbsToInclude = wbsIdsToInclude.Select(w => new
+            {
+                WBSId = w,
+                TotalHoras = 0.0
+            }).ToList();
+
+            // Juntar horasPorWBS com wbsToInclude.
+            horasPorWBS.AddRange(wbsToInclude);
+
+            // Ordena a lista de horas por WBS em ordem decrescente.
+            var horasPorWBSList = horasPorWBS.OrderByDescending(h => h.TotalHoras).ToList();
+
+            // Consulta LINQ para obter as descrições das WBS.
+            var wbsDescriptions = await _context.WBS
+                                      .Select(w => new
+                                      {
+                                          w.WBSId,
+                                          w.Code,
+                                          w.Desc,
+                                          w.Type
+                                      })
+                                      .ToListAsync();
+
+            // Lista combinada com os Ids, Códigos, Descrições e Total de horas.
+            var listaCombinada = (from h in horasPorWBSList
+                                  join d in wbsDescriptions
+                                  on h.WBSId equals d.WBSId
+                                  select new
+                                  {
+                                      WBSId = h.WBSId,
+                                      Code = d.Code,
+                                      Desc = d.Desc,
+                                      Type = Enum.GetName(typeof(WBSType), d.Type),
+                                      TotalHours = h.TotalHoras
+                                  }).ToList();
+
+            // Configuração do arquivo CSV para download.
+            var fileName = $"Relatorio_{DateTime.Today.ToString("dd/MM/yyyy")}.csv";
+            var contentType = "text/csv";
+            var columnNames = new List<string>
+            {
+                "Id da WBS",
+                "Código",
+                "Descrição",
+                "Tipo",
+                "Total de Horas"
+            };
+
+            // Escrever os dados em um arquivo CSV.
+            var csvData = _csvService.WriteCSV(listaCombinada, columnNames);
+
+            // Retornar o arquivo CSV para download.
+            return File(csvData, contentType, fileName);
+        }
+
+        [Authorize(Policy = "RequerPerfilAdmin")]
+        [HttpPost]
+        public async Task<IActionResult> ExportEmployees()
+        {
+            // Consulta LINQ para obter os registros de horas dos funcionários.
+            var employeesRecords = await _context.BiweeklyRecords
+                .Include(b => b.Records)
+                .Include(b => b.Department)
+                .ToListAsync();
+
+            // Lista combinada com os registros de horas dos funcionários.
+            var listaCombinada = employeesRecords.SelectMany(b => b.Records.Select(r => new
+            {
+                EmployeeName = b.EmployeeName,
+                Department = b.Department.Name,
+                StartDate = b.StartDate,
+                EndDate = b.EndDate,
+                Date = r.Data,
+                Hours = r.Hours,
+                WBS = _context.WBS.FirstOrDefault(w => w.WBSId == r.WBSId).Code
+            })).ToList();
+
+            // Configuração do arquivo CSV para download.
+            var fileName = $"Relatorio_NomeFuncionario_Quinzena.csv";
+            var contentType = "text/csv";
+            var columnNames = new List<string>
+            {
+                "Nome do Funcionário",
+                "Departamento",
+                "Data Inicial",
+                "Data Final",
+                "Data",
+                "Horas",
+                "WBS"
+            };
+
+            // Escrever os dados em um arquivo CSV.
+            var csvData = _csvService.WriteCSV(listaCombinada, columnNames);
+
+            // Retornar o arquivo CSV para download.
+            return File(csvData, contentType, fileName);
         }
     }
 }

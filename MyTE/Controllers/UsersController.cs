@@ -36,6 +36,9 @@ public class UsersController : Controller
 
         var departments = _context.Department.ToList();
 
+        // Ordenar a lista de departamentos em ordem alfabética
+        departments.Sort((d1, d2) => d1.Name.CompareTo(d2.Name));
+
         // Criação do SelectList com as opções de departamento
         var departmentList = new SelectList(departments, "DepartmentId", "Name");
 

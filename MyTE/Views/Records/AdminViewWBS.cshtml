@@ -1,0 +1,108 @@
+﻿@model MyTE.Models.ViewModel.WBSViewModel
+
+@{
+    ViewData["Title"] = "Relatório WBS";
+    ViewBag.Title = "Relatório WBS";
+}
+
+<div class="container mt-3">
+    <div class="d-flex align-items-center justify-content-between my-3">
+        <h1 class="fw-bold display-2 text-white mb-3">@ViewData["Title"]</h1>
+        <div class="col d-flex justify-content-end">
+            <form asp-action="ExportWBS">
+                <button type="submit" class="btn btn-success">Gerar CSV (Todas WBS)</button>
+            </form>
+        </div>
+    </div>
+    <div class="row justify-content-between my-3">
+        <form asp-action="AdminViewWBS" method="get" class="col-7">
+            <div class="form-actions input-group d-flex">
+                <select class="form-control" name="WBSType" asp-for="WBSType" asp-items="Model.Type">
+                    <option value="0">Todos</option>
+                </select>
+                <input type="text" class="form-control w-25" name="SearchString" value="@ViewData["CurrentFilter"]" placeholder="Buscar por código ou descrição" id="autoComplete" data-table="WBS" data-column1="Desc" data-column2="Code" />
+                <input class="btn btn-outline-primary" type="submit" value="Procurar" />
+                <a class="btn btn-outline-primary align-content-center" asp-action="AdminViewWBS">Lista completa</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<img class="position-absolute object-fit-cover w-100 h-20rem top-0 z-n1" src="~/img/ArtHz.jpg" alt="Arte ilustrativa" />
+
+<div class="bg-white container rounded table-responsive">
+    <form id="exportForm" method="post">
+        <table class="table text-center align-middle">
+            <thead>
+                <tr>
+                    <th>Código</th>
+                    <th>Descrição</th>
+                    <th>Tipo</th>
+                    <th>Total de Horas</th>
+                    <th>Detalhes</th>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    foreach (var item in ViewBag.HorasPorWBS)
+                    {
+                        var wbsDesc = ViewBag.DescricoesWBS[item.Key] as string ?? "Sem descrição";
+                        var wbsCode = ViewBag.CodigosWBS[item.Key] as string ?? "Sem código";
+                        var wbsType = ViewBag.TiposWBS[item.Key] as string ?? "Sem tipo";
+
+                        <tr class="">
+                            <td>@wbsCode</td>
+                            <td>@wbsDesc</td>
+                            <td>@wbsType</td>
+                            <td>@item.Value</td>
+                            <td>
+                                <a asp-action="ViewDetailsWBS" asp-route-id="@item.Key" class="btn btn-primary">
+                                    Detalhes
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                }
+                <tr class="table-secondary">
+                    <td colspan = "2"><button type="submit" class="btn btn-primary">Exportar selecionados para CSV</button></td>
+                    <td colspan="2"><strong>Total de Horas</strong></td>
+                    @{
+                        // Calcular a soma das horas de todas as WBS.
+                        double totalHours = 0;
+                        foreach (var item in ViewBag.HorasPorWBS)
+                        {
+                            totalHours += item.Value;
+                        }
+                        <td><strong>@totalHours</strong></td>
+                    }
+                    <td></td>
+                </tr>
+            </tbody>
+        </table>
+
+    </form>
+</div>
+
+<nav aria-label="Page navigation example" class="container mt-4">
+    <ul class="pagination">
+        <li class="page-item @(Model.WBSList.HasPreviousPage ? "" : "disabled")">
+            <a class="page-link" asp-action="AdminViewWBS" asp-route-pageNumber="@(Model.WBSList.PageIndex - 1)" asp-route-searchString="@Model.CurrentFilter">Anterior</a>
+        </li>
+        @for (int i = 1; i <= Model.WBSList.TotalPages; i++)
+        {
+            <li class="page-item @(i == Model.WBSList.PageIndex ? "active" : "")">
+                <a class="page-link" asp-action="AdminViewWBS" asp-route-pageNumber="@i" asp-route-searchString="@Model.CurrentFilter">@i</a>
+            </li>
+        }
+        <li class="page-item @(Model.WBSList.HasNextPage ? "" : "disabled")">
+            <a class="page-link" asp-action="AdminViewWBS" asp-route-pageNumber="@(Model.WBSList.PageIndex + 1)" asp-route-searchString="@Model.CurrentFilter">Próxima</a>
+        </li>
+    </ul>
+</nav>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
+
