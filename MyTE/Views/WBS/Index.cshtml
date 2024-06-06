@@ -16,7 +16,7 @@
                 <form asp-action="Index" method="get">
                     <div class="form-actions input-group w-100">
                         <select class="form-control" asp-for="WBSType" asp-items="Model.Type">
-                            <option value="">Todos</option>
+                            <option value="0">Todos</option>
                         </select>
                         <input type="text" class="form-control w-25" name="SearchString" value="@ViewData["CurrentFilter"]" placeholder="Buscar por código ou descrição" id="autoComplete" data-table="WBS" data-column1="Desc" data-column2="Code" />
                         <input class="btn btn-outline-primary" type="submit" value="Procurar" />
@@ -119,7 +119,7 @@
                 <form class="col-7" asp-action="Index" method="get">
                     <div class="form-actions input-group w-100">
                         <select class="form-control" asp-for="WBSType" asp-items="Model.Type">
-                            <option value="">Todos</option>
+                            <option value="0">Todos</option>
                         </select>
                         <input type="text" class="form-control w-25" name="SearchString" value="@ViewData["CurrentFilter"]" placeholder="Buscar por código ou descrição" id="autoComplete" data-table="WBS" data-column1="Desc" data-column2="Code" />
                         <input class="btn btn-outline-primary" type="submit" value="Procurar" />
