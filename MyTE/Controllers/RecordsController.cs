@@ -66,7 +66,7 @@ namespace MyTE.Controllers
                 else
                 {
                     TempData["ErrorMessage"] = "Falha na validação dos registros.";
-                    return RedirectToAction(nameof(Index));
+                    //return RedirectToAction(nameof(Index));
                 }
             }
             return RedirectToAction(nameof(Index));
@@ -238,8 +238,23 @@ namespace MyTE.Controllers
         // Método auxiliar para validar os registros
         private bool ValidateRecords(Dictionary<DateTime, double> myMap)
         {
+            // Calcular a quantidade de dias uteis na quinzena
+            int businessDays = 0;
+            for (DateTime date = myMap.Keys.Min(); date <= myMap.Keys.Max(); date = date.AddDays(1))
+            {
+                if (date.DayOfWeek != DayOfWeek.Saturday && date.DayOfWeek != DayOfWeek.Sunday)
+                {
+                    businessDays++;
+                }
+            }
+
             foreach (var item in myMap)
             {
+                if (item.Value < 0)
+                {
+                    TempData["ErrorMessageText"] = $"A data {item.Key:dd/MM} não pode ter horas negativas. Quantidade de horas registradas: {item.Value}";
+                    return false;
+                }
                 if (item.Value > 0 && item.Value < 8)
                 {
                     TempData["ErrorMessageText"] = $"A data {item.Key:dd/MM} possui uma quantidade inferior ao mínimo permitido (8 horas). Quantidade de horas registradas: {item.Value}";
@@ -256,6 +271,22 @@ namespace MyTE.Controllers
                     return false;
                 }
             }
+
+            int workHours = 8 * businessDays;
+            int maxWorkHours = 24 * businessDays;
+
+            // Verificar se a quantidade de horas registradas é válida.
+            if (myMap.Values.Sum() < workHours)
+            {
+                TempData["ErrorMessageText"] = $"A quantidade de horas registradas não corresponde ao esperado. Quantidade de horas registradas: {myMap.Values.Sum()}";
+                return false;
+            }
+            if (myMap.Values.Sum() > maxWorkHours)
+            {
+                TempData["ErrorMessageText"] = $"A quantidade de horas registradas ultrapassa o limite permitido. Quantidade de horas registradas: {myMap.Values.Sum()}";
+                return false;
+            }
+            
             return true;
         }
 
