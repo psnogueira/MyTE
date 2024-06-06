@@ -419,5 +419,10 @@ namespace MyTE.Controllers
 
             return View(viewModel);
         }
+
+        public IActionResult PowerBiReport()
+        {
+            return View();
+        }
     }
 }
