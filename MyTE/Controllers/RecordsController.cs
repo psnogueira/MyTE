@@ -450,7 +450,6 @@ namespace MyTE.Controllers
             {
                 wbs = wbs.Where(x => x.Type == wbsType.Value);
             }
-
             var viewModel = new WBSViewModel
             {
                 WBSList = await PaginatedList<WBS>.CreateAsync(wbs.AsNoTracking(), pageNumber ?? 1, pageSize),
@@ -482,14 +481,13 @@ namespace MyTE.Controllers
             // Juntar horasPorWBS com wbsToInclude.
             horasPorWBS.AddRange(wbsToInclude);
 
-            // Filtrar horasPorWBS para exibir apenas as WBS que também estão na ViewnModel.
-            horasPorWBS = horasPorWBS.Where(h => viewModel.WBSList.Any(w => w.WBSId == h.WBSId)).ToList();
-
-            // Ordena a lista de horas por WBS em ordem decrescente.
             var horasPorWBSList = horasPorWBS.OrderByDescending(h => h.TotalHoras).ToList();
 
+            // Cria uma nova lista de horasPorWBS com base no pageNumber e no pageSize.
+            var listaPorPagina = horasPorWBSList.Skip(((pageNumber - 1) ?? 1 - 1) * pageSize).Take(pageSize).ToList();
+
             // Dicionário para armazenar os resultados.
-            var horasPorWBSDicionario = horasPorWBSList.ToDictionary(item => item.WBSId, item => item.TotalHoras);
+            var horasPorWBSDicionario = listaPorPagina.ToDictionary(item => item.WBSId, item => item.TotalHoras);
 
             // Consulta LINQ para obter as descrições das WBS.
             var wbsDescriptions = await _context.WBS
