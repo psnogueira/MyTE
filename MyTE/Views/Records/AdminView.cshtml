@@ -2,7 +2,6 @@
 
 @{
     ViewData["Title"] = "Relatórios";
-    Layout = "~/Views/Shared/_LayoutCRUD.cshtml";
 }
 
 <div class="container my-3">
@@ -141,114 +140,5 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
-    <script>
-        // Função para salvar seleções no local storage
-        function saveSelections() {
-            const checkboxes = document.querySelectorAll('.form-check-input');
-            const selectedIds = JSON.parse(localStorage.getItem('selectedReports')) || [];
-            checkboxes.forEach(checkbox => {
-                const id = checkbox.value;
-                if (checkbox.checked && !selectedIds.includes(id)) {
-                    selectedIds.push(id);
-                } else if (!checkbox.checked && selectedIds.includes(id)) {
-                    const index = selectedIds.indexOf(id);
-                    selectedIds.splice(index, 1);
-                }
-            });
-            localStorage.setItem('selectedReports', JSON.stringify(selectedIds));
-        }
-
-        // Função para restaurar seleções do local storage
-        function restoreSelections() {
-            const selectedIds = JSON.parse(localStorage.getItem('selectedReports')) || [];
-            const checkboxes = document.querySelectorAll('.form-check-input');
-            checkboxes.forEach(checkbox => {
-                if (selectedIds.includes(checkbox.value)) {
-                    checkbox.checked = true;
-                }
-            });
-        }
-
-        // Evento para salvar seleções antes do envio do formulário
-        document.getElementById("exportForm").addEventListener("submit", function (event) {
-            saveSelections();
-            const selectedIds = JSON.parse(localStorage.getItem('selectedReports')) || [];
-
-            // Verifica se existe pelo menos 1 item selecionado
-            if (selectedIds.length === 0) {
-                event.preventDefault();
-                alert("Por favor, selecione pelo menos um item para exportar.");
-                return;
-            }
-
-            const hiddenInput = document.createElement('input');
-            hiddenInput.type = 'hidden';
-            hiddenInput.name = 'selectedReportIds';
-            hiddenInput.value = JSON.stringify(selectedIds);
-            this.appendChild(hiddenInput);
-        });
-
-        // Evento para selecionar/desmarcar todos os checkboxes
-        document.getElementById("selectAll").addEventListener("click", function () {
-            const checkboxes = document.querySelectorAll('input[name="selectedReports"]');
-            checkboxes.forEach(checkbox => {
-                checkbox.checked = this.checked;
-            });
-            saveSelections();
-        });
-
-        // Salvar seleções ao marcar/desmarcar individualmente
-        document.querySelectorAll('.form-check-input').forEach(checkbox => {
-            checkbox.addEventListener('change', saveSelections);
-        });
-
-        // Limpar seleções ao sair da admin view
-        window.addEventListener('unload', function (event) {
-            // Verificar se a nova URL não está na admin view
-            if (!event.currentTarget.location.href.includes("/Admin")) {
-                localStorage.removeItem('selectedReports');
-            }
-        });
-
-        // Limpar seleções ao exportar com sucesso
-        document.getElementById("exportForm").addEventListener("submit", function (event) {
-            saveSelections();
-            const selectedIds = JSON.parse(localStorage.getItem('selectedReports')) || [];
-            const hiddenInput = document.createElement('input');
-            hiddenInput.type = 'hidden';
-            hiddenInput.name = 'selectedReportIds';
-            hiddenInput.value = JSON.stringify(selectedIds);
-            this.appendChild(hiddenInput);
-            // Limpar seleções após a exportação bem-sucedida
-            localStorage.removeItem('selectedReports');
-        });
-
-        // As seleções permancem mesmo ao mudar da página 1 para a página 2, por exemplo
-        window.addEventListener('load', function () {
-            restoreSelections();
-        });
-
-        let leavingAdminView = false;
-
-        // Limpar seleções ao sair da admin view, a menos que estejamos indo para outra página da admin view
-        window.addEventListener('unload', function (event) {
-            if (!leavingAdminView) {
-                localStorage.removeItem('selectedReports');
-            }
-        });
-
-        // Evento para detectar quando o usuário está navegando para fora da admin view
-        document.querySelectorAll('a').forEach(link => {
-            link.addEventListener('click', function (event) {
-                const href = this.getAttribute('href');
-                if (href && href.includes('/Admin')) {
-                    leavingAdminView = true;
-                } else {
-                    leavingAdminView = false;
-                }
-            });
-        });
-
-    </script>
 }
 
