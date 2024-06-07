@@ -1,43 +1,56 @@
 ﻿@{
     ViewData["Title"] = "Relatório de WBS";
-    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+    Layout = "~/Views/Shared/_LayoutCRUD.cshtml";
 }
-<div class="container d-flex justify-content-between align-items-end mt-3">
-    <div class="d-flex flex-column">
-        <a class="text-white fs-5 text-decoration-none" asp-action="AdminViewWBS">
-            <i class="bi bi-arrow-left-short fs-3"></i>Voltar
-        </a>
-        <h1 class="fw-bold display-2 text-white">@ViewData["Title"]</h1>
-    </div>
-    @if (ViewBag.IsEmpty)
-    {
-        <div class="my-3">
-            <form asp-action="ExportWBSDetails" asp-route-id="@ViewBag.WBS.WBSId">
-                <button type="submit" class="btn btn-success" disabled>Gerar CSV</button>
-            </form>
+
+<div class="container">
+    <div class="row justify-content-between align-items-end mt-3">
+        <div class="col-5">
+            <div>
+                <a class="d-flex align-items-center gap-1 text-white fs-5 text-decoration-none" asp-action="AdminViewWBS">
+                    <i class="bi bi-arrow-left-short fs-3"></i>Voltar
+                </a>
+                <h1 class="fw-bold  text-white">@ViewData["Title"]</h1>
+            </div>
+
+            <div class="p-2 bg-white rounded d-flex flex-lg-row flex-md-wrap justify-content-evenly w-30rem mb-3">
+                <div class="">
+                    <small class="text-secondary">Descrição</small><br />
+                    @ViewBag.WBS.Desc
+                </div>
+                <div class="linha d-lg-flex d-none"></div>
+                <div class="">
+                    <small class="text-secondary">Total de horas</small><br />
+                    @ViewBag.TotalHoras
+                </div>
+            </div>
+
         </div>
-    }
-    else
-    {
-       <div class="my-3">
-            <form asp-action="ExportWBSDetails" asp-route-id="@ViewBag.WBS.WBSId">
-                <button type="submit" class="btn btn-success">Gerar CSV</button>
-           </form>
-       </div>
-        
-    }
+        <div class="col my-3 d-flex justify-content-end">
+            @if (ViewBag.IsEmpty)
+            {
+                <div class="my-3">
+                    <form asp-action="ExportWBSDetails" asp-route-id="@ViewBag.WBS.WBSId">
+                        <button type="submit" class="btn btn-success" disabled>Gerar CSV</button>
+                    </form>
+                </div>
+            }
+            else
+            {
+                <div class="my-3">
+                    <form asp-action="ExportWBSDetails" asp-route-id="@ViewBag.WBS.WBSId">
+                        <button type="submit" class="btn btn-success">Gerar CSV</button>
+                    </form>
+                </div>
+
+            }
+        </div>
+    </div>
 </div>
+
 <img class="position-absolute object-fit-cover w-100 h-50 top-0 z-n1" src="~/img/ArtHz.jpg" alt="Arte ilustrativa" />
 
-<div class="bg-white container rounded-top text-center pt-3 pb-2">
-    <div class="row">
-        <div class="col">
-            <h5>WBS: @ViewBag.WBS.Desc</h5>
-        </div>
-    </div>
-</div>
-
-<div class="bg-white container rounded-bottom table-responsive">
+<div class="bg-white container rounded table-responsive">
     <table class="table text-center align-middle">
         <thead>
             <tr>
@@ -46,7 +59,7 @@
                 <th></th>
             </tr>
         </thead>
-        <tbody class="table-group-divider">
+        <tbody class="">
             @{
                 if (ViewBag.IsEmpty)
                 {

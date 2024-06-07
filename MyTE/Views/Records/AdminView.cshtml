@@ -2,16 +2,21 @@
 
 @{
     ViewData["Title"] = "Relatórios";
+    Layout = "~/Views/Shared/_LayoutCRUD.cshtml";
 }
 
 <div class="container my-3">
     <h1 class="fw-bold display-2 text-white mb-3">@ViewData["Title"]</h1>
-    <div class="row position-absolute">
-        <div class="container d-xl-none">
-            <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar" aria-label="Toggle navigation">
-                <i class="bi bi-filter"></i> Filtrar
-            </button>
-
+    <div class="row">
+        <div class="container">
+            <div class="d-flex align-items-center justify-content-between my-1">
+                <button class="btn btn-info" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar" aria-label="Toggle navigation">
+                    <i class="bi bi-filter"></i> Filtrar
+                </button>
+                <form asp-action="ExportEmployees">
+                    <button type="submit" class="btn btn-success">Gerar CSV (Todos os Funcionários)</button>
+                </form>
+            </div>
             <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
                 <div class="offcanvas-header">
                     <h5 class="offcanvas-title" id="offcanvasNavbarLabel">Filtrar</h5>
@@ -45,18 +50,6 @@
                 </div>
             </div>
         </div>
-        <form class="col d-xl-flex d-none" asp-action="AdminView" method="get">
-            <div class="form-actions input-group w-100">
-                <select class="form-control" name="departmentType" asp-for="DepartmentType" asp-items="Model.DepartmentList">
-                    <option value="0">Todos</option>
-                </select>
-                <input type="text" class="form-control w-15" name="SearchString" value="@ViewData["CurrentFilter"]" placeholder="Buscar por nome ou email" id="autoComplete" data-table="BiweeklyRecords" data-column1="EmployeeName" data-column2="UserEmail" />
-                <input type="date" class="form-control w-5" name="StartDate" value="@ViewData["CurrentStartDate"]" placeholder="Data Inicial" />
-                <input type="date" class="form-control w-5" name="EndDate" value="@ViewData["CurrentEndDate"]" placeholder="Data Inicial" />
-                <input class="btn btn-outline-primary " type="submit" value="Procurar" />
-                <a class="btn btn-outline-primary " asp-action="AdminView">Lista completa</a>
-            </div>
-        </form>
     </div>
 </div>
 
@@ -64,9 +57,6 @@
 
 <div class="container">
     <form id="exportForm" method="post">
-        <p class="d-flex justify-content-end mb-3">
-            <button type="submit" class="btn btn-primary">Exportar selecionados</button>
-        </p>
         <div class="bg-white container rounded table-responsive">
             <table class="table text-center align-middle">
                 <thead>

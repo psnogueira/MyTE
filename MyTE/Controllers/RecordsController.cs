@@ -26,10 +26,11 @@ namespace MyTE.Controllers
 
         private readonly CSVService _csvService;
 
-        public RecordsController(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
+        public RecordsController(ApplicationDbContext context, UserManager<ApplicationUser> userManager, CSVService csvService)
         {
             _context = context;
             _userManager = userManager;
+            _csvService = csvService;
         }
 
         // GET: Records
@@ -402,6 +403,8 @@ namespace MyTE.Controllers
                 .Include(b => b.Records)
                 .FirstOrDefaultAsync(b => b.BiweeklyRecordId == id);
 
+            ViewBag.RecordId = id;
+
             if (biweeklyRecord == null)
             {
                 return NotFound();
@@ -630,7 +633,7 @@ namespace MyTE.Controllers
                                   }).ToList();
 
             // Configuração do arquivo CSV para download.
-            var fileName = $"Relatorio_{DateTime.Today.ToString("dd/MM/yyyy")}.csv";
+            var fileName = $"Relatorio_WBS_{DateTime.Today.ToString("dd/MM/yyyy")}.csv";
             var contentType = "text/csv";
             var columnNames = new List<string>
             {
@@ -726,7 +729,7 @@ namespace MyTE.Controllers
             }).ToList();
 
             // Configuração do arquivo CSV para download.
-            var fileName = $"Relatorio_NomeFuncionario_Quinzena.csv";
+            var fileName = $"Relatorio_Registros_{DateTime.Today.ToString("dd/MM/yyyy")}.csv";
             var contentType = "text/csv";
             var columnNames = new List<string>
             {
