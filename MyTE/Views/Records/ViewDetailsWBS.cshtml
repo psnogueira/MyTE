@@ -1,0 +1,104 @@
+﻿@{
+    ViewData["Title"] = "Relatório de WBS";
+    Layout = "~/Views/Shared/_LayoutCRUD.cshtml";
+}
+
+<div class="container">
+    <div class="row justify-content-between align-items-end mt-3">
+        <div class="col-5">
+            <div>
+                <a class="d-flex align-items-center gap-1 text-white fs-5 text-decoration-none" asp-action="AdminViewWBS">
+                    <i class="bi bi-arrow-left-short fs-3"></i>Voltar
+                </a>
+                <h1 class="fw-bold  text-white">@ViewData["Title"]</h1>
+            </div>
+
+            <div class="p-2 bg-white rounded d-flex flex-lg-row flex-md-wrap justify-content-evenly w-30rem mb-3">
+                <div class="">
+                    <small class="text-secondary">Descrição</small><br />
+                    @ViewBag.WBS.Desc
+                </div>
+                <div class="linha d-lg-flex d-none"></div>
+                <div class="">
+                    <small class="text-secondary">Total de horas</small><br />
+                    @ViewBag.TotalHoras
+                </div>
+            </div>
+
+        </div>
+        <div class="col my-3 d-flex justify-content-end">
+            @if (ViewBag.IsEmpty)
+            {
+                <div class="my-3">
+                    <form asp-action="ExportWBSDetails" asp-route-id="@ViewBag.WBS.WBSId">
+                        <button type="submit" class="btn btn-success" disabled>Gerar CSV</button>
+                    </form>
+                </div>
+            }
+            else
+            {
+                <div class="my-3">
+                    <form asp-action="ExportWBSDetails" asp-route-id="@ViewBag.WBS.WBSId">
+                        <button type="submit" class="btn btn-success">Gerar CSV</button>
+                    </form>
+                </div>
+
+            }
+        </div>
+    </div>
+</div>
+
+<img class="position-absolute object-fit-cover w-100 h-50 top-0 z-n1" src="~/img/ArtHz.jpg" alt="Arte ilustrativa" />
+
+<div class="bg-white container rounded table-responsive">
+    <table class="table text-center align-middle">
+        <thead>
+            <tr>
+                <th colspan="2">Quinzenas</th>
+                <th colspan="3">Total de Horas</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody class="">
+            @{
+                if (ViewBag.IsEmpty)
+                {
+                    <tr>
+                        <td colspan="5"></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td colspan="5">Ainda não há nenhum registro de horas nesta WBS!</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td colspan="5"></td>
+                        <td></td>
+                    </tr>
+                }
+                else
+                {
+                    foreach (var item in ViewBag.HorasPorQuinzena)
+                    {
+                        // Verifica se o item é nulo,
+                        var inicioQuinzena = item.Key.StartDate.ToString("dd/MM/yyyy") as string ?? "Sem data";
+                        var fimQuinzena = item.Key.EndDate.ToString("dd/MM/yyyy") as string ?? "Sem data";
+                        var totalHoras = item.Value as double? ?? 0;
+
+                        <tr>
+                            <td colspan="1">@inicioQuinzena</td>
+                            <td colspan="1">@fimQuinzena</td>
+                            <td colspan="3">@totalHoras</td>
+                            <td></td>
+                        </tr>
+                    }
+                }
+            }
+            <tr class="table-secondary">
+                <td colspan="3"><strong>Total de Horas</strong></td>
+                <td colspan="2"><strong>@ViewBag.TotalHoras</strong></td>
+                <td></td>
+            </tr>
+        </tbody>
+    </table>
+</div>

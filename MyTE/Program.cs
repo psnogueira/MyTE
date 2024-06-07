@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using MyTE.Data;
 using MyTE.Models;
+using MyTE.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,6 +18,9 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options => options.S
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultUI()
     .AddDefaultTokenProviders();
+
+// Registra o Serviço CSVService para ser injetado em outras classes.
+builder.Services.AddScoped<CSVService>();
 
 // Define política para autorização apenas do perfil admin para acessar algumas funcionalidades
 builder.Services.AddAuthorization(options =>

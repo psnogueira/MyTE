@@ -45,8 +45,15 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Departments" asp-action="Index">Departamentos</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Records" asp-action="AdminView">Relatórios</a>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link text-dark dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Relatórios
+                            </a>
+                            <ul class="dropdown-menu">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Records" asp-action="AdminView">Funcionários</a>
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Records" asp-action="AdminViewWBS">WBS</a>
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Records" asp-action="PowerBiReport">Power BI</a>
+                            </ul>
                         </li>
                     </ul>
                     <partial name="_LoginPartial" />
