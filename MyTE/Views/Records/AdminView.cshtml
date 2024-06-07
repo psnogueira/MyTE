@@ -8,12 +8,12 @@
     <h1 class="fw-bold display-2 text-white mb-3">@ViewData["Title"]</h1>
     <div class="row">
         <div class="container">
-            <div class="d-flex align-items-center justify-content-between my-1">
-                <button class="btn btn-info" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar" aria-label="Toggle navigation">
+            <div class="d-flex align-items-center justify-content-between">
+                <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar" aria-label="Toggle navigation">
                     <i class="bi bi-filter"></i> Filtrar
                 </button>
                 <form asp-action="ExportEmployees">
-                    <button type="submit" class="btn btn-success">Gerar CSV (Todos os Funcionários)</button>
+                    <button type="submit" class="btn btn-primary">Gerar CSV (Todos os Funcionários)</button>
                 </form>
             </div>
             <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
@@ -52,76 +52,62 @@
     </div>
 </div>
 
-<img class="position-absolute object-fit-cover w-100 h-20rem top-0 z-n1" src="~/img/ArtHz3.jpg" alt="Arte ilustrativa" />
+<img class="position-absolute object-fit-cover w-100 h-20rem top-0 z-n1" src="~/img/ArtHz2.jpg" alt="Arte ilustrativa" />
 
 <div class="container">
-    <form id="exportForm" method="post">
-        <div class="bg-white container rounded table-responsive">
-            <table class="table text-center align-middle">
-                <thead>
+    <div class="bg-white container rounded table-responsive">
+        <table class="table text-center align-middle">
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Usuário</th>
+                    <th>Departamento</th>
+                    <th>Período</th>
+                    <th>Total de Horas</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var record in Model.ReportsList)
+                {
                     <tr>
-                        <th>
-                            <input type="checkbox" id="selectAll" class="t form-check-input" />
-                        </th>
-                        <th>Nome</th>
-                        <th>Usuário</th>
-                        <th>Departamento</th>
-                        <th>Período</th>
-                        <th>Total de Horas</th>
-                        <th></th>
+                        <td class="text-capitalize">@record.EmployeeName</td>
+                        <td>@record.UserEmail</td>
+                        <td>@record.Department?.Name</td>
+                        <td>@record.StartDate.ToString("dd/MM/yyyy") - @record.EndDate.ToString("dd/MM/yyyy")</td>
+                        <td>@record.TotalHours</td>
+                        <td>
+                            <a asp-action="ViewDetails" asp-route-id="@record.BiweeklyRecordId" class="btn btn-primary">
+                                Detalhes
+                            </a>
+                        </td>
                     </tr>
-                </thead>
-                <tbody>
-                    @foreach (var record in Model.ReportsList)
-                    {
-                        <tr>
-                            <td>
-                                <input type="checkbox" name="selectedReports" value="@record.BiweeklyRecordId" class="form-check-input" />
-                            </td>
-                            <td class="text-capitalize">@record.EmployeeName</td>
-                            <td>@record.UserEmail</td>
-                            <td>@record.Department?.Name</td>
-                            <td>@record.StartDate.ToString("dd/MM/yyyy") - @record.EndDate.ToString("dd/MM/yyyy")</td>
-                            <td>@record.TotalHours</td>
-                            <td>
-                                <a asp-action="ViewDetails" asp-route-id="@record.BiweeklyRecordId" class="btn btn-primary">
-                                    Detalhes
-                                </a>
-                            </td>
-                        </tr>
-                    }
-                    @* <tr>
-                        <td></td>
-                        <td colspan="3"><strong>Total de Horas</strong></td>
-                        <td><strong></strong></td>
-                        <td></td>
-                    </tr> *@
-                </tbody>
-            </table>
-        </div>
-    </form>
+                }
+            </tbody>
+        </table>
+    </div>
 </div>
 
 <div class="container d-flex align-items-center justify-content-between">
-<nav aria-label="Page navigation example" class="mt-4">
-    <ul class="pagination">
-        <li class="page-item @(Model.ReportsList.HasPreviousPage ? "" : "disabled")">
-            <a class="page-link" asp-action="AdminView" asp-route-pageNumber="@(Model.ReportsList.PageIndex - 1)" asp-route-searchString="@Model.CurrentFilter">Anterior</a>
-        </li>
-        @for (int i = 1; i <= Model.ReportsList.TotalPages; i++)
-        {
-            <li class="page-item @(i == Model.ReportsList.PageIndex ? "active" : "")">
-                <a class="page-link" asp-action="AdminView" asp-route-pageNumber="@i" asp-route-searchString="@Model.CurrentFilter">@i</a>
+    <nav aria-label="Page navigation example" class="mt-4">
+        <ul class="pagination">
+            <li class="page-item @(Model.ReportsList.HasPreviousPage ? "" : "disabled")">
+                <a class="page-link" asp-action="AdminView" asp-route-pageNumber="@(Model.ReportsList.PageIndex - 1)" asp-route-searchString="@Model.CurrentFilter">Anterior</a>
             </li>
-        }
-        <li class="page-item @(Model.ReportsList.HasNextPage ? "" : "disabled")">
-            <a class="page-link" asp-action="AdminView" asp-route-pageNumber="@(Model.ReportsList.PageIndex + 1)" asp-route-searchString="@Model.CurrentFilter">Próxima</a>
-        </li>
-    </ul>
-</nav>
+            @for (int i = 1; i <= Model.ReportsList.TotalPages; i++)
+            {
+                <li class="page-item @(i == Model.ReportsList.PageIndex ? "active" : "")">
+                    <a class="page-link" asp-action="AdminView" asp-route-pageNumber="@i" asp-route-searchString="@Model.CurrentFilter">@i</a>
+                </li>
+            }
+            <li class="page-item @(Model.ReportsList.HasNextPage ? "" : "disabled")">
+                <a class="page-link" asp-action="AdminView" asp-route-pageNumber="@(Model.ReportsList.PageIndex + 1)" asp-route-searchString="@Model.CurrentFilter">Próxima</a>
+            </li>
+        </ul>
+    </nav>
 
     <div class="d-flex justify-content-end  p-2 rounded">
-    <span class="text-secondary"><strong>Total de horas registradas: </strong> @Model.TotalHours</span>
+        <span class="text-secondary"><strong>Total de horas registradas: </strong> @Model.TotalHours</span>
     </div>
 </div>
 

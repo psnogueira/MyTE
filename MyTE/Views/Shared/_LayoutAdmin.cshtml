@@ -1,11 +1,11 @@
 ﻿@{
-    var isDifferent = ViewData["Title"] != null && (ViewData["Title"].ToString() == "Perfil" || ViewData["Title"].ToString() == "Relatórios" || ViewData["Title"].ToString() == "Relatório");
-    var isReport = ViewData["Title"] != null && (ViewData["Title"].ToString() == "Relatórios" || ViewData["Title"].ToString() == "Relatório");
+    var isDifferent = ViewData["Title"] != null && (ViewData["Title"].ToString() == "Perfil" || ViewData["Title"].ToString() == "Relatórios" || ViewData["Title"].ToString() == "Relatório" || ViewData["Title"].ToString() == "Relatórios WBS");
+    var isReport = ViewData["Title"] != null && (ViewData["Title"].ToString() == "Relatórios" || ViewData["Title"].ToString() == "Relatório" || ViewData["Title"].ToString() == "Relatórios WBS");
     var cssClass = isDifferent ? "bg-violet" : "";
 }
 
 <!DOCTYPE html>
-<html lang="pt-br" class="">
+<html lang="pt-br" class="h-100">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -64,7 +64,7 @@
     @if (isReport)
     {
         <div class="">
-            <main role="main" class="pb-3">
+            <main role="main" class="pb-1">
                 @RenderBody()
             </main>
         </div>
@@ -81,8 +81,7 @@
 
     @if (isReport)
     {
-        <footer class="d-none">
-        </footer>
+        <footer class="d-none"></footer>
     }
     else
     {

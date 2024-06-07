@@ -29,11 +29,10 @@
                     @Model.BiweeklyRecord.TotalHours
                 </div>
             </div>
-
         </div>
         <div class="col my-3 d-flex justify-content-end">
             <form asp-action="ExportEmployeeDetail" asp-route-id="@ViewBag.RecordId">
-                <button type="submit" class="btn btn-success">Gerar CSV</button>
+                <button type="submit" class="btn btn-primary">Gerar CSV</button>
             </form>
         </div>
     </div>

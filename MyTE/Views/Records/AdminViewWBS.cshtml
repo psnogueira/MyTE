@@ -1,16 +1,14 @@
 ﻿@model MyTE.Models.ViewModel.WBSViewModel
 
 @{
-    ViewData["Title"] = "Relatório WBS";
-    ViewBag.Title = "Relatório WBS";
-    Layout = "~/Views/Shared/_LayoutCRUD.cshtml";
+    ViewData["Title"] = "Relatórios WBS";
 }
 
 <div class="container mt-3">
-    <div class="d-flex align-items-center justify-content-between my-3">
+    <div class="d-flex align-items-center justify-content-between">
         <h1 class="fw-bold display-2 text-white mb-3">@ViewData["Title"]</h1>
     </div>
-    <div class="d-flex align-items-center justify-content-between my-3">
+    <div class="d-flex align-items-center justify-content-between mb-3">
         <form asp-action="AdminViewWBS" method="get" class="col-7">
             <div class="form-actions input-group d-flex">
                 <select class="form-control" name="WBSType" asp-for="WBSType" asp-items="Model.Type">
@@ -22,7 +20,7 @@
             </div>
         </form>
         <form asp-action="ExportWBS">
-            <button type="submit" class="btn btn-success">Gerar CSV (Todas WBS)</button>
+            <button type="submit" class="btn btn-primary">Gerar CSV (Todas WBS)</button>
         </form>
     </div>
 </div>
@@ -62,42 +60,45 @@
                         </tr>
                     }
                 }
-                <tr class="table-secondary">
-                    <td colspan="3"><strong>Total de Horas</strong></td>
-                    @{
-                        // Calcular a soma das horas de todas as WBS.
-                        double totalHours = 0;
-                        foreach (var item in ViewBag.HorasPorWBS)
-                        {
-                            totalHours += item.Value;
-                        }
-                        <td><strong>@totalHours</strong></td>
-                    }
-                    <td></td>
-                </tr>
             </tbody>
         </table>
 
     </form>
 </div>
 
-<nav aria-label="Page navigation example" class="container mt-4">
-    <ul class="pagination">
-        <li class="page-item @(Model.WBSList.HasPreviousPage ? "" : "disabled")">
-            <a class="page-link" asp-action="AdminViewWBS" asp-route-pageNumber="@(Model.WBSList.PageIndex - 1)" asp-route-searchString="@Model.CurrentFilter">Anterior</a>
-        </li>
-        @for (int i = 1; i <= Model.WBSList.TotalPages; i++)
-        {
-            <li class="page-item @(i == Model.WBSList.PageIndex ? "active" : "")">
-                <a class="page-link" asp-action="AdminViewWBS" asp-route-pageNumber="@i" asp-route-searchString="@Model.CurrentFilter">@i</a>
+<div class="container d-flex align-items-center justify-content-between">
+    <nav aria-label="Page navigation example" class="mt-4">
+        <ul class="pagination">
+            <li class="page-item @(Model.WBSList.HasPreviousPage ? "" : "disabled")">
+                <a class="page-link" asp-action="AdminViewWBS" asp-route-pageNumber="@(Model.WBSList.PageIndex - 1)" asp-route-searchString="@Model.CurrentFilter">Anterior</a>
             </li>
-        }
-        <li class="page-item @(Model.WBSList.HasNextPage ? "" : "disabled")">
-            <a class="page-link" asp-action="AdminViewWBS" asp-route-pageNumber="@(Model.WBSList.PageIndex + 1)" asp-route-searchString="@Model.CurrentFilter">Próxima</a>
-        </li>
-    </ul>
-</nav>
+            @for (int i = 1; i <= Model.WBSList.TotalPages; i++)
+            {
+                <li class="page-item @(i == Model.WBSList.PageIndex ? "active" : "")">
+                    <a class="page-link" asp-action="AdminViewWBS" asp-route-pageNumber="@i" asp-route-searchString="@Model.CurrentFilter">@i</a>
+                </li>
+            }
+            <li class="page-item @(Model.WBSList.HasNextPage ? "" : "disabled")">
+                <a class="page-link" asp-action="AdminViewWBS" asp-route-pageNumber="@(Model.WBSList.PageIndex + 1)" asp-route-searchString="@Model.CurrentFilter">Próxima</a>
+            </li>
+        </ul>
+    </nav>
 
+    <div class="d-flex justify-content-end  p-2 rounded">
+        <span class="text-secondary">
+            <strong>Total de horas registradas: </strong> 
+            @{
+                // Calcular a soma das horas de todas as WBS.
+                double totalHours = 0;
+                foreach (var item in ViewBag.HorasPorWBS)
+                {
+                    totalHours += item.Value;
+                }
+                @totalHours
+            }
+        </span>
+    </div>
+</div>
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");

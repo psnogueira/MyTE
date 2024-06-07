@@ -10,7 +10,7 @@
                 <a class="d-flex align-items-center gap-1 text-white fs-5 text-decoration-none" asp-action="AdminViewWBS">
                     <i class="bi bi-arrow-left-short fs-3"></i>Voltar
                 </a>
-                <h1 class="fw-bold  text-white">@ViewData["Title"]</h1>
+                <h1 class="fw-bold text-white">@ViewData["Title"]</h1>
             </div>
 
             <div class="p-2 bg-white rounded d-flex flex-lg-row flex-md-wrap justify-content-evenly w-30rem mb-3">
@@ -29,17 +29,17 @@
         <div class="col my-3 d-flex justify-content-end">
             @if (ViewBag.IsEmpty)
             {
-                <div class="my-3">
+                <div class="">
                     <form asp-action="ExportWBSDetails" asp-route-id="@ViewBag.WBS.WBSId">
-                        <button type="submit" class="btn btn-success" disabled>Gerar CSV</button>
+                        <button type="submit" class="btn btn-primary" disabled>Gerar CSV</button>
                     </form>
                 </div>
             }
             else
             {
-                <div class="my-3">
+                <div class="">
                     <form asp-action="ExportWBSDetails" asp-route-id="@ViewBag.WBS.WBSId">
-                        <button type="submit" class="btn btn-success">Gerar CSV</button>
+                        <button type="submit" class="btn btn-primary">Gerar CSV</button>
                     </form>
                 </div>
 
@@ -48,7 +48,7 @@
     </div>
 </div>
 
-<img class="position-absolute object-fit-cover w-100 h-50 top-0 z-n1" src="~/img/ArtHz.jpg" alt="Arte ilustrativa" />
+<img class="position-absolute object-fit-cover w-100 h-20rem top-0 z-n1" src="~/img/ArtHz.jpg" alt="Arte ilustrativa" />
 
 <div class="bg-white container rounded table-responsive">
     <table class="table text-center align-middle">
@@ -64,15 +64,7 @@
                 if (ViewBag.IsEmpty)
                 {
                     <tr>
-                        <td colspan="5"></td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td colspan="5">Ainda não há nenhum registro de horas nesta WBS!</td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td colspan="5"></td>
+                        <td class="text-secondary" colspan="5">Ainda não há nenhum registro de horas nesta WBS!</td>
                         <td></td>
                     </tr>
                 }
@@ -94,11 +86,6 @@
                     }
                 }
             }
-            <tr class="table-secondary">
-                <td colspan="3"><strong>Total de Horas</strong></td>
-                <td colspan="2"><strong>@ViewBag.TotalHoras</strong></td>
-                <td></td>
-            </tr>
         </tbody>
     </table>
 </div>
