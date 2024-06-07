@@ -750,6 +750,51 @@ namespace MyTE.Controllers
 
         [Authorize(Policy = "RequerPerfilAdmin")]
         [HttpPost]
+        public async Task<IActionResult> ExportSelectedEmployees()
+        {
+            // Consulta LINQ para obter os registros de horas dos funcionários.
+            var employeesRecords = await _context.BiweeklyRecords
+                .Include(b => b.Department)
+                .OrderByDescending(r => r.StartDate)
+                .ToListAsync();
+
+            // Lista contendo os dados de employeesRecords mais o PID do funcionário.
+            var listaCombinada = employeesRecords.Select(b => new
+            {
+                Id = b.BiweeklyRecordId,
+                PID = _context.Users.FirstOrDefault(u => u.Email == b.UserEmail).PID,
+                EmployeeName = b.EmployeeName,
+                Email = b.UserEmail,
+                Department = b.Department.Name,
+                StartDate = b.StartDate.ToString("dd/MM/yyyy"),
+                EndDate = b.EndDate.ToString("dd/MM/yyyy"),
+                TotalHours = b.TotalHours
+            }).ToList();
+
+            // Configuração do arquivo CSV para download.
+            var fileName = $"Relatorio_Registros_{DateTime.Today.ToString("dd/MM/yyyy")}.csv";
+            var contentType = "text/csv";
+            var columnNames = new List<string>
+            {
+                "Id",
+                "PID",
+                "Nome",
+                "Email",
+                "Departamento",
+                "Data Inicial",
+                "Data Final",
+                "Total de Horas",
+            };
+
+            // Escrever os dados em um arquivo CSV.
+            var csvData = _csvService.WriteCSV(listaCombinada, columnNames);
+
+            // Retornar o arquivo CSV para download.
+            return File(csvData, contentType, fileName);
+        }
+
+        [Authorize(Policy = "RequerPerfilAdmin")]
+        [HttpPost]
         public async Task<IActionResult> ExportEmployeeDetail(int id)
         {
             // Registo de horas do funcionário selecionado.

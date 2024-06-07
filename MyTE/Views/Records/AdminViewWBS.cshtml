@@ -45,9 +45,18 @@
                 @{
                     foreach (var item in ViewBag.HorasPorWBS)
                     {
-                        var wbsDesc = ViewBag.DescricoesWBS[item.Key] as string ?? "Sem descrição";
-                        var wbsCode = ViewBag.CodigosWBS[item.Key] as string ?? "Sem código";
-                        var wbsType = ViewBag.TiposWBS[item.Key] as string ?? "Sem tipo";
+                        var wbsDesc = "";
+                        var wbsCode = "";
+                        var wbsType = "";
+
+                        // Try catch para evitar ao não encontrar a descrição da WBS.
+                        try { wbsDesc = ViewBag.DescricoesWBS[item.Key] as string ?? "Sem descrição"; }
+                        catch { wbsDesc = "Sem descrição"; }
+                        try { wbsCode = ViewBag.CodigosWBS[item.Key] as string ?? "Sem código"; }
+                        catch { wbsCode = "Sem descrição"; }
+                        try { wbsType = ViewBag.TiposWBS[item.Key] as string ?? "Sem tipo"; }
+                        catch { wbsType = "Sem descrição"; }
+                        
 
                         <tr class="">
                             <td>@wbsCode</td>
