@@ -60,9 +60,6 @@
             <table class="table text-center align-middle">
                 <thead>
                     <tr>
-                        <th>
-                            <input type="checkbox" id="selectAll" class="t form-check-input" />
-                        </th>
                         <th>Nome</th>
                         <th>Usuário</th>
                         <th>Departamento</th>
@@ -75,9 +72,6 @@
                     @foreach (var record in Model.ReportsList)
                     {
                         <tr>
-                            <td>
-                                <input type="checkbox" name="selectedReports" value="@record.BiweeklyRecordId" class="form-check-input" />
-                            </td>
                             <td class="text-capitalize">@record.EmployeeName</td>
                             <td>@record.UserEmail</td>
                             <td>@record.Department?.Name</td>
