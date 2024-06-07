@@ -37,8 +37,15 @@ namespace MyTE.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Create([Bind("Id", "Name")] IdentityRole role)
         {
-            // Verificar se o Nível de Acesso já existe
-            if (!_manager.RoleExistsAsync(role.Name).GetAwaiter().GetResult())
+            // Verifica a validade do nome da Role.
+            if (string.IsNullOrEmpty(role.Name))
+            {
+                // TempData["ErrorMessage"] = "Nome da Role não pode ser vazio!";
+                return View(role);
+            }
+
+            // Verifica se a Role já existe.
+            if (ModelState.IsValid && !_manager.RoleExistsAsync(role.Name).GetAwaiter().GetResult())
             {
                 _manager.CreateAsync(new IdentityRole(role.Name)).GetAwaiter().GetResult();
                 TempData["SuccessMessage"] = "Role criada com sucesso!";

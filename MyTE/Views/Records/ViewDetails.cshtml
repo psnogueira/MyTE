@@ -33,7 +33,9 @@
 
         </div>
         <div class="col my-3 d-flex justify-content-end">
-            <a class="btn btn-primary" asp-action="Index">Download</a>
+            <form asp-action="ExportEmployeeDetail" asp-route-id="@ViewBag.RecordId">
+                <button type="submit" class="btn btn-success">Gerar CSV</button>
+            </form>
         </div>
     </div>
 </div>

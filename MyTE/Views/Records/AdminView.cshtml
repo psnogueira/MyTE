@@ -7,12 +7,16 @@
 
 <div class="container my-3">
     <h1 class="fw-bold display-2 text-white mb-3">@ViewData["Title"]</h1>
-    <div class="row position-absolute">
-        <div class="container d-xl-none">
-            <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar" aria-label="Toggle navigation">
-                <i class="bi bi-filter"></i> Filtrar
-            </button>
-
+    <div class="row">
+        <div class="container">
+            <div class="d-flex align-items-center justify-content-between my-1">
+                <button class="btn btn-info" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar" aria-label="Toggle navigation">
+                    <i class="bi bi-filter"></i> Filtrar
+                </button>
+                <form asp-action="ExportEmployees">
+                    <button type="submit" class="btn btn-success">Gerar CSV (Todos os Funcionários)</button>
+                </form>
+            </div>
             <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
                 <div class="offcanvas-header">
                     <h5 class="offcanvas-title" id="offcanvasNavbarLabel">Filtrar</h5>
@@ -46,18 +50,6 @@
                 </div>
             </div>
         </div>
-        <form class="col d-xl-flex d-none" asp-action="AdminView" method="get">
-            <div class="form-actions input-group w-100">
-                <select class="form-control" name="departmentType" asp-for="DepartmentType" asp-items="Model.DepartmentList">
-                    <option value="0">Todos</option>
-                </select>
-                <input type="text" class="form-control w-15" name="SearchString" value="@ViewData["CurrentFilter"]" placeholder="Buscar por nome ou email" id="autoComplete" data-table="BiweeklyRecords" data-column1="EmployeeName" data-column2="UserEmail" />
-                <input type="date" class="form-control w-5" name="StartDate" value="@ViewData["CurrentStartDate"]" placeholder="Data Inicial" />
-                <input type="date" class="form-control w-5" name="EndDate" value="@ViewData["CurrentEndDate"]" placeholder="Data Inicial" />
-                <input class="btn btn-outline-primary " type="submit" value="Procurar" />
-                <a class="btn btn-outline-primary " asp-action="AdminView">Lista completa</a>
-            </div>
-        </form>
     </div>
 </div>
 
@@ -65,9 +57,6 @@
 
 <div class="container">
     <form id="exportForm" method="post">
-        <p class="d-flex justify-content-end mb-3">
-            <button type="submit" class="btn btn-primary">Exportar selecionados</button>
-        </p>
         <div class="bg-white container rounded table-responsive">
             <table class="table text-center align-middle">
                 <thead>
@@ -141,114 +130,5 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
-    <script>
-        // Função para salvar seleções no local storage
-        function saveSelections() {
-            const checkboxes = document.querySelectorAll('.form-check-input');
-            const selectedIds = JSON.parse(localStorage.getItem('selectedReports')) || [];
-            checkboxes.forEach(checkbox => {
-                const id = checkbox.value;
-                if (checkbox.checked && !selectedIds.includes(id)) {
-                    selectedIds.push(id);
-                } else if (!checkbox.checked && selectedIds.includes(id)) {
-                    const index = selectedIds.indexOf(id);
-                    selectedIds.splice(index, 1);
-                }
-            });
-            localStorage.setItem('selectedReports', JSON.stringify(selectedIds));
-        }
-
-        // Função para restaurar seleções do local storage
-        function restoreSelections() {
-            const selectedIds = JSON.parse(localStorage.getItem('selectedReports')) || [];
-            const checkboxes = document.querySelectorAll('.form-check-input');
-            checkboxes.forEach(checkbox => {
-                if (selectedIds.includes(checkbox.value)) {
-                    checkbox.checked = true;
-                }
-            });
-        }
-
-        // Evento para salvar seleções antes do envio do formulário
-        document.getElementById("exportForm").addEventListener("submit", function (event) {
-            saveSelections();
-            const selectedIds = JSON.parse(localStorage.getItem('selectedReports')) || [];
-
-            // Verifica se existe pelo menos 1 item selecionado
-            if (selectedIds.length === 0) {
-                event.preventDefault();
-                alert("Por favor, selecione pelo menos um item para exportar.");
-                return;
-            }
-
-            const hiddenInput = document.createElement('input');
-            hiddenInput.type = 'hidden';
-            hiddenInput.name = 'selectedReportIds';
-            hiddenInput.value = JSON.stringify(selectedIds);
-            this.appendChild(hiddenInput);
-        });
-
-        // Evento para selecionar/desmarcar todos os checkboxes
-        document.getElementById("selectAll").addEventListener("click", function () {
-            const checkboxes = document.querySelectorAll('input[name="selectedReports"]');
-            checkboxes.forEach(checkbox => {
-                checkbox.checked = this.checked;
-            });
-            saveSelections();
-        });
-
-        // Salvar seleções ao marcar/desmarcar individualmente
-        document.querySelectorAll('.form-check-input').forEach(checkbox => {
-            checkbox.addEventListener('change', saveSelections);
-        });
-
-        // Limpar seleções ao sair da admin view
-        window.addEventListener('unload', function (event) {
-            // Verificar se a nova URL não está na admin view
-            if (!event.currentTarget.location.href.includes("/Admin")) {
-                localStorage.removeItem('selectedReports');
-            }
-        });
-
-        // Limpar seleções ao exportar com sucesso
-        document.getElementById("exportForm").addEventListener("submit", function (event) {
-            saveSelections();
-            const selectedIds = JSON.parse(localStorage.getItem('selectedReports')) || [];
-            const hiddenInput = document.createElement('input');
-            hiddenInput.type = 'hidden';
-            hiddenInput.name = 'selectedReportIds';
-            hiddenInput.value = JSON.stringify(selectedIds);
-            this.appendChild(hiddenInput);
-            // Limpar seleções após a exportação bem-sucedida
-            localStorage.removeItem('selectedReports');
-        });
-
-        // As seleções permancem mesmo ao mudar da página 1 para a página 2, por exemplo
-        window.addEventListener('load', function () {
-            restoreSelections();
-        });
-
-        let leavingAdminView = false;
-
-        // Limpar seleções ao sair da admin view, a menos que estejamos indo para outra página da admin view
-        window.addEventListener('unload', function (event) {
-            if (!leavingAdminView) {
-                localStorage.removeItem('selectedReports');
-            }
-        });
-
-        // Evento para detectar quando o usuário está navegando para fora da admin view
-        document.querySelectorAll('a').forEach(link => {
-            link.addEventListener('click', function (event) {
-                const href = this.getAttribute('href');
-                if (href && href.includes('/Admin')) {
-                    leavingAdminView = true;
-                } else {
-                    leavingAdminView = false;
-                }
-            });
-        });
-
-    </script>
 }
 
