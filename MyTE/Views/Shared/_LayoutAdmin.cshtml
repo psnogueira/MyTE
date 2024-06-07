@@ -1,7 +1,6 @@
 ﻿@{
-    var isDifferent = ViewData["Title"] != null && (ViewData["Title"].ToString() == "Perfil" || ViewData["Title"].ToString() == "Relatórios" || ViewData["Title"].ToString() == "Relatório" || ViewData["Title"].ToString() == "Relatórios WBS");
-    var isReport = ViewData["Title"] != null && (ViewData["Title"].ToString() == "Relatórios" || ViewData["Title"].ToString() == "Relatório" || ViewData["Title"].ToString() == "Relatórios WBS");
-    var cssClass = isDifferent ? "bg-violet" : "";
+    var isReport = ViewData["Title"] != null && (ViewData["Title"].ToString() == "Relatórios" || ViewData["Title"].ToString() == "Relatório" || ViewData["Title"].ToString() == "Relatórios WBS" || ViewData["Title"].ToString() == "Relatório de WBS");
+    var cssClass = isReport ? "bg-violet" : "";
 }
 
 <!DOCTYPE html>

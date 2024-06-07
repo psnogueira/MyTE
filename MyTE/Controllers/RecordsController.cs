@@ -450,6 +450,7 @@ namespace MyTE.Controllers
             {
                 wbs = wbs.Where(x => x.Type == wbsType.Value);
             }
+
             var viewModel = new WBSViewModel
             {
                 WBSList = await PaginatedList<WBS>.CreateAsync(wbs.AsNoTracking(), pageNumber ?? 1, pageSize),

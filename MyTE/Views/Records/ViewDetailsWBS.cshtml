@@ -1,6 +1,5 @@
 ﻿@{
     ViewData["Title"] = "Relatório de WBS";
-    Layout = "~/Views/Shared/_LayoutCRUD.cshtml";
 }
 
 <div class="container">
@@ -50,42 +49,44 @@
 
 <img class="position-absolute object-fit-cover w-100 h-20rem top-0 z-n1" src="~/img/ArtHz.jpg" alt="Arte ilustrativa" />
 
-<div class="bg-white container rounded table-responsive">
-    <table class="table text-center align-middle">
-        <thead>
-            <tr>
-                <th colspan="2">Quinzenas</th>
-                <th colspan="3">Total de Horas</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody class="">
-            @{
-                if (ViewBag.IsEmpty)
-                {
-                    <tr>
-                        <td class="text-secondary" colspan="5">Ainda não há nenhum registro de horas nesta WBS!</td>
-                        <td></td>
-                    </tr>
-                }
-                else
-                {
-                    foreach (var item in ViewBag.HorasPorQuinzena)
+<div class="container">
+    <div class="bg-white container rounded table-responsive">
+        <table class="table text-center align-middle">
+            <thead>
+                <tr>
+                    <th >Quinzenas</th>
+                    <th >Total de Horas</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody class="">
+                @{
+                    if (ViewBag.IsEmpty)
                     {
-                        // Verifica se o item é nulo,
-                        var inicioQuinzena = item.Key.StartDate.ToString("dd/MM/yyyy") as string ?? "Sem data";
-                        var fimQuinzena = item.Key.EndDate.ToString("dd/MM/yyyy") as string ?? "Sem data";
-                        var totalHoras = item.Value as double? ?? 0;
-
                         <tr>
-                            <td colspan="1">@inicioQuinzena</td>
-                            <td colspan="1">@fimQuinzena</td>
-                            <td colspan="3">@totalHoras</td>
+                            <td class="text-secondary" colspan="5">Ainda não há nenhum registro de horas nesta WBS!</td>
                             <td></td>
                         </tr>
                     }
+                    else
+                    {
+                        foreach (var item in ViewBag.HorasPorQuinzena)
+                        {
+                            // Verifica se o item é nulo,
+                            var inicioQuinzena = item.Key.StartDate.ToString("dd/MM/yyyy") as string ?? "Sem data";
+                            var fimQuinzena = item.Key.EndDate.ToString("dd/MM/yyyy") as string ?? "Sem data";
+                            var totalHoras = item.Value as double? ?? 0;
+
+                            <tr>
+                                <td >@inicioQuinzena  -  @fimQuinzena</td>
+                         
+                                <td >@totalHoras</td>
+                                <td></td>
+                            </tr>
+                        }
+                    }
                 }
-            }
-        </tbody>
-    </table>
+            </tbody>
+        </table>
+    </div>
 </div>
