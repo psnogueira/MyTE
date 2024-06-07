@@ -2,58 +2,67 @@
 
 @{
     ViewData["Title"] = "Relatório";
-    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+    Layout = "~/Views/Shared/_LayoutCRUD.cshtml";
 }
-<div class="container d-flex justify-content-between align-items-end mt-3">
-    <div class="d-flex flex-column">
-        <a class="text-white fs-5 text-decoration-none" asp-action="AdminView">
-            <i class="bi bi-arrow-left-short fs-3"></i>Voltar
-        </a>
-        <h1 class="fw-bold display-2 text-white">@ViewData["Title"]</h1>
-    </div>
-    <div class="my-3">
-        <form asp-action="ExportEmployeeDetail" asp-route-id="@ViewBag.RecordId">
-            <button type="submit" class="btn btn-success">Gerar CSV</button>
-        </form>
-    </div>
-</div>
-<img class="position-absolute object-fit-cover w-100 h-50 top-0 z-n1" src="~/img/ArtHz.jpg" alt="Arte ilustrativa" />
+<div class="container">
+    <div class="row justify-content-between align-items-end mt-3">
+        <div class="col-8">
+            <div>
+                <a class="d-flex align-items-center gap-1 text-white fs-5 text-decoration-none" asp-action="AdminView">
+                    <i class="bi bi-arrow-left-short fs-3"></i>Voltar
+                </a>
+                <h1 class="fw-bold  text-white">@ViewData["Title"]</h1>
+            </div>
 
-<div class="bg-white container rounded-top text-center pt-3 pb-2">
-    <div class="row">
-        <div class="col">
-            <h5>Funcionário: @Model.BiweeklyRecord.EmployeeName</h5>
+            <div class="p-2 bg-white rounded d-flex flex-lg-row flex-md-wrap justify-content-evenly w-30rem mb-3">
+                <div class="">
+                    <small class="text-secondary">Usuário</small><br />
+                    @Model.BiweeklyRecord.UserEmail
+                </div>
+                <div class="linha d-lg-flex d-none"></div>
+                <div class="">
+                    <small class="text-secondary">Período</small><br />
+                    @Model.BiweeklyRecord.StartDate.ToString("dd/MM/yyyy") - @Model.BiweeklyRecord.EndDate.ToString("dd/MM/yyyy")
+                </div>
+                <div class="linha d-lg-flex d-none"></div>
+                <div class="">
+                    <small class="text-secondary">Total de horas</small><br />
+                    @Model.BiweeklyRecord.TotalHours
+                </div>
+            </div>
+
         </div>
-        <div class="col">
-            <h5>Período: @Model.BiweeklyRecord.StartDate.ToString("dd/MM/yyyy") - @Model.BiweeklyRecord.EndDate.ToString("dd/MM/yyyy")</h5>
-        </div>
-        <div class="col">
-            <h5>Total de Horas: @Model.BiweeklyRecord.TotalHours</h5>
+        <div class="col my-3 d-flex justify-content-end">
+            <a class="btn btn-primary" asp-action="Index">Download</a>
         </div>
     </div>
 </div>
-<div class="bg-white container rounded-bottom table-responsive">
-    
-    <table class="table text-center align-middle">
-        <thead>
-            <tr>
-                <th>Data</th>
-                <th>Horas</th>
-                <th>WBS</th>
-            </tr>
-        </thead>
-        <tbody class="table-group-divider">
-            @foreach (var detail in Model.RecordDetails)
-            {
-                if (detail.Record.Hours > 0)
+
+<img class="position-absolute object-fit-cover w-100 h-20rem top-0 z-n1" src="~/img/ArtHz.jpg" alt="Arte ilustrativa" />
+
+<div class="container">
+    <div class="scroll bg-white container rounded table-responsive max-h-20rem overflow-y-scroll">
+        <table class="table text-center align-middle">
+            <thead>
+                <tr>
+                    <th>Data</th>
+                    <th>Horas</th>
+                    <th>WBS</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var detail in Model.RecordDetails)
                 {
-                    <tr>
-                        <td>@detail.Record.Data.ToString("dd/MM/yyyy")</td>
-                        <td>@detail.Record.Hours</td>
-                        <td>@detail.WBS?.Code - @detail.WBS?.Desc</td>
-                    </tr>
+                    if (detail.Record.Hours > 0)
+                    {
+                        <tr>
+                            <td>@detail.Record.Data.ToString("dd/MM/yyyy")</td>
+                            <td>@detail.Record.Hours</td>
+                            <td>@detail.WBS?.Code - @detail.WBS?.Desc</td>
+                        </tr>
+                    }
                 }
-            }
-        </tbody>
-    </table>
+            </tbody>
+        </table>
+    </div>
 </div>

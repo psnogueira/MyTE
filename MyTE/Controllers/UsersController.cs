@@ -175,6 +175,7 @@ public class UsersController : Controller
             var user = await _userManager.FindByIdAsync(model.Id);
             if (user != null)
             {
+                var oldEmail = user.Email;
                 user.Email = model.Email;
                 user.UserName = model.Email; // Certifique-se de que o UserName é atualizado também
                 user.FirstName = model.FirstName;
@@ -187,6 +188,33 @@ public class UsersController : Controller
                 var result = await _userManager.UpdateAsync(user);
                 if (result.Succeeded)
                 {
+                    var currentRole = await _userManager.GetRolesAsync(user);
+                        var removeRole = await _userManager.RemoveFromRolesAsync(user, currentRole);
+                   if(!removeRole.Succeeded)
+                    {
+                        foreach(var error in removeRole.Errors)
+                        {
+                            ModelState.AddModelError(string.Empty, error.Description);
+                        }
+                        return View(model);
+                    }
+
+                    var role = await _roleManager.FindByIdAsync(model.RoleId);
+                    if (role != null)
+                    {
+                        var addRole = await _userManager.AddToRoleAsync(user, role.Name);
+                        if (!addRole.Succeeded)
+                        {
+                            foreach (var error in removeRole.Errors)
+                            {
+                                ModelState.AddModelError(string.Empty, error.Description);
+                            }
+                            return View(model);
+                        }
+                    }
+
+                    await UpdateRecordsEmailAndName(oldEmail, user.Email, user.FullName); // Atualiza nome/email no registro dos records
+
                     TempData["SuccessMessage2"] = "Usuário editado com sucesso!";
                     return RedirectToAction(nameof(Index));
                 }
@@ -254,5 +282,19 @@ public class UsersController : Controller
         return pid.ToUpper();
     }
 
+    private async Task UpdateRecordsEmailAndName(string oldEmail, string newEmail, string newName)
+    {
+        var biweeklyRecords = await _context.BiweeklyRecords
+            .Where(b => b.UserEmail == oldEmail)
+            .ToListAsync();
 
+        foreach (var record in biweeklyRecords)
+        {
+            record.UserEmail = newEmail;
+            record.EmployeeName = newName;
+        }
+
+        _context.BiweeklyRecords.UpdateRange(biweeklyRecords);
+        await _context.SaveChangesAsync();
+    }
 }

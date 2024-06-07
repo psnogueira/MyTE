@@ -31,6 +31,22 @@ btn-orange {
     font-weight: bold;
 }
 
-.createImage {
-    height: calc(100vh - 57px); /* Ajuste 56px para a altura real do seu menu */
+.linha {
+    height: 50px;
+    border: .5px solid #EDF1F6;
+}
+
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    background-color: #8C8C8F;
 }

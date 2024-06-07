@@ -3,21 +3,21 @@
 
 @{
     ViewData["Title"] = "Editar";
-    Layout = "~/Views/Shared/_LayoutRegister.cshtml";
 }
 
-<div class="d-flex flex-wrap justify-content-between">
-    <div class="col-md-5 h-100 mx-auto">
-        <a class=" d-flex align-items-center gap-1 text-primary fs-5 text-decoration-none position-relative" asp-action="Index">
+
+<div class="d-flex justify-content-between align-items-center position-relative">
+    <div class="col-md-5 d-flex flex-column justify-content-evenly ">
+        <a class="position-absolute top-0 mt-2 start-0 d-flex align-items-center gap-1 text-primary fs-5 text-decoration-none" asp-action="Index">
             <i class="bi bi-arrow-left-short fs-3"></i>Voltar
         </a>
-        <h1 class="mb-3 text-primary fw-bold">Editar Nível de Acesso: @Model.Name</h1>
+        <h1 class="mb-3 text-primary fw-bold">Editar Nível de Acesso</h1>
         <form asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Id" />
             <div class="form-floating mb-3">
                 <input asp-for="Name" class="form-control" placeholder="nome" />
-                <label asp-for="Name" class="form-label text-secondary"></label>
+                <label asp-for="Name" class="form-label text-secondary">Nome</label>
                 <span asp-validation-for="Name" class="text-danger"></span>
             </div>
             <div class="form-group">
@@ -26,8 +26,8 @@
         </form>
     </div>
 
-    <div class="col-md-6 d-none d-md-block">
-        <img class=" createImage w-100" src="~/img/artSq.jpg" alt="Arte decorativa" />
+    <div class="col-md-6">
+        <img class=" w-100" src="~/img/artSq.jpg" alt="Arte decorativa" />
     </div>
 </div>
 

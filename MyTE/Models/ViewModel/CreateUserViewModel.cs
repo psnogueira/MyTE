@@ -10,13 +10,13 @@ public class CreateUserViewModel
 
     [Required(ErrorMessage = "O nome do funcionário é obrigatório.")]
     [StringLength(50, ErrorMessage = "O nome do funcionário deve ter no máximo 50 caracteres.")]
-    [RegularExpression(@"^[a-zA-Z\s]*$", ErrorMessage = "O Nome não deve conter números ou caracteres especiais.")]
+    [RegularExpression(@"^[a-zA-ZÀ-ÿ\s-]*$", ErrorMessage = "O Nome não deve conter números ou caracteres especiais.")]
     [Display(Name = "Nome")]
     public string? FirstName { get; set; }
 
     [Required(ErrorMessage = "O sobrenome do funcionário é obrigatório")]
     [MaxLength(50, ErrorMessage = "O sobrenome do funcionário deve ter até 50 caracteres")]
-    [RegularExpression(@"^[a-zA-Z\s]*$", ErrorMessage = "O Sobrenome não deve conter números ou caracteres especiais.")]
+    [RegularExpression(@"^[a-zA-ZÀ-ÿ\s-]*$", ErrorMessage = "O Sobrenome não deve conter números ou caracteres especiais.")]
     [Display(Name = "Sobrenome")]
     public string? LastName { get; set; }
 

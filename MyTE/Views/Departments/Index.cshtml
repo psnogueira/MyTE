@@ -39,11 +39,10 @@
 
 <div class="container mt-3">
     <h1 class="fw-bold display-2 text-white mb-3">@ViewData["Title"]</h1>
-    
-    <div class="d-flex align-items-center justify-content-between my-3">
-        <form asp-action="Index" method="get">
-            <div class="form-actions input-group w-20rem">
-                <input type="text" class="form-control" name="SearchString" value="@ViewData["CurrentFilter"]" placeholder="Buscar por nome" id="autoComplete" data-table="Department" data-column1="Name" data-column2="" />
+    <div class="row my-3">
+        <form class="col-5" asp-action="Index" method="get">
+            <div class="form-actions input-group">
+                <input type="text" class="form-control" name="SearchString" value="@ViewData["CurrentFilter"]" placeholder="Buscar por nome ou ID" id="autoComplete" data-table="Department" data-column1="DepartmentId" data-column2="Name" />
                 <input class="btn btn-outline-primary" type="submit" value="Procurar" />
                 <a class="btn btn-outline-primary align-content-center" asp-action="Index">Lista completa</a>
             </div>
@@ -51,118 +50,119 @@
         <div class="col d-flex justify-content-end">
             <a asp-action="Create" class="btn btn-primary"><i class="bi bi-plus-lg"></i> Novo departamento</a>
         </div>
-
-        @* <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#create">
-        <i class="bi bi-plus-lg"></i> Novo departamento
-        </button> *@
     </div>
 </div>
 
 <img class="position-absolute object-fit-cover w-100 h-20rem top-0 z-n1" src="~/img/ArtHz.jpg" alt="Arte ilustrativa" />
 
-<div class="bg-white container rounded table-responsive">
-    <table class="table text-center align-middle">
-        <thead>
-            <tr>
-                <th>
-                    @Html.DisplayNameFor(model => model.Department.Name)
-                </th>
-                <th class="col-4">Ações</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model.DepartmentList)
-            {
+<div class="container">
+    <div class="bg-white container rounded table-responsive">
+        <table class="table text-center align-middle">
+            <thead>
                 <tr>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Name)
-                    </td>
-                    <td>
-                        <a class="text-primary fs-5" asp-action="Edit" asp-route-id="@item.DepartmentId"><i class="bi bi-pen"></i></a>
-
-                        @* <a class="text-primary fs-5 mx-2" asp-action="Details" asp-route-id="@item.DepartmentId"><i class="bi bi-info-circle"></i></a> *@
-                        <a type="button" class="text-primary fs-5 mx-2" data-bs-toggle="modal" data-bs-target="#detail-@item.DepartmentId" data-task-id="@item.DepartmentId">
-                            <i class="bi bi-info-circle"></i>
-                        </a>
-
-                        @*  <a class="text-primary fs-5" asp-action="Delete" asp-route-id="@item.DepartmentId"><i class="bi bi-trash3"></i></a> *@
-                        <a type="button" class="text-primary fs-5" data-bs-toggle="modal" data-bs-target="#delete-@item.DepartmentId" data-task-id="@item.DepartmentId">
-                            <i class="bi bi-trash3"></i>
-                        </a>
-                    </td>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Department.DepartmentId)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Department.Name)
+                    </th>
+                    <th class="col-4">Ações</th>
                 </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.DepartmentList)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.DepartmentId)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Name)
+                        </td>
+                        <td>
+                            <a class="text-primary fs-5" asp-action="Edit" asp-route-id="@item.DepartmentId"><i class="bi bi-pen"></i></a>
 
-                @* Detail Modal *@
-                <div class="modal fade" id="detail-@item.DepartmentId" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                    <div class="modal-dialog modal-dialog-centered">
-                        <div class="modal-content">
-                            <div class="modal-header d-flex flex-column border-none align-items-start">
-                                <span class="d-flex w-100 align-items-center">
-                                    <h3 class="text-primary fw-bold ">Detalhes do departamento</h3>
+                            @* <a class="text-primary fs-5 mx-2" asp-action="Details" asp-route-id="@item.DepartmentId"><i class="bi bi-info-circle"></i></a> *@
+                            <a type="button" class="text-primary fs-5 mx-2" data-bs-toggle="modal" data-bs-target="#detail-@item.DepartmentId" data-task-id="@item.DepartmentId">
+                                <i class="bi bi-info-circle"></i>
+                            </a>
+
+                            @*  <a class="text-primary fs-5" asp-action="Delete" asp-route-id="@item.DepartmentId"><i class="bi bi-trash3"></i></a> *@
+                            <a type="button" class="text-primary fs-5" data-bs-toggle="modal" data-bs-target="#delete-@item.DepartmentId" data-task-id="@item.DepartmentId">
+                                <i class="bi bi-trash3"></i>
+                            </a>
+                        </td>
+                    </tr>
+
+                    @* Detail Modal *@
+                    <div class="modal fade" id="detail-@item.DepartmentId" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content">
+                                <div class="modal-header d-flex flex-column border-none align-items-start">
+                                    <span class="d-flex w-100 align-items-center">
+                                        <h3 class="text-primary fw-bold ">Detalhes do departamento</h3>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </span>
+                                </div>
+                                <div class="modal-body">
+                                    <dl class="row">
+                                        <dt class="col-sm-2">
+                                            @Html.DisplayNameFor(model => model.Department.DepartmentId)
+                                        </dt>
+                                        <dd class="col-sm-10">
+                                            @Html.DisplayFor(modelItem => item.DepartmentId)
+                                        </dd>
+                                        <dt class="col-sm-2">
+                                            @Html.DisplayNameFor(model => model.Department.Name)
+                                        </dt>
+                                        <dd class="col-sm-10">
+                                            @Html.DisplayFor(modelItem => item.Name)
+                                        </dd>
+                                    </dl>
+                                </div>
+                                <div class="modal-footer">
+                                    <a type="button" class="btn btn-lg btn-primary w-100 fw-bold" asp-action="Edit" asp-route-id="@item.DepartmentId">Editar</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    @* Delete Modal *@
+                    <div class="modal fade" id="delete-@item.DepartmentId" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content">
+                                <div class="modal-header align-items-center ">
+                                    <h3 class="text-primary fw-bold ">Deletar departamento</h3>
                                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                </span>
-                            </div>
-                            <div class="modal-body">
-                                <dl class="row">
-                                    <dt class="col-sm-2">
-                                        @Html.DisplayNameFor(model => model.Department.DepartmentId)
-                                    </dt>
-                                    <dd class="col-sm-10">
-                                        @Html.DisplayFor(modelItem => item.DepartmentId)
-                                    </dd>
-                                    <dt class="col-sm-2">
-                                        @Html.DisplayNameFor(model => model.Department.Name)
-                                    </dt>
-                                    <dd class="col-sm-10">
-                                        @Html.DisplayFor(modelItem => item.Name)
-                                    </dd>
-                                </dl>
-                            </div>
-                            <div class="modal-footer">
-                                <a type="button" class="btn btn-lg btn-primary w-100 fw-bold" asp-action="Edit" asp-route-id="@item.DepartmentId">Editar</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-
-
-
-                @* Delete Modal *@
-                <div class="modal fade" id="delete-@item.DepartmentId" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                    <div class="modal-dialog modal-dialog-centered">
-                        <div class="modal-content">
-                            <div class="modal-header align-items-center ">
-                                <h3 class="text-primary fw-bold ">Deletar departamento</h3>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body">
-                                <h4>Tem certeza de que deseja deletar?</h4>
-                                <p class="lh-1 mb-4 text-danger">*Esta operação não poderá ser desfeita*</p>
-                                <dl class="row">
-                                    <dt class="col-sm-2">
-                                        @Html.DisplayNameFor(model => model.Department.DepartmentId)
-                                    </dt>
-                                    <dd class="col-sm-10">
-                                        @Html.DisplayFor(modelItem => item.DepartmentId)
-                                    </dd>
-                                    <dt class="col-sm-2">
-                                        @Html.DisplayNameFor(model => model.Department.Name)
-                                    </dt>
-                                    <dd class="col-sm-10">
-                                        @Html.DisplayFor(modelItem => item.Name)
-                                    </dd>
-                                </dl>
-                            </div>
-                            <div class="modal-footer">
-                                <a type="button" class="btn btn-lg btn-danger w-100 fw-bold" asp-action="Delete" asp-route-id="@item.DepartmentId">Deletar</a>
+                                </div>
+                                <div class="modal-body">
+                                    <h4>Tem certeza de que deseja deletar?</h4>
+                                    <p class="lh-1 mb-4 text-danger">*Esta operação não poderá ser desfeita*</p>
+                                    <dl class="row">
+                                        <dt class="col-sm-2">
+                                            @Html.DisplayNameFor(model => model.Department.DepartmentId)
+                                        </dt>
+                                        <dd class="col-sm-10">
+                                            @Html.DisplayFor(modelItem => item.DepartmentId)
+                                        </dd>
+                                        <dt class="col-sm-2">
+                                            @Html.DisplayNameFor(model => model.Department.Name)
+                                        </dt>
+                                        <dd class="col-sm-10">
+                                            @Html.DisplayFor(modelItem => item.Name)
+                                        </dd>
+                                    </dl>
+                                </div>
+                                <div class="modal-footer">
+                                    <a type="button" class="btn btn-lg btn-danger w-100 fw-bold" asp-action="Delete" asp-route-id="@item.DepartmentId">Deletar</a>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            }
-        </tbody>
-    </table>
+                }
+            </tbody>
+        </table>
+    </div>
 </div>
 
 <nav aria-label="Page navigation example" class="container mt-4">
@@ -182,30 +182,6 @@
     </ul>
 </nav>
 
-@* <div class="modal fade" id="create" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h1 class="modal-title text-primary fs-3" id="exampleModalLabel">Criar novo departamento</h1>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form asp-action="Create">
-                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                    <div class="form-floating mb-3">
-                        <input asp-for="Department.Name" class="form-control" placeholder="code" />
-                        <label asp-for="Department.Name" class="form-label text-secondary"></label>
-                        <span asp-validation-for="Department.Name" class="text-danger"></span>
-                    </div>
-                    <div class="form-group">
-                        <input type="submit" value="Criar" class="btn btn-lg btn-primary w-100 fw-bold" />
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-*@
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
