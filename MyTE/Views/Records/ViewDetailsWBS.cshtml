@@ -8,29 +8,34 @@
             <i class="bi bi-arrow-left-short fs-3"></i>Voltar
         </a>
         <h1 class="fw-bold display-2 text-white">@ViewData["Title"]</h1>
-        @{
-            if (ViewBag.IsEmpty)
-            {
-                <h3 class="fw-bold text-white mb-3">Ainda não há nenhum registro de horas nesta WBS!</h3>
-            }
-        }
     </div>
-    <div class="my-3">
-        <a class="btn btn-success align-content-end " asp-action="Index">Gerar CSV</a>
-    </div>
+    @if (ViewBag.IsEmpty)
+    {
+        <div class="my-3">
+            <form asp-action="ExportWBSDetails" asp-route-id="@ViewBag.WBS.WBSId">
+                <button type="submit" class="btn btn-success" disabled>Gerar CSV</button>
+            </form>
+        </div>
+    }
+    else
+    {
+       <div class="my-3">
+            <form asp-action="ExportWBSDetails" asp-route-id="@ViewBag.WBS.WBSId">
+                <button type="submit" class="btn btn-success">Gerar CSV</button>
+           </form>
+       </div>
+        
+    }
 </div>
 <img class="position-absolute object-fit-cover w-100 h-50 top-0 z-n1" src="~/img/ArtHz.jpg" alt="Arte ilustrativa" />
 
-@if (!ViewBag.IsEmpty)
-{
-    <div class="bg-white container rounded-top text-center pt-3 pb-2">
-        <div class="row">
-            <div class="col">
-                <h5>WBS: @ViewBag.WBS.Desc</h5>
-            </div>
+<div class="bg-white container rounded-top text-center pt-3 pb-2">
+    <div class="row">
+        <div class="col">
+            <h5>WBS: @ViewBag.WBS.Desc</h5>
         </div>
     </div>
-}
+</div>
 
 <div class="bg-white container rounded-bottom table-responsive">
     <table class="table text-center align-middle">
@@ -46,7 +51,15 @@
                 if (ViewBag.IsEmpty)
                 {
                     <tr>
-                        <td colspan="5">Nenhum Registro encontrado ):</td>
+                        <td colspan="5"></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td colspan="5">Ainda não há nenhum registro de horas nesta WBS!</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td colspan="5"></td>
                         <td></td>
                     </tr>
                 }

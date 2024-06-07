@@ -403,6 +403,8 @@ namespace MyTE.Controllers
                 .Include(b => b.Records)
                 .FirstOrDefaultAsync(b => b.BiweeklyRecordId == id);
 
+            ViewBag.RecordId = id;
+
             if (biweeklyRecord == null)
             {
                 return NotFound();
@@ -537,6 +539,9 @@ namespace MyTE.Controllers
                     b.EndDate
                 }).Distinct().ToList();
 
+                // Ordena a lista de quinzenas em ordem decrescente.
+                biweeklyRecordsDistinct = biweeklyRecordsDistinct.OrderByDescending(b => b.StartDate).ToList();
+
                 // Array contendo a data mais antiga e a data mais recente.
                 var dateRange = new DateTime[] { biweeklyRecordsDistinct.Min(b => b.StartDate), biweeklyRecordsDistinct.Max(b => b.EndDate) };
 
@@ -573,6 +578,7 @@ namespace MyTE.Controllers
             return View();
         }
 
+        [Authorize(Policy = "RequerPerfilAdmin")]
         [HttpPost]
         public async Task<IActionResult> ExportWBS()
         {
@@ -647,38 +653,49 @@ namespace MyTE.Controllers
 
         [Authorize(Policy = "RequerPerfilAdmin")]
         [HttpPost]
-        public async Task<IActionResult> ExportEmployees()
+        public async Task<IActionResult> ExportWBSDetails(int id)
         {
-            // Consulta LINQ para obter os registros de horas dos funcionários.
-            var employeesRecords = await _context.BiweeklyRecords
+            // WBS selecionada.
+            var wbs = await _context.WBS.FindAsync(id);
+
+            // Lista de todas as quinzenas que possuem registros para a WBS selecionada.
+            var biweeklyRecords = await _context.BiweeklyRecords
                 .Include(b => b.Records)
-                .Include(b => b.Department)
+                .Where(b => b.Records.Any(r => r.WBSId == id))
                 .ToListAsync();
 
-            // Lista combinada com os registros de horas dos funcionários.
-            var listaCombinada = employeesRecords.SelectMany(b => b.Records.Select(r => new
+            if (wbs == null || biweeklyRecords.Count <= 0)
             {
-                EmployeeName = b.EmployeeName,
-                Department = b.Department.Name,
-                StartDate = b.StartDate,
-                EndDate = b.EndDate,
-                Date = r.Data,
-                Hours = r.Hours,
-                WBS = _context.WBS.FirstOrDefault(w => w.WBSId == r.WBSId).Code
-            })).ToList();
+                return NotFound();
+            }
+
+            // Lista de todas as quinzenas diferentes em biweeklyRecords.
+            var biweeklyRecordsDistinct = biweeklyRecords.Select(b => new
+            {
+                b.StartDate,
+                b.EndDate
+            }).Distinct().ToList();
+
+            // Ordena a lista de quinzenas em ordem decrescente.
+            biweeklyRecordsDistinct = biweeklyRecordsDistinct.OrderByDescending(b => b.StartDate).ToList();
+
+            // Lista de todos os registros de horas em biweeklyRecords.
+            var records = biweeklyRecords.SelectMany(b => b.Records).Where(r => r.WBSId == id).ToList();
+
+            // Lista para armazenar as quinzenas e a soma das horas de cada uma.
+            var listaCombinada = biweeklyRecordsDistinct.Select(b => new
+            {
+                Quinzena = $"{b.StartDate:dd/MM/yyyy} - {b.EndDate:dd/MM/yyyy}",
+                TotalHoras = records.Where(r => r.Data >= b.StartDate && r.Data <= b.EndDate).Sum(r => r.Hours)
+            }).ToList();
 
             // Configuração do arquivo CSV para download.
-            var fileName = $"Relatorio_NomeFuncionario_Quinzena.csv";
+            var fileName = $"Relatorio_{wbs.Desc}_{DateTime.Today.ToString("dd/MM/yyyy")}.csv";
             var contentType = "text/csv";
             var columnNames = new List<string>
             {
-                "Nome do Funcionário",
-                "Departamento",
-                "Data Inicial",
-                "Data Final",
-                "Data",
-                "Horas",
-                "WBS"
+                "Quinzena",
+                "Total de Horas"
             };
 
             // Escrever os dados em um arquivo CSV.
@@ -687,5 +704,92 @@ namespace MyTE.Controllers
             // Retornar o arquivo CSV para download.
             return File(csvData, contentType, fileName);
         }
+
+        [Authorize(Policy = "RequerPerfilAdmin")]
+        [HttpPost]
+        public async Task<IActionResult> ExportEmployees()
+        {
+            // Consulta LINQ para obter os registros de horas dos funcionários.
+            var employeesRecords = await _context.BiweeklyRecords
+                .Include(b => b.Department)
+                .OrderByDescending(r => r.StartDate)
+                .ToListAsync();
+
+            // Lista contendo os dados de employeesRecords mais o PID do funcionário.
+            var listaCombinada = employeesRecords.Select(b => new
+            {
+                Id = b.BiweeklyRecordId,
+                PID = _context.Users.FirstOrDefault(u => u.Email == b.UserEmail).PID,
+                EmployeeName = b.EmployeeName,
+                Email = b.UserEmail,
+                Department = b.Department.Name,
+                StartDate = b.StartDate.ToString("dd/MM/yyyy"),
+                EndDate = b.EndDate.ToString("dd/MM/yyyy"),
+                TotalHours = b.TotalHours
+            }).ToList();
+
+            // Configuração do arquivo CSV para download.
+            var fileName = $"Relatorio_NomeFuncionario_Quinzena.csv";
+            var contentType = "text/csv";
+            var columnNames = new List<string>
+            {
+                "Id",
+                "PID",
+                "Nome",
+                "Email",
+                "Departamento",
+                "Data Inicial",
+                "Data Final",
+                "Total de Horas",
+            };
+
+            // Escrever os dados em um arquivo CSV.
+            var csvData = _csvService.WriteCSV(listaCombinada, columnNames);
+
+            // Retornar o arquivo CSV para download.
+            return File(csvData, contentType, fileName);
+        }
+
+        [Authorize(Policy = "RequerPerfilAdmin")]
+        [HttpPost]
+        public async Task<IActionResult> ExportEmployeeDetail(int id)
+        {
+            // Registo de horas do funcionário selecionado.
+            var employeeRecord = await _context.BiweeklyRecords
+                .Include(b => b.Records)
+                .Include(b => b.Department)
+                .FirstOrDefaultAsync(b => b.BiweeklyRecordId == id);
+
+
+            if (employeeRecord == null) return NotFound();
+
+            // Lista dos registros de horas do funcionário.
+            var records = employeeRecord.Records.Select(r => new
+            {
+                WBS = _context.WBS.FirstOrDefault(w => w.WBSId == r.WBSId).Code,
+                Desc = _context.WBS.FirstOrDefault(w => w.WBSId == r.WBSId).Desc,
+                Data = r.Data.ToString("dd/MM/yyyy"),
+                Horas = r.Hours,
+                
+            }).ToList();
+
+            // Configuração do arquivo CSV para download.
+            var fileName = $"Relatorio_{employeeRecord.EmployeeName}_Q{employeeRecord.StartDate.ToString("dd/MM/yyyy")}.csv";
+            var contentType = "text/csv";
+            var columnNames = new List<string>
+            {
+                "Código",
+                "WBS",
+                "Data",
+                "Horas"
+            };
+
+            // Escrever os dados em um arquivo CSV.
+            var csvData = _csvService.WriteCSV(records, columnNames);
+
+            // Retornar o arquivo CSV para download.
+            return File(csvData, contentType, fileName);
+        }
+        
     }
 }

@@ -12,7 +12,9 @@
         <h1 class="fw-bold display-2 text-white">@ViewData["Title"]</h1>
     </div>
     <div class="my-3">
-        <a class="btn btn-success align-content-end " asp-action="Index">Gerar CSV</a>
+        <form asp-action="ExportEmployeeDetail" asp-route-id="@ViewBag.RecordId">
+            <button type="submit" class="btn btn-success">Gerar CSV</button>
+        </form>
     </div>
 </div>
 <img class="position-absolute object-fit-cover w-100 h-50 top-0 z-n1" src="~/img/ArtHz.jpg" alt="Arte ilustrativa" />
