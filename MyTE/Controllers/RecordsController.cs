@@ -337,7 +337,7 @@ namespace MyTE.Controllers
         [Authorize(Policy = "RequerPerfilAdmin")]
         public async Task<IActionResult> AdminView(string searchString, DateTime? startDate, DateTime? endDate,int? pageNumber, int? departmentType)
         {
-            var pageSize = 5;
+            var pageSize = 10;
             ViewData["CurrentFilter"] = searchString;
             ViewData["CurrentStartDate"] = startDate?.ToString("yyyy-MM-dd");
             ViewData["CurrentEndDate"] = endDate?.ToString("yyyy-MM-dd");
@@ -430,7 +430,7 @@ namespace MyTE.Controllers
         [Authorize(Policy = "RequerPerfilAdmin")]
         public async Task<IActionResult> AdminViewWBS(string searchString, int? pageNumber, WBSType? wbsType)
         {
-            int pageSize = 5;
+            int pageSize = 10;
             ViewData["CurrentFilter"] = searchString;
             var wbs = from s in _context.WBS
                       select s;
